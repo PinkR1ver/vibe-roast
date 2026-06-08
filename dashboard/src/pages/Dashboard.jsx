@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useApi } from "../hooks/useApi.jsx";
 import { Badge } from "../ui";
 import WordCloud from "../components/WordCloud.jsx";
-import ActivityHeatmap from "../components/ActivityHeatmap.jsx";
+import ActivityHeatmap3D from "../components/ActivityHeatmap3D.jsx";
 
 const CAT_LABEL = {
   planning: "Planning", debugging: "Debugging", implementation: "Implementation",
@@ -55,8 +55,8 @@ export default function Dashboard() {
 
   return (
     <div className="animate-fade-in h-[calc(100vh-49px)] flex flex-col bg-oai-gray-950 overflow-hidden">
-      {/* ═══ TOP ROW: 3-column grid ═══ */}
-      <div className="flex-1 grid grid-cols-3 gap-0 min-h-0">
+      {/* ═══ TOP ROW: 1 + 2 + 1 column grid ═══ */}
+      <div className="flex-1 grid grid-cols-[1fr_2fr_1fr] gap-0 min-h-0">
         {/* ── Col 1: Personality ── */}
         <div className="flex flex-col items-center justify-center p-6 border-r border-oai-gray-900 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-4">
@@ -79,24 +79,21 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── Col 2: Activity ── */}
+        {/* ── Col 2: 3D Activity Map (wider) ── */}
         <div className="flex flex-col justify-center p-6 border-r border-oai-gray-900 overflow-hidden">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
             Your Rhythm
           </p>
-          <h2 className="text-h4 text-white mb-1">Activity Map</h2>
-          <p className="text-caption text-oai-gray-500 mb-4">Each cell is a day. Greener = more prompts.</p>
-          <div className="overflow-x-auto">
-            <ActivityHeatmap prompts={prompts || []} weeks={26} dark />
+          <h2 className="text-h4 text-white mb-1">3D Activity Map</h2>
+          <p className="text-caption text-oai-gray-500 mb-4">
+            Drag to rotate. Green=Codex, Amber=Claude, Blue=Cursor. Height = prompts.
+          </p>
+          <div className="flex-1 min-h-0">
+            <ActivityHeatmap3D prompts={prompts || []} weeks={20} />
           </div>
-          {summary?.first_prompt_at && (
-            <p className="text-[10px] text-oai-gray-600 mt-3 text-center">
-              {summary.first_prompt_at} → {summary.last_prompt_at}
-            </p>
-          )}
         </div>
 
-        {/* ── Col 3: Categories + Word Cloud ── */}
+        {/* ── Col 3: Categories ── */}
         <div className="flex flex-col justify-center p-6 overflow-hidden">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
             Your DNA
@@ -124,7 +121,7 @@ export default function Dashboard() {
           {/* Word Cloud (compact) */}
           {word_frequencies && word_frequencies.length > 0 && (
             <div className="flex-1 flex items-center justify-center min-h-0">
-              <WordCloud words={word_frequencies} width={340} height={220} />
+              <WordCloud words={word_frequencies} width={280} height={200} />
             </div>
           )}
         </div>
