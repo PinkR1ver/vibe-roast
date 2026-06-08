@@ -28,7 +28,7 @@ export function useApi() {
 
 export function SkeletonCard({ className = "" }) {
   return (
-    <div className={`rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 ${className}`}>
+    <div className={`rounded-xl border border-oai-gray-200 dark:border-oai-gray-800 bg-white dark:bg-oai-gray-900 p-5 ${className}`}>
       <div className="skeleton h-5 w-1/3 mb-4" />
       <div className="skeleton h-4 w-full mb-2" />
       <div className="skeleton h-4 w-2/3 mb-2" />

@@ -24,8 +24,8 @@ export default function PromptAnalysis() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-h1 text-neutral-950 dark:text-neutral-50">Prompt Analysis</h1>
-        <p className="text-body-sm text-neutral-500 mt-1">
+        <h1 className="text-h2 text-oai-black dark:text-oai-white">Prompt Analysis</h1>
+        <p className="text-body-sm text-oai-gray-500 mt-1">
           Classification of {pa.total_prompts?.toLocaleString() || 0} prompts
         </p>
       </div>
@@ -36,15 +36,15 @@ export default function PromptAnalysis() {
           <div className="text-hero tabular-nums text-brand-600 dark:text-brand-400">
             {((pa.useful_ratio || 0) * 100).toFixed(0)}%
           </div>
-          <div className="text-label uppercase text-neutral-500 dark:text-neutral-400 mt-1">Useful Ratio</div>
+          <div className="text-label uppercase text-oai-gray-500 dark:text-oai-gray-400 mt-1">Useful Ratio</div>
         </Card>
         <Card className="md:col-span-2 flex items-center">
           <div className="w-full">
             <div className="flex justify-between text-body-sm mb-2">
-              <span className="text-neutral-700 dark:text-neutral-300">
+              <span className="text-oai-gray-700 dark:text-oai-gray-300">
                 <Badge variant="success">Useful</Badge> {pa.useful_prompt_count?.toLocaleString() || 0}
               </span>
-              <span className="text-neutral-700 dark:text-neutral-300">
+              <span className="text-oai-gray-700 dark:text-oai-gray-300">
                 <Badge variant="secondary">Reference</Badge> {pa.reference_prompt_count?.toLocaleString() || 0}
               </span>
             </div>
@@ -54,7 +54,7 @@ export default function PromptAnalysis() {
                 style={{ width: `${Math.max(((pa.useful_ratio || 0) * 100), 1)}%` }}
               />
             </div>
-            <p className="text-caption text-neutral-500 mt-2">
+            <p className="text-caption text-oai-gray-500 mt-2">
               Useful prompts express intent. Reference material is pasted code or logs.
             </p>
           </div>
@@ -69,10 +69,10 @@ export default function PromptAnalysis() {
             return (
               <div key={name}>
                 <div className="flex items-center justify-between text-body-sm mb-1.5">
-                  <span className="text-neutral-700 dark:text-neutral-300 font-medium capitalize">
+                  <span className="text-oai-gray-700 dark:text-oai-gray-300 font-medium capitalize">
                     {CATEGORY_LABELS[name] || name}
                   </span>
-                  <span className="text-neutral-500 tabular-nums">{row.count}</span>
+                  <span className="text-oai-gray-500 tabular-nums">{row.count}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex-1 progress-bar">
@@ -83,7 +83,7 @@ export default function PromptAnalysis() {
                   </div>
                 </div>
                 {row.examples?.length > 0 && (
-                  <p className="text-caption text-neutral-400 mt-1 truncate">&ldquo;{row.examples[0]?.text}&rdquo;</p>
+                  <p className="text-caption text-oai-gray-400 mt-1 truncate">&ldquo;{row.examples[0]?.text}&rdquo;</p>
                 )}
               </div>
             );
@@ -96,13 +96,13 @@ export default function PromptAnalysis() {
         <Card title="Useful Prompt Examples" subtitle={`Showing ${pa.useful_prompts.length} of ${pa.useful_prompt_count || 0}`}>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {pa.useful_prompts.slice(0, 20).map((p, i) => (
-              <div key={i} className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800">
+              <div key={i} className="p-4 rounded-lg bg-oai-gray-50 dark:bg-oai-gray-800/50 border border-oai-gray-100 dark:border-oai-gray-800">
                 <div className="flex items-center gap-2 mb-1.5">
                   <Badge variant="info" className="text-[10px]">{p.source}</Badge>
                   <Badge className="text-[10px]">{CATEGORY_LABELS[p.category] || p.category}</Badge>
-                  {p.timestamp && <span className="text-caption text-neutral-400 ml-auto">{p.timestamp}</span>}
+                  {p.timestamp && <span className="text-caption text-oai-gray-400 ml-auto">{p.timestamp}</span>}
                 </div>
-                <p className="text-body-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap line-clamp-3">
+                <p className="text-body-sm text-oai-gray-700 dark:text-oai-gray-300 whitespace-pre-wrap line-clamp-3">
                   {p.text}
                 </p>
               </div>
@@ -121,10 +121,10 @@ export default function PromptAnalysis() {
           </div>
           {pa.reference_summary.signals.files?.length > 0 && (
             <div className="mt-6">
-              <h4 className="text-label uppercase text-neutral-500 mb-3">Referenced Files</h4>
+              <h4 className="text-label uppercase text-oai-gray-500 mb-3">Referenced Files</h4>
               <div className="flex flex-wrap gap-2">
                 {pa.reference_summary.signals.files.slice(0, 20).map((f) => (
-                  <code key={f.path} className="px-2 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-body-sm font-mono text-neutral-600 dark:text-neutral-400">
+                  <code key={f.path} className="px-2 py-1 rounded-md bg-oai-gray-100 dark:bg-oai-gray-800 text-body-sm font-mono text-oai-gray-600 dark:text-oai-gray-400">
                     {f.path}
                   </code>
                 ))}
@@ -142,12 +142,12 @@ function SignalList({ title, items }) {
   if (entries.length === 0) return null;
   return (
     <div>
-      <h4 className="text-label uppercase text-neutral-500 mb-3">{title}</h4>
+      <h4 className="text-label uppercase text-oai-gray-500 mb-3">{title}</h4>
       <div className="space-y-2">
         {entries.slice(0, 8).map(([name, count]) => (
           <div key={name} className="flex justify-between items-center">
-            <span className="text-body-sm text-neutral-700 dark:text-neutral-300">{name}</span>
-            <span className="text-caption text-neutral-500 tabular-nums">{count}</span>
+            <span className="text-body-sm text-oai-gray-700 dark:text-oai-gray-300">{name}</span>
+            <span className="text-caption text-oai-gray-500 tabular-nums">{count}</span>
           </div>
         ))}
       </div>
@@ -172,7 +172,7 @@ function ErrorCard({ error }) {
     <Card className="border-red-200 dark:border-red-800">
       <div className="text-center py-8">
         <p className="text-body text-red-600 dark:text-red-400 mb-2">Failed to load data</p>
-        <p className="text-body-sm text-neutral-500">{error}</p>
+        <p className="text-body-sm text-oai-gray-500">{error}</p>
       </div>
     </Card>
   );

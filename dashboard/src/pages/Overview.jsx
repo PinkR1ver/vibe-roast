@@ -37,9 +37,9 @@ export default function Overview() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Hero */}
-      <div>
-        <h1 className="text-h1 text-neutral-950 dark:text-neutral-50">Vibe Profile</h1>
-        <p className="text-body-sm text-neutral-500 mt-1">
+      <div className="mb-1">
+        <h1 className="text-h2 text-oai-black dark:text-oai-white">Vibe Profile</h1>
+        <p className="text-body-sm text-oai-gray-500 mt-1">
           {data.range?.from || "..."} &rarr; {data.range?.to || "..."} &middot;{" "}
           {summary?.source_count || 0} sources
         </p>
@@ -47,21 +47,21 @@ export default function Overview() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="text-center py-6">
-          <div className="text-hero tabular-nums text-brand-600 dark:text-brand-400">{totalPrompts.toLocaleString()}</div>
-          <div className="text-label uppercase text-neutral-500 dark:text-neutral-400 mt-1">Prompts</div>
+        <Card className="text-center py-5">
+          <div className="text-h1 font-semibold tabular-nums text-brand-600 dark:text-brand-400">{totalPrompts.toLocaleString()}</div>
+          <div className="text-label uppercase text-oai-gray-500 dark:text-oai-gray-400 mt-1">Prompts</div>
         </Card>
-        <Card className="text-center py-6">
-          <div className="text-hero tabular-nums text-brand-600 dark:text-brand-400">{summary?.source_count || 0}</div>
-          <div className="text-label uppercase text-neutral-500 dark:text-neutral-400 mt-1">Sources</div>
+        <Card className="text-center py-5">
+          <div className="text-h1 font-semibold tabular-nums text-brand-600 dark:text-brand-400">{summary?.source_count || 0}</div>
+          <div className="text-label uppercase text-oai-gray-500 dark:text-oai-gray-400 mt-1">Sources</div>
         </Card>
-        <Card className="text-center py-6">
-          <div className="text-hero tabular-nums text-brand-600 dark:text-brand-400">{(usefulRatio * 100).toFixed(0)}%</div>
-          <div className="text-label uppercase text-neutral-500 dark:text-neutral-400 mt-1">Useful</div>
+        <Card className="text-center py-5">
+          <div className="text-h1 font-semibold tabular-nums text-brand-600 dark:text-brand-400">{(usefulRatio * 100).toFixed(0)}%</div>
+          <div className="text-label uppercase text-oai-gray-500 dark:text-oai-gray-400 mt-1">Useful</div>
         </Card>
-        <Card className="text-center py-6">
-          <div className="text-hero tabular-nums text-brand-600 dark:text-brand-400">{summary?.files_scanned || 0}</div>
-          <div className="text-label uppercase text-neutral-500 dark:text-neutral-400 mt-1">Files</div>
+        <Card className="text-center py-5">
+          <div className="text-h1 font-semibold tabular-nums text-brand-600 dark:text-brand-400">{summary?.files_scanned || 0}</div>
+          <div className="text-label uppercase text-oai-gray-500 dark:text-oai-gray-400 mt-1">Files</div>
         </Card>
       </div>
 
@@ -74,7 +74,7 @@ export default function Overview() {
               {topCategory ? categoryCode(topCategory[0]) : "--"}
             </div>
             <div>
-              <p className="text-body text-neutral-700 dark:text-neutral-300">
+              <p className="text-body text-oai-gray-700 dark:text-oai-gray-300">
                 {topCategory ? profileDescription(topCategory[0]) : "Not enough data yet"}
               </p>
               {topCategory && (
@@ -97,10 +97,10 @@ export default function Overview() {
                 return (
                   <div key={name}>
                     <div className="flex justify-between text-body-sm mb-1">
-                      <span className="text-neutral-700 dark:text-neutral-300 capitalize">
+                      <span className="text-oai-gray-700 dark:text-oai-gray-300 capitalize">
                         {CATEGORY_LABELS[name] || name}
                       </span>
-                      <span className="text-neutral-500 tabular-nums">{row.count} ({pct}%)</span>
+                      <span className="text-oai-gray-500 tabular-nums">{row.count} ({pct}%)</span>
                     </div>
                     <div className="progress-bar">
                       <div
@@ -128,12 +128,12 @@ export default function Overview() {
           {["codex", "claude", "cursor"].map((source) => {
             const s = data.sources?.[source];
             return (
-              <div key={source} className="p-4 rounded-lg bg-neutral-50 dark:bg-neutral-800/50">
-                <div className="text-label uppercase text-neutral-500 mb-2">{source}</div>
-                <div className="text-h3 tabular-nums text-neutral-900 dark:text-neutral-100">
+              <div key={source} className="p-4 rounded-lg bg-oai-gray-50 dark:bg-oai-gray-800/50">
+                <div className="text-label uppercase text-oai-gray-500 mb-2">{source}</div>
+                <div className="text-h3 tabular-nums text-oai-gray-900 dark:text-oai-gray-100">
                   {s?.prompt_count != null ? s.prompt_count.toLocaleString() : "--"}
                 </div>
-                <div className="text-caption text-neutral-500 mt-1">
+                <div className="text-caption text-oai-gray-500 mt-1">
                   {s?.files_scanned || 0} files &middot;{" "}
                   {s?.token_totals?.total_tokens ? `${s.token_totals.total_tokens.toLocaleString()} tokens` : "no tokens"}
                 </div>
@@ -191,7 +191,7 @@ function ErrorCard({ error }) {
     <Card className="border-red-200 dark:border-red-800">
       <div className="text-center py-8">
         <p className="text-body text-red-600 dark:text-red-400 mb-2">Failed to load data</p>
-        <p className="text-body-sm text-neutral-500">{error}</p>
+        <p className="text-body-sm text-oai-gray-500">{error}</p>
       </div>
     </Card>
   );

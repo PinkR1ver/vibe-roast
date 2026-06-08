@@ -6,6 +6,7 @@
   --brand: #059669;
   --brand-dark: #047857;
   --brand-light: #10b981;
+  --brand-50: #ecfdf5;
 }
 
 html {
@@ -45,7 +46,6 @@ html.dark ::-webkit-scrollbar-thumb { background: #404040; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stagger delays for card animations */
 .stagger-1 { animation-delay: 0.05s; }
 .stagger-2 { animation-delay: 0.1s; }
 .stagger-3 { animation-delay: 0.15s; }
@@ -53,7 +53,7 @@ html.dark ::-webkit-scrollbar-thumb { background: #404040; }
 .stagger-5 { animation-delay: 0.25s; }
 .stagger-6 { animation-delay: 0.3s; }
 
-/* Shimmer skeleton */
+/* Skeleton shimmer */
 .skeleton {
   background: linear-gradient(90deg, #e5e5e5 25%, #f5f5f5 50%, #e5e5e5 75%);
   background-size: 200% 100%;
@@ -67,6 +67,29 @@ html.dark .skeleton {
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Panel — main content wrapper */
+.panel {
+  border-radius: 16px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+html.dark .panel {
+  border-color: #262626;
+  background: linear-gradient(180deg, #1f1f1f, #171717);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Hover lift */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 /* Progress bar */
@@ -97,7 +120,6 @@ html.dark .progress-bar { background: #262626; }
 .cat-workflow { background: #14b8a6; }
 .cat-reference { background: #737373; }
 
-/* Tabular numbers for data alignment */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }

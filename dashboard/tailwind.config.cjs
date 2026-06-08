@@ -70,7 +70,9 @@ module.exports = {
           900: "#064e3b",
           950: "#022c22",
         },
-        neutral: {
+        "oai-black": "#0a0a0a",
+        "oai-white": "#fafafa",
+        "oai-gray": {
           50: "#fafafa",
           100: "#f5f5f5",
           200: "#e5e5e5",
@@ -100,10 +102,10 @@ module.exports = {
         },
       },
       boxShadow: {
-        sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-        DEFAULT: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
-        md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
-        lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+        "oai-sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        oai: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
+        "oai-md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)",
+        "oai-lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
       },
       borderRadius: {
         sm: "4px",

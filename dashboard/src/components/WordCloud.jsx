@@ -49,7 +49,7 @@ export default function WordCloud({ words, width = 600, height = 400, className 
   }, [words, width, height]);
 
   if (!words || words.length === 0) {
-    return <p className="text-body-sm text-neutral-500">No terms to display</p>;
+    return <p className="text-body-sm text-oai-gray-500">No terms to display</p>;
   }
 
   return (
