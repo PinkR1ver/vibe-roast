@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #059669;
+  --brand-dark: #047857;
+  --brand-light: #10b981;
+}
+
+html {
+  background: #fafafa;
+  color: #171717;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
+}
+
+html.dark {
+  background: #0a0a0a;
+  color: #fafafa;
+}
+
+body {
+  margin: 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
+html.dark ::-webkit-scrollbar-thumb { background: #404040; }
+
+/* Animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out both;
+}
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Stagger delays for card animations */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+/* Shimmer skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #e5e5e5 25%, #f5f5f5 50%, #e5e5e5 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+html.dark .skeleton {
+  background: linear-gradient(90deg, #262626 25%, #171717 50%, #262626 75%);
+  background-size: 200% 100%;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e5e5;
+  overflow: hidden;
+}
+html.dark .progress-bar { background: #262626; }
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand);
+  transition: width 0.6s ease-out;
+}
+
+/* Category bar colors */
+.cat-planning { background: #8b5cf6; }
+.cat-debugging { background: #ef4444; }
+.cat-implementation { background: #3b82f6; }
+.cat-refactor { background: #f59e0b; }
+.cat-testing { background: #10b981; }
+.cat-packaging { background: #ec4899; }
+.cat-explanation { background: #06b6d4; }
+.cat-research { background: #6366f1; }
+.cat-ui_design { background: #f97316; }
+.cat-workflow { background: #14b8a6; }
+.cat-reference { background: #737373; }
+
+/* Tabular numbers for data alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

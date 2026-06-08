@@ -1,0 +1,47 @@
+import { useEffect, useState } from "react";
+
+export function useApi() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchData() {
+      try {
+        const res = await fetch("/api/inspect");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+        if (!cancelled) setData(json);
+      } catch (err) {
+        if (!cancelled) setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+    fetchData();
+    return () => { cancelled = true; };
+  }, []);
+
+  return { data, loading, error };
+}
+
+export function SkeletonCard({ className = "" }) {
+  return (
+    <div className={`rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 ${className}`}>
+      <div className="skeleton h-5 w-1/3 mb-4" />
+      <div className="skeleton h-4 w-full mb-2" />
+      <div className="skeleton h-4 w-2/3 mb-2" />
+      <div className="skeleton h-4 w-1/2" />
+    </div>
+  );
+}
+
+export function SkeletonMetric({ className = "" }) {
+  return (
+    <div className={`text-center ${className}`}>
+      <div className="skeleton h-16 w-24 mx-auto mb-2" />
+      <div className="skeleton h-3 w-16 mx-auto" />
+    </div>
+  );
+}
