@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Badge, MetricDisplay } from "../ui";
 import { useApi, SkeletonCard, SkeletonMetric } from "../hooks/useApi.jsx";
+import WordCloud from "../components/WordCloud.jsx";
 
 const CATEGORY_LABELS = {
   planning: "Planning",
@@ -114,20 +115,10 @@ export default function Overview() {
         </Card>
       </div>
 
-      {/* Top Terms */}
+      {/* Word Cloud */}
       {word_frequencies && word_frequencies.length > 0 && (
-        <Card title="Top Terms" subtitle="Most frequent terms in useful prompts">
-          <div className="flex flex-wrap gap-2">
-            {word_frequencies.slice(0, 24).map(({ term, count }) => (
-              <span
-                key={term}
-                className="inline-flex items-center px-3 py-1.5 rounded-full text-body-sm font-medium bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-brand-50 dark:hover:bg-brand-950 hover:text-brand-700 dark:hover:text-brand-300 transition-colors"
-                style={{ fontSize: `${Math.max(12, 14 + Math.log2(count))}px` }}
-              >
-                {term}
-              </span>
-            ))}
-          </div>
+        <Card title="Word Cloud" subtitle="Most frequent terms in useful prompts">
+          <WordCloud words={word_frequencies} />
         </Card>
       )}
 
