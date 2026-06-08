@@ -86,10 +86,10 @@ export default function Dashboard() {
           </p>
           <h2 className="text-h4 text-white mb-1">3D Activity Map</h2>
           <p className="text-caption text-oai-gray-500 mb-4">
-            Drag to rotate. Green=Codex, Amber=Claude, Blue=Cursor. Height = prompts.
+            Each column is a day. Height = prompt count. Greener = more active.
           </p>
           <div className="flex-1 min-h-0">
-            <ActivityHeatmap3D prompts={prompts || []} weeks={20} />
+            <ActivityHeatmap3D prompts={prompts || []} weeks={20} interactive={false} autoRotateInit={false} />
           </div>
         </div>
 
