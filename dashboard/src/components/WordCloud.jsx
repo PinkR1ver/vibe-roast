@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import "wordcloud";
+import WordCloudLib from "wordcloud";
 
 export default function WordCloud({ words, width = 600, height = 400, className = "" }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !words || words.length === 0) return;
+    const draw = WordCloudLib || window.WordCloud;
+    if (!canvas || !words || words.length === 0 || typeof draw !== "function") return;
 
     const list = words.map(({ term, count }) => [term, count]);
     const max = list[0]?.[1] || 1;
@@ -19,7 +20,7 @@ export default function WordCloud({ words, width = 600, height = 400, className 
     const ctx = canvas.getContext("2d");
     ctx.scale(dpr, dpr);
 
-    window.WordCloud(canvas, {
+    draw(canvas, {
       list,
       gridSize: Math.round((16 * width) / 1024),
       weightFactor: (w) => (w / max) * (Math.min(width, height) / 8),
@@ -42,7 +43,6 @@ export default function WordCloud({ words, width = 600, height = 400, className 
     });
 
     return () => {
-      // WordCloud doesn't have a destroy method, just clear
       const dpr = window.devicePixelRatio || 1;
       ctx && ctx.clearRect(0, 0, width * dpr, height * dpr);
     };
