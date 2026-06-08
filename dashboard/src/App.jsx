@@ -8,20 +8,20 @@ function TopBar() {
   const { theme, cycle } = useTheme();
 
   return (
-    <header className="sticky top-0 z-10 border-b border-oai-gray-200 dark:border-oai-gray-800 bg-oai-white/80 dark:bg-oai-gray-950/80 backdrop-blur-md">
+    <header className="sticky top-0 z-10 border-b border-oai-gray-800 bg-oai-gray-950/80 backdrop-blur-md">
       <div className="max-w-4xl mx-auto flex items-center justify-between px-6 py-3">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
             V
           </div>
-          <span className="text-[13px] font-semibold text-oai-black dark:text-oai-white">
+          <span className="text-[13px] font-semibold text-oai-white">
             Vibe Wrapper
           </span>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={cycle}
-            className="p-2 rounded-lg text-oai-gray-500 hover:text-oai-black dark:hover:text-oai-white hover:bg-oai-gray-100 dark:hover:bg-oai-gray-800 transition-colors"
+            className="p-2 rounded-lg text-oai-gray-500 hover:text-oai-white hover:bg-oai-gray-800 transition-colors"
             title={`Theme: ${theme}`}
           >
             <ThemeIcon theme={theme} />
@@ -30,7 +30,7 @@ function TopBar() {
             href="https://github.com/PinkR1ver/vibe-wrapper"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-lg text-oai-gray-500 hover:text-oai-black dark:hover:text-oai-white hover:bg-oai-gray-100 dark:hover:bg-oai-gray-800 transition-colors"
+            className="p-2 rounded-lg text-oai-gray-500 hover:text-oai-white hover:bg-oai-gray-800 transition-colors"
           >
             <svg width="16" height="16" viewBox="0 0 15 15" fill="currentColor">
               <path d="M7.5.5a7 7 0 0 0-2.21 13.64c.35.06.48-.15.48-.33v-1.16c-1.97.42-2.38-.94-2.38-.94-.33-.82-.8-1.04-.8-1.04-.64-.44.05-.43.05-.43.71.05 1.09.72 1.09.72.64 1.08 1.67.77 2.07.59.06-.46.25-.77.45-.95-1.58-.18-3.24-.78-3.24-3.5 0-.77.28-1.4.73-1.9-.07-.18-.32-.9.07-1.87 0 0 .6-.19 1.95.73A6.8 6.8 0 0 1 7.5 3.9a6.8 6.8 0 0 1 1.78.24c1.35-.92 1.95-.73 1.95-.73.39.97.14 1.69.07 1.87.45.5.73 1.13.73 1.9 0 2.73-1.66 3.32-3.25 3.5.26.22.48.65.48 1.3v1.93c0 .18.13.4.49.33A7 7 0 0 0 7.5.5Z" />
@@ -70,12 +70,10 @@ function ThemeIcon({ theme }) {
 export default function AppShell() {
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-oai-gray-50 dark:bg-oai-gray-950">
+      <div className="min-h-screen bg-oai-gray-950">
         <TopBar />
-        <main className="p-6">
-          <div className="max-w-4xl mx-auto panel p-8">
-            <Dashboard />
-          </div>
+        <main>
+          <Dashboard />
         </main>
       </div>
     </ThemeProvider>
