@@ -6,7 +6,7 @@ export default function WordCloud({ words, width = 600, height = 400, className 
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const draw = WordCloudLib || window.WordCloud;
+    const draw = WordCloudLib?.default || WordCloudLib || window.WordCloud;
     if (!canvas || !words || words.length === 0 || typeof draw !== "function") return;
 
     const list = words.map(({ term, count }) => [term, count]);
