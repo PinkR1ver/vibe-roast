@@ -9,7 +9,8 @@
   },
   "dependencies": {
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "wordcloud": "^1.2.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
