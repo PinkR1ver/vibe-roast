@@ -6,6 +6,7 @@ const { inspectCodex } = require("./sources/codex");
 const { inspectClaude } = require("./sources/claude");
 const { inspectCursor } = require("./sources/cursor");
 const { inspectVibeTracker } = require("./sources/vibe-tracker");
+const { inspectTokenTracker } = require("./sources/token-tracker");
 
 const SOURCE_INSPECTORS = {
   codex: inspectCodex,
@@ -19,6 +20,10 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
   const selected = normalizeSources(sources);
   const sourceReports = {};
   const prompts = [];
+  const tokenTrackerActivity = await inspectTokenTracker({
+    queuePath: roots.tokenTrackerQueue,
+    range,
+  });
 
   for (const source of selected) {
     const inspect = SOURCE_INSPECTORS[source];
@@ -44,12 +49,36 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
     range: { from: from || null, to: to || null },
     summary: buildSummary(sourceReports, prompts),
     sources: sourceReports,
+    activity: buildActivity(tokenTrackerActivity),
     word_frequencies: wordFrequencies(promptAnalysis.useful_prompts),
     profile_signals: {
       prompt_analysis: promptAnalysis,
       environment,
     },
     prompts,
+  };
+}
+
+function buildActivity(tokenTrackerActivity) {
+  if (tokenTrackerActivity?.daily_rows?.length > 0) {
+    return {
+      source: "token-tracker",
+      metric: "tokens",
+      daily_rows: tokenTrackerActivity.daily_rows,
+      total_tokens: tokenTrackerActivity.token_totals?.total_tokens || 0,
+      active_day_count: tokenTrackerActivity.active_day_count || 0,
+      bucket_count: tokenTrackerActivity.bucket_count || 0,
+      root: tokenTrackerActivity.root,
+    };
+  }
+  return {
+    source: "prompts",
+    metric: "prompts",
+    daily_rows: [],
+    total_tokens: 0,
+    active_day_count: 0,
+    bucket_count: 0,
+    root: null,
   };
 }
 

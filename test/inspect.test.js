@@ -6,6 +6,7 @@ const { inspectSources } = require("../src/inspect");
 const { analyzePrompts } = require("../src/extract/prompt-analysis");
 const { inspectEnvironment } = require("../src/extract/environment");
 const { extractCursorEntriesFromRows } = require("../src/sources/cursor");
+const { inspectTokenTracker } = require("../src/sources/token-tracker");
 
 const fixtures = path.join(__dirname, "fixtures");
 
@@ -67,6 +68,46 @@ test("Cursor row parser treats cursorDiskKV type 1 bubbles as user prompts", () 
 
   assert.equal(entries.length, 1);
   assert.equal(entries[0].text, "给这个项目补一个最小 CLI 入口");
+});
+
+test("TokenTracker queue adapter aggregates hourly token buckets by day", async () => {
+  const report = await inspectTokenTracker({
+    queuePath: path.join(fixtures, "tokentracker", "queue.jsonl"),
+    range: {
+      from: "2026-06-07T00:00:00.000Z",
+      to: "2026-06-08T23:59:59.999Z",
+    },
+  });
+
+  assert.equal(report.files_scanned, 1);
+  assert.equal(report.bucket_count, 3);
+  assert.equal(report.active_day_count, 2);
+  assert.equal(report.token_totals.total_tokens, 5800);
+  assert.deepEqual(report.daily_rows.map((row) => row.day), ["2026-06-07", "2026-06-08"]);
+  assert.equal(report.daily_rows[0].total_tokens, 5000);
+  assert.equal(report.daily_rows[0].conversation_count, 4);
+  assert.equal(report.daily_rows[0].models["codex/gpt-5"], 1500);
+  assert.equal(report.daily_rows[0].models["cursor/claude-4"], 3500);
+  assert.equal(report.daily_rows[1].billable_total_tokens, 750);
+});
+
+test("inspectSources exposes TokenTracker activity without adding synthetic prompts", async () => {
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-08",
+    sources: ["codex"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      tokenTrackerQueue: path.join(fixtures, "tokentracker", "queue.jsonl"),
+    },
+  });
+
+  assert.equal(report.activity.source, "token-tracker");
+  assert.equal(report.activity.metric, "tokens");
+  assert.equal(report.activity.daily_rows.length, 2);
+  assert.equal(report.activity.total_tokens, 5800);
+  assert.equal(report.summary.prompt_count, 2);
+  assert.equal(report.sources["token-tracker"], undefined);
 });
 
 test("inspectSources computes useful high-frequency terms", async () => {

@@ -2,46 +2,25 @@ import React, { useState } from "react";
 import { useApi } from "../hooks/useApi.jsx";
 import { Badge } from "../ui";
 import WordCloud from "../components/WordCloud.jsx";
-import ActivityHeatmap3D from "../components/ActivityHeatmap3D.jsx";
+import ActivityHeatmap3DPanel from "../components/ActivityHeatmap3DPanel.jsx";
+import { useLocale } from "../contexts/LocaleContext.jsx";
 
-const CAT_LABEL = {
-  planning: "Planning", debugging: "Debugging", implementation: "Implementation",
-  refactor: "Refactor", testing: "Testing", packaging: "Packaging",
-  explanation: "Explanation", research: "Research", ui_design: "UI/Design",
-  workflow: "Workflow",
-};
 const TYPE_CODE = {
   planning: "PLN", debugging: "DBG", implementation: "IMP", refactor: "REF",
   testing: "TST", packaging: "PKG", explanation: "EXP", research: "RSR",
   ui_design: "UID", workflow: "WRK",
 };
-const TYPE_TITLE = {
-  planning: "The Architect", debugging: "The Debugger", implementation: "The Builder",
-  refactor: "The Refiner", testing: "The Guardian", packaging: "The Publisher",
-  explanation: "The Scholar", research: "The Explorer", ui_design: "The Designer",
-  workflow: "The Automator",
-};
-const TYPE_DESC = {
-  planning: "You think before you code. Architecture first.",
-  debugging: "A problem solver. Bugs don't stand a chance.",
-  implementation: "You turn ideas into working code. Building is your language.",
-  refactor: "You see beauty in clean structure. Always improving.",
-  testing: "Quality is non-negotiable. You verify before you ship.",
-  explanation: "Understanding why matters as much as what.",
-  research: "You dig deep. Surface-level is never enough.",
-  ui_design: "Beautiful, polished interfaces drive you.",
-  workflow: "Better tools and automation is your superpower.",
-};
 
 export default function Dashboard() {
   const { data, loading, error } = useApi();
+  const { t } = useLocale();
   const [envOpen, setEnvOpen] = useState(false);
 
   if (loading) return <Skeleton />;
-  if (error) return <ErrorState error={error} />;
+  if (error) return <ErrorState error={error} title={t("dashboard.loading.errorTitle")} />;
   if (!data) return null;
 
-  const { summary, profile_signals, word_frequencies, prompts } = data;
+  const { summary, profile_signals, word_frequencies, prompts, activity } = data;
   const pa = profile_signals?.prompt_analysis || {};
   const env = profile_signals?.environment?.codex;
   const categories = pa.categories || {};
@@ -54,58 +33,83 @@ export default function Dashboard() {
   const topKey = sorted[0]?.[0] || "implementation";
 
   return (
-    <div className="animate-fade-in h-[calc(100vh-49px)] flex flex-col bg-oai-gray-950 overflow-hidden">
+    <div className="animate-fade-in min-h-[calc(100vh-49px)] lg:h-[calc(100vh-49px)] flex flex-col bg-oai-gray-950 overflow-y-auto lg:overflow-hidden">
       {/* ═══ TOP ROW: 1 + 2 + 1 column grid ═══ */}
-      <div className="flex-1 grid grid-cols-[1fr_2fr_1fr] gap-0 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] gap-0 min-h-0">
         {/* ── Col 1: Personality ── */}
-        <div className="flex flex-col items-center justify-center p-6 border-r border-oai-gray-900 text-center">
+        <div className="flex flex-col items-center justify-center p-6 border-b lg:border-b-0 lg:border-r border-oai-gray-900 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-4">
-            Your Vibe Profile
+            {t("dashboard.profile.kicker")}
           </p>
           <div className="w-20 h-20 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
             <span className="text-[34px] font-black tracking-tighter text-brand-400">
               {TYPE_CODE[topKey]}
             </span>
           </div>
-          <h1 className="text-h4 text-white mb-1.5">{TYPE_TITLE[topKey]}</h1>
+          <h1 className="text-h4 text-white mb-1.5">{t(`type.${topKey}.title`)}</h1>
           <p className="text-body-sm text-oai-gray-400 max-w-[240px] leading-relaxed mb-4">
-            {TYPE_DESC[topKey]}
+            {t(`type.${topKey}.desc`)}
           </p>
           <div className="grid grid-cols-2 gap-2 w-full max-w-[200px]">
-            <MiniStat value={totalPrompts.toLocaleString()} label="prompts" />
-            <MiniStat value={summary?.source_count} label="tools" />
-            <MiniStat value={`${(usefulRatio * 100).toFixed(0)}%`} label="useful" />
-            <MiniStat value={summary?.files_scanned || 0} label="files" />
+            <MiniStat value={totalPrompts.toLocaleString()} label={t("dashboard.stats.prompts")} />
+            <MiniStat value={summary?.source_count} label={t("dashboard.stats.tools")} />
+            <MiniStat value={`${(usefulRatio * 100).toFixed(0)}%`} label={t("dashboard.stats.useful")} />
+            <MiniStat value={summary?.files_scanned || 0} label={t("dashboard.stats.files")} />
           </div>
         </div>
 
-        {/* ── Col 2: 3D Activity Map (wider) ── */}
-        <div className="flex flex-col justify-center p-6 border-r border-oai-gray-900 overflow-hidden">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
-            Your Rhythm
-          </p>
-          <h2 className="text-h4 text-white mb-1">3D Activity Map</h2>
-          <p className="text-caption text-oai-gray-500 mb-4">
-            Each column is a day. Height = prompt count. Greener = more active.
-          </p>
-          <div className="flex-1 min-h-0">
-            <ActivityHeatmap3D prompts={prompts || []} weeks={20} interactive={false} autoRotateInit={false} />
+        {/* ── Col 2: Word Cloud + 3D Activity Map (wider) ── */}
+        <div className="flex flex-col p-6 border-b lg:border-b-0 lg:border-r border-oai-gray-900 overflow-hidden min-h-[760px] lg:min-h-0 gap-5">
+          {word_frequencies && word_frequencies.length > 0 && (
+            <div className="shrink-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
+                {t("dashboard.cloud.kicker")}
+              </p>
+              <h2 className="text-h4 text-white mb-2">{t("dashboard.cloud.title")}</h2>
+              <div className="h-[270px] lg:h-[280px] flex items-center justify-center overflow-hidden">
+                <WordCloud
+                  words={word_frequencies}
+                  width={760}
+                  height={270}
+                  gridSize={4}
+                  weightDivisor={3.2}
+                  rotateRatio={0.08}
+                  minRotation={-0.14}
+                  maxRotation={0.14}
+                  ellipticity={0.62}
+                  minSize={10}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col flex-1 min-h-[280px]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
+              {t("dashboard.rhythm.kicker")}
+            </p>
+            <h2 className="text-h4 text-white mb-1">{t("dashboard.rhythm.title")}</h2>
+            <p className="text-caption text-oai-gray-500 mb-4">
+              {t("dashboard.rhythm.description")}
+            </p>
+            <div className="flex-1 min-h-0">
+              <ActivityHeatmap3DPanel prompts={prompts || []} activity={activity} weeks={52} />
+            </div>
           </div>
         </div>
 
         {/* ── Col 3: Categories ── */}
-        <div className="flex flex-col justify-center p-6 overflow-hidden">
+        <div className="flex flex-col justify-center p-6 overflow-hidden min-h-[360px] lg:min-h-0">
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400 mb-1.5">
-            Your DNA
+            {t("dashboard.dna.kicker")}
           </p>
-          <h2 className="text-h4 text-white mb-3">What You Do</h2>
+          <h2 className="text-h4 text-white mb-3">{t("dashboard.dna.title")}</h2>
 
           {/* Category bars */}
           <div className="space-y-2 mb-4">
             {sorted.slice(0, 7).map(([name, row]) => (
               <div key={name}>
                 <div className="flex justify-between text-[11px] mb-0.5">
-                  <span className="text-oai-gray-400">{CAT_LABEL[name] || name}</span>
+                  <span className="text-oai-gray-400">{t(`category.${name}`)}</span>
                   <span className="text-oai-gray-600 tabular-nums">{row.count}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-oai-gray-800 overflow-hidden">
@@ -118,12 +122,6 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Word Cloud (compact) */}
-          {word_frequencies && word_frequencies.length > 0 && (
-            <div className="flex-1 flex items-center justify-center min-h-0">
-              <WordCloud words={word_frequencies} width={280} height={200} />
-            </div>
-          )}
         </div>
       </div>
 
@@ -133,8 +131,8 @@ export default function Dashboard() {
         {pa.useful_prompts && pa.useful_prompts.length > 0 && (
           <div className="px-6 py-3 flex items-center gap-4 overflow-x-auto border-b border-oai-gray-900">
             <div className="shrink-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400">Your Voice</p>
-              <p className="text-xs text-oai-gray-500">{pa.useful_prompt_count} useful prompts</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400">{t("dashboard.voice.kicker")}</p>
+              <p className="text-xs text-oai-gray-500">{t("dashboard.voice.usefulPrompts", { count: pa.useful_prompt_count })}</p>
             </div>
             {pa.useful_prompts.slice(0, 10).map((p, i) => (
               <div
@@ -143,7 +141,7 @@ export default function Dashboard() {
               >
                 <div className="flex items-center gap-1.5 mb-1.5">
                   <Badge variant="info" className="text-[9px]">{p.source}</Badge>
-                  <span className="text-[9px] text-oai-gray-500">{CAT_LABEL[p.category] || p.category}</span>
+                  <span className="text-[9px] text-oai-gray-500">{t(`category.${p.category}`)}</span>
                 </div>
                 <p className="text-xs text-oai-gray-300 line-clamp-2 leading-relaxed">{p.text}</p>
               </div>
@@ -158,9 +156,9 @@ export default function Dashboard() {
             className="w-full px-6 py-2.5 flex items-center justify-between text-left hover:bg-oai-gray-900/50 transition-colors"
           >
             <div className="flex items-center gap-4">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400">Your World</span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-400">{t("dashboard.world.kicker")}</span>
               <span className="text-xs text-oai-gray-500">
-                {env.skills?.count || 0} skills · {env.mcp_servers?.count || 0} MCP · {env.plugins?.count || 0} plugins
+                {env.skills?.count || 0} {t("dashboard.env.skills")} · {env.mcp_servers?.count || 0} MCP · {env.plugins?.count || 0} {t("dashboard.env.plugins")}
                 {env.config?.model ? ` · model: ${env.config.model}` : ""}
               </span>
             </div>
@@ -221,11 +219,11 @@ function Skeleton() {
   );
 }
 
-function ErrorState({ error }) {
+function ErrorState({ error, title }) {
   return (
     <div className="h-screen bg-oai-gray-950 flex items-center justify-center">
       <div className="text-center">
-        <p className="text-h3 text-white mb-2">Not yet</p>
+        <p className="text-h3 text-white mb-2">{title}</p>
         <p className="text-body-sm text-oai-gray-500">{error}</p>
       </div>
     </div>

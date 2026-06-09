@@ -33,7 +33,7 @@ function clampLevel(level) {
   return level;
 }
 
-export function buildActivityHeatmap({ prompts = [], weeks = 52 }) {
+export function buildActivityHeatmap({ prompts = [], dailyRows = null, weeks = 52 }) {
   const now = new Date();
   const end = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   const start = addUtcDays(end, -(weeks * 7 - 1));
@@ -42,16 +42,31 @@ export function buildActivityHeatmap({ prompts = [], weeks = 52 }) {
   const startDow = start.getUTCDay();
   const startAligned = addUtcDays(start, -startDow);
 
-  // Aggregate prompts by day
+  // Aggregate either TokenTracker daily token rows or prompt counts by day.
   const valuesByDay = new Map();
-  for (const p of prompts || []) {
-    if (!p.timestamp) continue;
-    const day = String(p.timestamp).slice(0, 10);
-    const cur = valuesByDay.get(day) || { value: 0, models: {} };
-    cur.value++;
-    const src = p.source || "unknown";
-    cur.models[src] = (cur.models[src] || 0) + 1;
-    valuesByDay.set(day, cur);
+  if (Array.isArray(dailyRows) && dailyRows.length > 0) {
+    for (const row of dailyRows) {
+      if (!row?.day) continue;
+      const value = number(row.billable_total_tokens ?? row.total_tokens ?? row.value);
+      const current = valuesByDay.get(row.day) || { value: 0, models: {}, sources: {}, conversation_count: 0 };
+      current.value += value;
+      current.total_tokens = (current.total_tokens || 0) + number(row.total_tokens ?? value);
+      current.billable_total_tokens = (current.billable_total_tokens || 0) + value;
+      current.conversation_count += number(row.conversation_count);
+      mergeCounts(current.models, row.models);
+      mergeCounts(current.sources, row.sources);
+      valuesByDay.set(row.day, current);
+    }
+  } else {
+    for (const p of prompts || []) {
+      if (!p.timestamp) continue;
+      const day = String(p.timestamp).slice(0, 10);
+      const cur = valuesByDay.get(day) || { value: 0, models: {} };
+      cur.value++;
+      const src = p.source || "unknown";
+      cur.models[src] = (cur.models[src] || 0) + 1;
+      valuesByDay.set(day, cur);
+    }
   }
 
   const totalDays = diffUtcDays(startAligned, end) + 1;
@@ -94,8 +109,12 @@ export function buildActivityHeatmap({ prompts = [], weeks = 52 }) {
       week.push({
         day,
         value,
+        total_tokens: dayData?.total_tokens,
+        billable_total_tokens: dayData?.billable_total_tokens,
+        conversation_count: dayData?.conversation_count,
         level: clampLevel(levelFor(value)),
         models: dayData?.models || null,
+        sources: dayData?.sources || null,
       });
     }
     weeksOut.push(week);
@@ -109,4 +128,16 @@ export function buildActivityHeatmap({ prompts = [], weeks = 52 }) {
     weeks: trimmed,
     thresholds: { t1, t2, t3 },
   };
+}
+
+function mergeCounts(target, source) {
+  if (!source || typeof source !== "object") return;
+  for (const [key, value] of Object.entries(source)) {
+    target[key] = (target[key] || 0) + number(value);
+  }
+}
+
+function number(value) {
+  const n = Number(value || 0);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }

@@ -37,6 +37,18 @@ html.dark ::-webkit-scrollbar-thumb { background: #404040; }
 .animate-slide-up {
   animation: slideUp 0.5s ease-out both;
 }
+.animate-tt-fade-in {
+  animation: ttFadeIn 0.2s ease-out both;
+}
+.animate-tt-fade-out {
+  animation: ttFadeOut 0.18s ease-in both;
+}
+.animate-tt-modal {
+  animation: ttModalIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-tt-modal-exit {
+  animation: ttModalOut 0.18s ease-in both;
+}
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -44,6 +56,22 @@ html.dark ::-webkit-scrollbar-thumb { background: #404040; }
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ttFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ttFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes ttModalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes ttModalOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.97) translateY(8px); }
 }
 
 .stagger-1 { animation-delay: 0.05s; }

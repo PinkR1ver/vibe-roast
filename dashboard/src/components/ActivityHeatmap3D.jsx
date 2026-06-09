@@ -53,7 +53,7 @@ function rotateVector(x, y, z, yaw, pitch) {
   return rotatePoint(x, y, z, yaw, pitch);
 }
 
-function getTooltipText(level, value) {
+export function getAITooltipMessage(level, value) {
   const v = Number(value).toLocaleString();
   if (level >= 4) return `${v} prompts — an epic day of coding!`;
   if (level === 3) return `${v} prompts — you were in the zone.`;
@@ -64,16 +64,19 @@ function getTooltipText(level, value) {
 
 export default function ActivityHeatmap3D({
   prompts = [],
+  dailyRows = null,
   weeks = 26,
   palette = "emerald",
   isDark = true,
   interactive = true,
   autoRotateInit = true,
+  onResetViewRef = null,
+  unitLabel = "Prompts",
 }) {
   // Build data
   const heatmap = useMemo(
-    () => buildActivityHeatmap({ prompts, weeks }),
-    [prompts, weeks]
+    () => buildActivityHeatmap({ prompts, dailyRows, weeks }),
+    [prompts, dailyRows, weeks]
   );
   const weeksData = heatmap.weeks;
 
@@ -89,6 +92,21 @@ export default function ActivityHeatmap3D({
   const [zoom, setZoom] = useState(1.0);
 
   const UNIT_SIZE = interactive ? 13 : 10.5;
+
+  useEffect(() => {
+    if (!onResetViewRef) return;
+    onResetViewRef.current = {
+      reset: () => {
+        setAngle({ yaw: defaultYaw, pitch: defaultPitch });
+        setAutoRotate(false);
+        setZoom(1.0);
+        triggerGrowthWave();
+      },
+      toggleAutoRotate: (value) => {
+        setAutoRotate(value);
+      },
+    };
+  }, [onResetViewRef]);
 
   // Floor grid lines
   const floorGridLines = useMemo(() => {
@@ -106,6 +124,12 @@ export default function ActivityHeatmap3D({
       const p1 = rotatePoint(x, -3.5 * UNIT_SIZE, 0, angle.yaw, angle.pitch);
       const p2 = rotatePoint(x, 3.5 * UNIT_SIZE, 0, angle.yaw, angle.pitch);
       lines.push({ d: `M${p1.x},${p1.y} L${p2.x},${p2.y}`, key: `v-${c}` });
+    }
+    if (W % 4 !== 0) {
+      const x = (W - W / 2) * UNIT_SIZE;
+      const p1 = rotatePoint(x, -3.5 * UNIT_SIZE, 0, angle.yaw, angle.pitch);
+      const p2 = rotatePoint(x, 3.5 * UNIT_SIZE, 0, angle.yaw, angle.pitch);
+      lines.push({ d: `M${p1.x},${p1.y} L${p2.x},${p2.y}`, key: "v-last" });
     }
     return lines;
   }, [weeksData.length, angle, UNIT_SIZE, interactive]);
@@ -358,7 +382,7 @@ export default function ActivityHeatmap3D({
               className="transition-all duration-200"
               style={{ filter: isHovered ? "brightness(1.15) drop-shadow(0 4px 6px rgba(0,0,0,0.15))" : "none", cursor: interactive ? "pointer" : "default" }}
             >
-              {!interactive && c.day && <title>{`${c.day}: ${Number(c.value).toLocaleString()} prompts`}</title>}
+              {!interactive && c.day && <title>{`${c.day}: ${Number(c.value).toLocaleString()} ${unitLabel.toLowerCase()}`}</title>}
               {c.renderedFaces.map((f, idx) => (
                 <path key={idx} d={f.d} fill={f.fill} stroke={f.fill} strokeWidth={0.25} strokeLinejoin="round" />
               ))}
@@ -387,11 +411,55 @@ export default function ActivityHeatmap3D({
             <div className="flex flex-col gap-2">
               <div className="flex items-baseline gap-1">
                 <span className="text-lg font-bold text-oai-gray-900 dark:text-white leading-none">{Number(hoveredCell.value).toLocaleString()}</span>
-                <span className="text-[10px] text-oai-gray-400 uppercase tracking-wider font-semibold">Prompts</span>
+                <span className="text-[10px] text-oai-gray-400 uppercase tracking-wider font-semibold">{unitLabel}</span>
               </div>
-              <p className="text-[11px] text-oai-gray-600 dark:text-oai-gray-300 leading-relaxed font-normal mt-1 border-t border-dashed border-oai-gray-100 dark:border-oai-gray-800/60 pt-1.5">
-                {getTooltipText(hoveredCell.level, hoveredCell.value)}
-              </p>
+              {hoveredCell.models && Object.keys(hoveredCell.models).length > 0 ? (
+                <div className="mt-1.5 border-t border-oai-gray-100 dark:border-oai-gray-800/60 pt-2 flex flex-col gap-1.5">
+                  <div className="text-[10px] font-semibold text-oai-gray-400 dark:text-oai-gray-500 uppercase tracking-wider">
+                    Source Breakdown
+                  </div>
+                  <div className="flex flex-col gap-2 max-h-[150px] overflow-y-auto pr-1.5">
+                    {Object.entries(hoveredCell.models)
+                      .map(([name, val]) => ({ name, val: Number(val) || 0 }))
+                      .sort((a, b) => b.val - a.val)
+                      .map(({ name, val }) => {
+                        const total = Number(hoveredCell.value) || 1;
+                        const pct = Math.round((val / total) * 100);
+                        return (
+                          <div key={name} className="flex flex-col gap-1">
+                            <div className="flex items-center justify-between text-[11px] gap-3">
+                              <span className="font-medium text-oai-gray-700 dark:text-oai-gray-200 truncate max-w-[120px]" title={name}>
+                                {name}
+                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <span className="font-mono text-oai-gray-900 dark:text-oai-gray-100 font-semibold">
+                                  {val.toLocaleString()}
+                                </span>
+                                <span className="text-[9px] text-oai-gray-400 dark:text-oai-gray-500 min-w-[28px] text-right font-medium">
+                                  {pct}%
+                                </span>
+                              </div>
+                            </div>
+                            <div className="w-full h-1 bg-oai-gray-100 dark:bg-oai-gray-800/85 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${pct}%`,
+                                  backgroundColor: colors[4],
+                                  boxShadow: `0 0 4px ${colors[4]}55`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[11px] text-oai-gray-600 dark:text-oai-gray-300 leading-relaxed font-normal mt-1 border-t border-dashed border-oai-gray-100 dark:border-oai-gray-800/60 pt-1.5">
+                  {getAITooltipMessage(hoveredCell.level, hoveredCell.value)}
+                </p>
+              )}
             </div>
           </div>
           <div className="absolute bottom-[6px] left-0 -translate-x-1/2 w-2.5 h-2.5 rotate-45 bg-white dark:bg-oai-gray-900 border-r border-b border-oai-gray-200/50 dark:border-oai-gray-800/50 shadow-sm" style={{ marginBottom: "1px" }} />
