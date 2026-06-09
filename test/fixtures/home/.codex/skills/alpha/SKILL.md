@@ -1,5 +1,0 @@
----
-name: alpha
----
-
-Alpha skill.

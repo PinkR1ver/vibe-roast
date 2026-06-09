@@ -1,3 +1,0 @@
-{"timestamp":"2026-06-07T10:00:00.000Z","type":"event_msg","payload":{"type":"user_message","message":"请帮我实现一个登录页面，并检查 token 使用量"}}
-{"timestamp":"2026-06-07T10:01:00.000Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":1200,"cached_input_tokens":200,"output_tokens":500,"reasoning_output_tokens":100,"total_tokens":1800}}}}
-{"timestamp":"2026-06-07T10:05:00.000Z","type":"event_msg","payload":{"msg":{"type":"user_message","message":"再优化一下移动端布局"}}}
