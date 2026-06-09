@@ -1,11 +1,13 @@
 import React from "react";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { LocaleProvider, useLocale } from "./contexts/LocaleContext";
 import Dashboard from "./pages/Dashboard";
 
 /* ── Top Bar ─────────────────────────────────────────────── */
 
 function TopBar() {
   const { theme, cycle } = useTheme();
+  const { t, toggleLocale } = useLocale();
 
   return (
     <header className="sticky top-0 z-10 border-b border-oai-gray-800 bg-oai-gray-950/80 backdrop-blur-md">
@@ -20,9 +22,16 @@ function TopBar() {
         </div>
         <div className="flex items-center gap-1">
           <button
+            onClick={toggleLocale}
+            className="h-8 px-2 rounded-lg text-[11px] font-semibold text-oai-gray-500 hover:text-oai-white hover:bg-oai-gray-800 transition-colors"
+            title="Language"
+          >
+            {t("app.language")}
+          </button>
+          <button
             onClick={cycle}
             className="p-2 rounded-lg text-oai-gray-500 hover:text-oai-white hover:bg-oai-gray-800 transition-colors"
-            title={`Theme: ${theme}`}
+            title={`${t("app.theme")}: ${theme}`}
           >
             <ThemeIcon theme={theme} />
           </button>
@@ -70,12 +79,14 @@ function ThemeIcon({ theme }) {
 export default function AppShell() {
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-oai-gray-950">
-        <TopBar />
-        <main>
-          <Dashboard />
-        </main>
-      </div>
+      <LocaleProvider>
+        <div className="min-h-screen bg-oai-gray-950">
+          <TopBar />
+          <main>
+            <Dashboard />
+          </main>
+        </div>
+      </LocaleProvider>
     </ThemeProvider>
   );
 }

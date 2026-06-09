@@ -1,15 +1,30 @@
 #!/usr/bin/env node
 const { inspectSources } = require("../src/inspect");
 const { start } = require("../src/server");
+const { install, uninstall } = require("../src/hooks/install");
 
 async function main(argv) {
   const [command, ...rest] = argv;
+
   if (command === "serve") {
     await start();
     return;
   }
+
+  if (command === "install") {
+    const results = await install();
+    process.stdout.write(JSON.stringify(results, null, 2) + "\n");
+    return;
+  }
+
+  if (command === "uninstall") {
+    const results = await uninstall();
+    process.stdout.write(JSON.stringify(results, null, 2) + "\n");
+    return;
+  }
+
   if (command !== "inspect") {
-    process.stderr.write("Usage: vibe-wrapper inspect|serve\n");
+    process.stderr.write("Usage: vibe-wrapper inspect|serve|install|uninstall\n");
     process.exitCode = 1;
     return;
   }

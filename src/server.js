@@ -1,6 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
+const { exec } = require("node:child_process");
 const { inspectSources } = require("./inspect");
 
 const PORT = Number(process.env.PORT) || 7681;
@@ -78,11 +79,20 @@ function createServer() {
   });
 }
 
+function openBrowser(url) {
+  const cmd = process.platform === "darwin" ? `open "${url}"`
+    : process.platform === "win32" ? `start "" "${url}"`
+    : `xdg-open "${url}"`;
+  exec(cmd, () => {});
+}
+
 function start() {
   const server = createServer();
   return new Promise((resolve) => {
     server.listen(PORT, () => {
-      process.stderr.write(`vibe-wrapper dashboard → http://localhost:${PORT}\n`);
+      const url = `http://localhost:${PORT}`;
+      process.stderr.write(`vibe-wrapper dashboard → ${url}\n`);
+      openBrowser(url);
       resolve(server);
     });
   });

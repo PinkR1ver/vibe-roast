@@ -7,10 +7,11 @@
     "vibe-wrapper": "bin/vibe-wrapper.js"
   },
   "scripts": {
-    "test": "node --test test/inspect.test.js",
+    "test": "node --test test/*.test.js",
     "inspect": "node bin/vibe-wrapper.js inspect",
     "serve": "node bin/vibe-wrapper.js serve",
-    "build": "cd dashboard && npm install && npm run build"
+    "build": "cd dashboard && npm install && npm run build",
+    "postinstall": "node bin/vibe-wrapper.js install"
   },
   "engines": {
     "node": ">=20"
