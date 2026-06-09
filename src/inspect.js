@@ -5,11 +5,13 @@ const { inspectEnvironment } = require("./extract/environment");
 const { inspectCodex } = require("./sources/codex");
 const { inspectClaude } = require("./sources/claude");
 const { inspectCursor } = require("./sources/cursor");
+const { inspectVibeTracker } = require("./sources/vibe-tracker");
 
 const SOURCE_INSPECTORS = {
   codex: inspectCodex,
   claude: inspectClaude,
   cursor: inspectCursor,
+  "vibe-tracker": inspectVibeTracker,
 };
 
 async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"], roots = {} } = {}) {
