@@ -6,7 +6,7 @@ const { install, uninstall } = require("../src/hooks/install");
 async function main(argv) {
   const [command, ...rest] = argv;
 
-  if (command === "serve") {
+  if (!command || command === "serve") {
     await start();
     return;
   }
@@ -24,7 +24,7 @@ async function main(argv) {
   }
 
   if (command !== "inspect") {
-    process.stderr.write("Usage: vibe-wrapper inspect|serve|install|uninstall\n");
+    process.stderr.write("Usage: vibe-wrapper [serve]|inspect|install|uninstall\n");
     process.exitCode = 1;
     return;
   }

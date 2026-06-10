@@ -4,7 +4,7 @@ const path = require("node:path");
 const { exec } = require("node:child_process");
 const { inspectSources } = require("./inspect");
 
-const PORT = Number(process.env.PORT) || 7681;
+const PORT = process.env.PORT === undefined ? 7681 : Number(process.env.PORT);
 const DIST_DIR = path.join(__dirname, "..", "dashboard", "dist");
 
 const MIME = {
@@ -80,6 +80,7 @@ function createServer() {
 }
 
 function openBrowser(url) {
+  if (process.env.VIBE_WRAPPER_NO_OPEN === "1") return;
   const cmd = process.platform === "darwin" ? `open "${url}"`
     : process.platform === "win32" ? `start "" "${url}"`
     : `xdg-open "${url}"`;
@@ -90,7 +91,9 @@ function start() {
   const server = createServer();
   return new Promise((resolve) => {
     server.listen(PORT, () => {
-      const url = `http://localhost:${PORT}`;
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : PORT;
+      const url = `http://localhost:${port}`;
       process.stderr.write(`vibe-wrapper dashboard → ${url}\n`);
       openBrowser(url);
       resolve(server);
