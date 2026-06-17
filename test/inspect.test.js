@@ -4,6 +4,7 @@ const path = require("node:path");
 
 const { inspectSources } = require("../src/inspect");
 const { analyzePrompts } = require("../src/extract/prompt-analysis");
+const { tokenize } = require("../src/extract/phrase-stats");
 const { inspectEnvironment } = require("../src/extract/environment");
 const { extractCursorEntriesFromRows } = require("../src/sources/cursor");
 const { inspectTokenTracker } = require("../src/sources/token-tracker");
@@ -124,6 +125,14 @@ test("inspectSources computes useful high-frequency terms", async () => {
   const terms = report.word_frequencies.map((row) => row.term);
   assert.ok(terms.includes("token"));
   assert.ok(terms.includes("测试"));
+});
+
+test("tokenize extracts session from Claude Code style identifiers", () => {
+  const terms = tokenize("Claude Code SessionEnd hook 里的 session_id 没抓住");
+
+  assert.ok(terms.includes("session"));
+  assert.ok(terms.includes("end"));
+  assert.ok(terms.includes("hook"));
 });
 
 test("analyzePrompts separates useful intent from pasted code and logs", () => {

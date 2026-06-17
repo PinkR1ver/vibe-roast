@@ -30,20 +30,31 @@ function wordFrequencies(prompts, { limit = 30 } = {}) {
 }
 
 function tokenize(text) {
-  const normalized = String(text || "").toLowerCase();
-  const matches = normalized.match(/[\p{Script=Han}]{2,}|[a-z0-9][a-z0-9_-]{1,}/gu) || [];
+  const normalized = String(text || "");
+  const matches = normalized.match(/[\p{Script=Han}]{2,}|[a-z0-9][a-z0-9_-]{1,}/giu) || [];
   const terms = [];
   for (const match of matches) {
     if (/^[\p{Script=Han}]+$/u.test(match) && match.length > 2) {
-      terms.push(match);
+      terms.push(match.toLowerCase());
       for (let i = 0; i < match.length - 1; i++) {
-        terms.push(match.slice(i, i + 2));
+        terms.push(match.slice(i, i + 2).toLowerCase());
       }
     } else {
-      terms.push(match);
+      terms.push(...splitAsciiTerm(match));
     }
   }
   return terms.filter((term) => !STOP_WORDS.has(term));
+}
+
+function splitAsciiTerm(term) {
+  const normalized = String(term || "").toLowerCase();
+  const parts = String(term || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .split(/[^A-Za-z0-9]+/)
+    .map((part) => part.toLowerCase())
+    .filter((part) => part.length > 1);
+
+  return Array.from(new Set([normalized, ...parts]));
 }
 
 module.exports = { wordFrequencies, tokenize };

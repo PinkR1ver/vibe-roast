@@ -29,6 +29,8 @@ Build a minimal CLI that verifies whether this project can read local Codex, Cla
 
 Use Node's built-in test runner with fixture session files. Cursor tests use fake rows through parser functions instead of requiring a real SQLite database.
 
+2026-06-11 maintenance note: phrase extraction now splits English identifiers such as `SessionEnd` and `session_id` so Claude Code session/hook terminology contributes searchable words like `session`, `end`, and `hook`.
+
 ## Completion Summary
 
 Implemented a minimal Node CLI and source adapters for Codex, Claude Code, and Cursor. Verification on this machine found local prompt signal from all three sources. Cursor currently yields prompt text from `cursorDiskKV` `bubbleId` rows, but compact rows do not provide reliable timestamps or token usage.
