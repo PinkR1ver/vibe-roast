@@ -117,8 +117,12 @@ function emptyReport(file, filesScanned = 0) {
 
 function inRange(timestamp, range) {
   if (!range) return true;
-  if (range.from && timestamp < range.from) return false;
-  if (range.to && timestamp > range.to) return false;
+  const ms = Date.parse(timestamp);
+  if (!Number.isFinite(ms)) return true;
+  const fromMs = range.fromMs ?? (range.from ? Date.parse(range.from) : null);
+  const toMs = range.toMs ?? (range.to ? Date.parse(range.to) : null);
+  if (Number.isFinite(fromMs) && ms < fromMs) return false;
+  if (Number.isFinite(toMs) && ms > toMs) return false;
   return true;
 }
 

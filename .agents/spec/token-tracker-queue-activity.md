@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-09
-Last updated: 2026-06-09
+Last updated: 2026-06-17
 
 ## Goal
 
@@ -16,10 +16,11 @@ Make the dashboard 3D heatmap use the same kind of data as TokenTracker: daily t
 - Aggregate deduplicated hourly buckets into daily token rows with model/source breakdowns.
 - Expose the result as `report.activity` from `inspectSources`.
 - Prefer `report.activity.daily_rows` in the dashboard 3D heatmap; fall back to prompt counts if TokenTracker data is unavailable.
+- Apply `inspectSources` date ranges to TokenTracker activity rows so dashboard provider cards, total tokens, and model breakdowns match the selected time filter.
 
 ## Testing Notes
 
-Added fixture-backed Node tests for queue aggregation, deduplication, daily rows, model breakdown, and `inspectSources` integration.
+Added fixture-backed Node tests for queue aggregation, deduplication, daily rows, date-range filtering, model breakdown, and `inspectSources` integration.
 
 ## Completion Summary
 

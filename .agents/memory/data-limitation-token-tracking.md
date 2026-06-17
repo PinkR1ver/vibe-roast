@@ -14,3 +14,5 @@ TokenTracker captures token usage via SessionEnd hooks that write to its own que
 2026-06-09 update: the dashboard heatmap visual shell now follows TokenTracker's 3D design more closely, including preview-to-modal interaction, stats sidebar, palette controls, rotate/reset controls, and source breakdown tooltips.
 
 Later 2026-06-09 update: Vibe Wrapper now reads `~/.tokentracker/tracker/queue.jsonl` as a dedicated activity source when available. TokenTracker queue rows are append-only, so the adapter deduplicates by latest `(source, model, hour_start)` before aggregating daily token rows. The 3D heatmap uses these token daily rows first and only falls back to prompt counts when TokenTracker data is unavailable.
+
+2026-06-17 update: dashboard date filters now affect both prompt-derived visuals and TokenTracker-derived model/token stats. Cursor prompt rows without reliable timestamps are included in Total, but omitted from date-filtered views so word clouds and prompt analysis are not polluted by undated historical records.

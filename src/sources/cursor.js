@@ -44,7 +44,7 @@ function buildCursorNotes(rows, prompts) {
   }
   if (prompts.some((prompt) => !prompt.timestamp)) {
     return [
-      "Cursor bubble rows expose prompt text but not reliable timestamps in the compact local query; date filters may include undated Cursor prompts.",
+      "Cursor bubble rows expose prompt text but not reliable timestamps in the compact local query; date-filtered views omit undated Cursor prompts.",
     ];
   }
   return [];

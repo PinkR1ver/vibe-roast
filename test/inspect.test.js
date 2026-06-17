@@ -1,12 +1,16 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const cp = require("node:child_process");
+const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 
 const { inspectSources } = require("../src/inspect");
 const { analyzePrompts } = require("../src/extract/prompt-analysis");
 const { tokenize } = require("../src/extract/phrase-stats");
 const { inspectEnvironment } = require("../src/extract/environment");
-const { extractCursorEntriesFromRows } = require("../src/sources/cursor");
+const { dayBounds } = require("../src/lib/dates");
+const { extractCursorEntriesFromRows, inspectCursor } = require("../src/sources/cursor");
 const { inspectTokenTracker } = require("../src/sources/token-tracker");
 
 const fixtures = path.join(__dirname, "fixtures");
@@ -71,6 +75,33 @@ test("Cursor row parser treats cursorDiskKV type 1 bubbles as user prompts", () 
   assert.equal(entries[0].text, "给这个项目补一个最小 CLI 入口");
 });
 
+test("Cursor date range omits prompt rows without timestamps", async (t) => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-cursor-"));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+
+  const dbPath = path.join(dir, "state.vscdb");
+  const sql = `
+    CREATE TABLE ItemTable (key TEXT, value TEXT);
+    INSERT INTO ItemTable VALUES (
+      'bubbleId:undated',
+      '{"text":"长期未标记 prompt"}'
+    );
+    INSERT INTO ItemTable VALUES (
+      'bubbleId:dated',
+      '{"text":"今天要处理 range filter","timestamp":"2026-06-07T12:00:00.000Z"}'
+    );
+  `;
+  cp.execFileSync("sqlite3", [dbPath], { input: sql });
+
+  const report = await inspectCursor({
+    dbPath,
+    range: dayBounds("2026-06-07", "2026-06-07"),
+  });
+
+  assert.equal(report.prompt_count, 1);
+  assert.equal(report.prompts[0].text, "今天要处理 range filter");
+});
+
 test("TokenTracker queue adapter aggregates hourly token buckets by day", async () => {
   const report = await inspectTokenTracker({
     queuePath: path.join(fixtures, "tokentracker", "queue.jsonl"),
@@ -109,6 +140,22 @@ test("inspectSources exposes TokenTracker activity without adding synthetic prom
   assert.equal(report.activity.total_tokens, 5800);
   assert.equal(report.summary.prompt_count, 2);
   assert.equal(report.sources["token-tracker"], undefined);
+});
+
+test("inspectSources filters TokenTracker activity by date range", async () => {
+  const report = await inspectSources({
+    from: "2026-06-08",
+    to: "2026-06-08",
+    sources: ["codex"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      tokenTrackerQueue: path.join(fixtures, "tokentracker", "queue.jsonl"),
+    },
+  });
+
+  assert.deepEqual(report.activity.daily_rows.map((row) => row.day), ["2026-06-08"]);
+  assert.equal(report.activity.total_tokens, 800);
+  assert.equal(report.activity.daily_rows[0].models["claude/sonnet"], 750);
 });
 
 test("inspectSources computes useful high-frequency terms", async () => {
