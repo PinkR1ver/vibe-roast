@@ -1,71 +1,83 @@
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vibe Visual QA · raster embed</title>
-    <style>
-      :root { color-scheme: dark; --ink: #f7f8fb; --muted: #9aa3ad; --pass: #23d6a5; --line: #202832; }
-      * { box-sizing: border-box; }
-      body { margin: 0; padding: 32px 20px 64px; font-family: Inter, system-ui, sans-serif; background: #090b0f; color: var(--ink); }
-      h1 { font-size: 28px; margin: 0 0 8px; }
-      p, li { color: var(--muted); line-height: 1.65; }
-      code { color: var(--pass); font-size: 13px; }
-      .ref { max-width: 720px; margin: 20px 0; border-radius: 10px; border: 1px solid var(--line); overflow: hidden; }
-      .ref img { width: 100%; display: block; }
-      .ref span { display: block; padding: 10px 14px; font-size: 12px; background: #111821; }
-      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-top: 28px; }
-      .panel { border: 1px solid var(--line); border-radius: 10px; padding: 16px; background: #111821; }
-      .panel h2 { margin: 0 0 4px; font-size: 18px; }
-      .panel .code { color: var(--pass); font-size: 12px; margin-bottom: 12px; }
-      .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-      .box { background: #3a3a39; border-radius: 8px; padding: 8px; text-align: center; }
-      .box span { display: block; font-size: 11px; color: #ccc; margin-bottom: 8px; }
-      img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-      .status { margin-top: 20px; padding: 14px 16px; border-radius: 8px; border: 1px solid rgba(35,214,165,0.35); background: rgba(35,214,165,0.08); }
-    </style>
-  </head>
-  <body>
-    <h1>Visual QA · 与参考 PNG 像素一致</h1>
-    <p>
-      卡片不再手画矢量路径，而是把 <code>vibe-mascots-v4-reference.png</code> 按列切成 PNG，
-      再 base64 内嵌进 SVG。更新参考图后运行：
-      <code>python scripts/split-reference.py</code> →
-      <code>node scripts/sync-raster.mjs</code>
-    </p>
-    <div class="status">右侧 card 应与参考图对应列完全一致（含 SHIP / DEPLOY / ERROR 等参考图内文字）。</div>
-
-    <div class="ref">
-      <img src="source/references/vibe-mascots-v4-reference.png" alt="Visual reference board" />
-      <span>Source · vibe-mascots-v4-reference.png</span>
-    </div>
-
-    <section class="grid">
-      <article class="panel">
-        <h2>Builder</h2>
-        <div class="code">SHIP · builder-mascot.png</div>
-        <div class="compare">
-          <div class="box"><span>PNG slice</span><img src="characters/01-builder/builder-mascot.png" alt="" /></div>
-          <div class="box"><span>card SVG</span><img src="characters/01-builder/builder-card.svg" alt="" /></div>
-        </div>
-      </article>
-      <article class="panel">
-        <h2>Debugger</h2>
-        <div class="code">HUNT · debugger-mascot.png</div>
-        <div class="compare">
-          <div class="box"><span>PNG slice</span><img src="characters/02-debugger/debugger-mascot.png" alt="" /></div>
-          <div class="box"><span>card SVG</span><img src="characters/02-debugger/debugger-card.svg" alt="" /></div>
-        </div>
-      </article>
-      <article class="panel">
-        <h2>Architect</h2>
-        <div class="code">DRAW · architect-mascot.png</div>
-        <div class="compare">
-          <div class="box"><span>PNG slice</span><img src="characters/03-architect/architect-mascot.png" alt="" /></div>
-          <div class="box"><span>card SVG</span><img src="characters/03-architect/architect-card.svg" alt="" /></div>
-        </div>
-      </article>
-    </section>
-  </body>
-</html>
-
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vibe Visual QA · v5 SBTI pack</title>
+    <style>
+      :root { color-scheme: dark; --ink: #f7f8fb; --muted: #9aa3ad; --pass: #23d6a5; --line: #202832; }
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 32px 20px 64px; font-family: Inter, system-ui, sans-serif; background: #090b0f; color: var(--ink); }
+      h1 { font-size: 28px; margin: 0 0 8px; }
+      h2 { font-size: 20px; margin: 32px 0 12px; }
+      p, li { color: var(--muted); line-height: 1.65; }
+      code { color: var(--pass); font-size: 13px; }
+      .boards { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 960px; }
+      .boards img { width: 100%; border-radius: 10px; border: 1px solid var(--line); }
+      .boards span { display: block; font-size: 12px; margin-top: 6px; color: var(--muted); }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+      .panel { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #111821; }
+      .panel h3 { margin: 0 0 4px; font-size: 16px; }
+      .code { color: var(--pass); font-size: 12px; margin-bottom: 10px; }
+      .row { display: grid; grid-template-columns: 1fr 1fr 64px; gap: 10px; align-items: start; }
+      .box { background: #0a0a0f; border-radius: 8px; padding: 8px; text-align: center; }
+      .box span { display: block; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+      .badge-box { width: 64px; padding: 0; }
+      img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+      .banners img { width: 100%; border-radius: 8px; border: 1px solid var(--line); }
+      .status { margin: 16px 0; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(35,214,165,0.35); background: rgba(35,214,165,0.08); font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <h1>Visual QA · v5 SBTI pack (8 profiles)</h1>
+    <p>风格锚点：<code>sbti-style-reference-board.png</code> · 生产板 <code>vibe-profiles-v5-board-a/b.png</code></p>
+    <div class="status">QA: <code>python scripts/split-reference.py</code> → <code>node scripts/sync-raster.mjs</code> → <code>node scripts/sync-banners.mjs</code> → <code>node scripts/qa-faces.mjs</code></div>
+
+    <h2>Reference boards</h2>
+    <div class="boards">
+      <div><img src="source/references/vibe-profiles-v5-board-a.png" alt="Board A" /><span>Board A · SHIP HUNT DRAW FAITH</span></div>
+      <div><img src="source/references/vibe-profiles-v5-board-b.png" alt="Board B" /><span>Board B · SPELL TABS METER YOLO</span></div>
+    </div>
+
+    <h2>Profiles · card + badge</h2>
+    <section class="grid" id="profiles"></section>
+
+    <h2>Banners</h2>
+    <section class="banners">
+      <p><strong>Home hero</strong> (1200×400)</p>
+      <img src="banners/home-hero.svg" alt="Home hero" />
+      <p><strong>Share strip</strong> (1200×400)</p>
+      <img src="banners/share-strip.svg" alt="Share strip" />
+      <p><strong>Result header</strong> (1200×280)</p>
+      <img src="banners/result-header.svg" alt="Result header" />
+    </section>
+
+    <script>
+      const profiles = [
+        ["01-builder", "Builder", "SHIP"],
+        ["02-debugger", "Debugger", "HUNT"],
+        ["03-architect", "Architect", "DRAW"],
+        ["04-codex-believer", "Codex Believer", "FAITH"],
+        ["05-prompt-priest", "Prompt Priest", "SPELL"],
+        ["06-tab-hoarder", "Tab Hoarder", "TABS"],
+        ["07-context-maxxer", "Context Maxxer", "METER"],
+        ["08-yolo-shipper", "YOLO Shipper", "YOLO"],
+      ];
+      const root = document.getElementById("profiles");
+      for (const [folder, title, code] of profiles) {
+        const name = folder.replace(/^\d+-/, "");
+        const art = document.createElement("article");
+        art.className = "panel";
+        art.innerHTML = `
+          <h3>${title}</h3>
+          <div class="code">${code}</div>
+          <div class="row">
+            <div class="box"><span>card</span><img src="characters/${folder}/${name}-card.svg" alt="" /></div>
+            <div class="box"><span>character</span><img src="characters/${folder}/${name}-character.svg" alt="" /></div>
+            <div class="box badge-box"><span>badge</span><img src="badges/${folder}/${name}-badge.svg" width="64" height="64" alt="" /></div>
+          </div>`;
+        root.appendChild(art);
+      }
+    </script>
+  </body>
+</html>

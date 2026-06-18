@@ -1,30 +1,27 @@
-# Visual audit — raster embed pass
+# Visual audit — v5 SBTI pack
 
 **Date:** 2026-06-11  
-**Method:** Reference PNG split + base64 SVG embed (pixel match).
+**PR:** [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) (owner revision)
 
-## Approach
+## Owner feedback addressed
 
-| Method | Match quality |
-|--------|----------------|
-| Hand-traced SVG | Approximate — drifts on faces, props, labels |
-| **PNG slice → embedded SVG** | **Identical** to `vibe-mascots-v4-reference.png` column |
-
-## Pipeline
-
-```bash
-python scripts/split-reference.py
-node scripts/sync-raster.mjs
-node scripts/qa-faces.mjs
-```
+- [x] Expand to **8 profiles** with vibe-coding meme hooks (not mechanical 16 fill)
+- [x] **Badges** per profile (64×64 SVG)
+- [x] **Banners** — home / share / result header
+- [x] Style pivot to **`sbti-style-reference-board.png`** (v5 boards A/B)
+- [x] Raster PNG slice embed pipeline retained
 
 ## Checks
 
-- [x] Each `*-mascot.png` is one column of the reference board
-- [x] Character/card SVG use `data:image/png;base64` (no external href)
-- [x] Card art includes reference labels (DEPLOY, ERROR, SHIP, …)
-- [x] No legacy human neck/hood layers
+```bash
+cd assests
+node scripts/qa-faces.mjs   # 8×3 character assets + 3 banners
+```
+
+- [x] 8 character + 8 card + 8 badge SVGs with embedded PNG
+- [x] 3 banner SVGs (1200×400 / 1200×280 viewBox)
+- [x] No external image href in deliverables
 
 ## Preview
 
-`review.html` — PNG slice vs card SVG side by side on `#3a3a39` (reference gray).
+`review.html` — full v5 gallery

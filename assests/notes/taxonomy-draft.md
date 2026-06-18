@@ -1,62 +1,67 @@
-# Vibe Profile Character Taxonomy
+# Vibe Profile Character Taxonomy (v2)
 
-Assignee: ShinjukuZhu · Branch: `codex/profile-visual-assets` · Status: first deliverable (3/16)
+Assignee: ShinjukuZhu · Branch: `codex/profile-visual-assets` · Status: **8/16** + badges + banners
 
-## SBTI-informed mapping
+## Style anchor
 
-| Vibe type | Code | SBTI spirit (not 1:1) | Emotion | Symbol |
-|-----------|------|------------------------|---------|--------|
-| Builder | SHIP | GOGO doer energy | eager grin | deploy button |
-| Debugger | HUNT | THIN-K meets WOC! stress | tired `_` eyes | error line + duck |
-| Architect | DRAW | THIN-K planner | calm glasses | 3-box flow |
+Primary reference: `source/references/sbti-style-reference-board.png`  
+Production boards: `vibe-profiles-v5-board-a.png` (01–04), `vibe-profiles-v5-board-b.png` (05–08)
 
-Reference mood board: `source/references/sbti-style-reference-board.png`
+SBTI card frame · circuit glow · diamond border accents · chibi or mascot · thick outlines · dark dashboard friendly.
 
-## 16 archetypes
+## 2026 vibe-coding meme hooks (Apr–Jun)
 
-| # | Archetype | Code | Accent | Hook | Status |
-|---|-----------|------|--------|------|--------|
-| 01 | Builder | SHIP | Mint | Deploy first, refine later | **Done** |
-| 02 | Debugger | HUNT | Pink | Error line + rubber duck | **Done** |
-| 03 | Architect | DRAW | Blue | Three-box system flow | **Done** |
-| 04 | Designer | — | — | — | Planned |
-| 05 | Researcher | — | — | — | Planned |
-| 06 | Automator | — | — | — | Planned |
-| 07 | Tester | — | — | — | Planned |
-| 08 | Publisher | — | — | — | Planned |
-| 09 | Refactorer | — | — | — | Planned |
-| 10 | Explainer | — | — | — | Planned |
-| 11 | Prompt Crafter | — | — | — | Planned |
-| 12 | Token Maxxer | — | — | — | Planned |
-| 13 | Workflow DJ | — | — | — | Planned |
-| 14 | Terminal Monk | — | — | — | Planned |
-| 15 | UI Polisher | — | — | — | Planned |
-| 16 | Chaos Shipper | — | — | — | Planned |
+| Meme signal | Source vibe | Used in |
+|-------------|-------------|---------|
+| Agentic engineering vs vibe coding | Karpathy / industry discourse 2026 | FAITH, YOLO |
+| Cursor `--yolo` / agent mode | Cursor CLI & agent workflows | YOLO |
+| Context window / credit meter anxiety | ICSE 2026 vibe-coding studies, SaaS pricing | METER |
+| “47 tabs / three localhost ports” | ProgrammerHumor AI memes 2026 | TABS |
+| Giant system prompt scroll | Prompt-engineering culture | SPELL |
+| “Thank you for the code though” | Production ≠ generation gap | HUNT, YOLO |
+| Codex / agent disciple | Owner brief + Cursor agent culture | FAITH |
 
-## Implemented characters (v1)
+## 8 implemented archetypes
 
-### 01 Builder · SHIP
+| # | Archetype | Code | Accent | Hook | Meme / state |
+|---|-----------|------|--------|------|--------------|
+| 01 | Builder | SHIP | Mint | Deploy first | Ship now, refine in prod |
+| 02 | Debugger | HUNT | Pink | Duck + breakpoint | 3am error line + rubber duck |
+| 03 | Architect | DRAW | Blue | Three-box flow | Boxes before bytes |
+| 04 | Codex Believer | FAITH | Purple | Agent halo terminal | Prays to the agent — owner example |
+| 05 | Prompt Priest | SPELL | Gold | Giant rules scroll | `.cursor/rules` as holy text |
+| 06 | Tab Hoarder | TABS | Orange | Tab swarm | :3000 :8000 :5000 all open |
+| 07 | Context Maxxer | METER | Cyan | Gauge at 99% | Context/credits almost full |
+| 08 | YOLO Shipper | YOLO | Red | Big red button | Agent `--yolo`, skip review merge |
 
-- **Meme:** “just hit deploy” / vibe ship
-- **Signature:** mint headband, spiky hair, sweat drop, fist pump, ship box + deploy on screen
-- **Expression:** wide grin, angled focused brows
+## Planned (not in v5 pack)
 
-### 02 Debugger · HUNT
-
-- **Meme:** rubber duck debugging, 3am breakpoint
-- **Signature:** deep hood, hoodie strings, eye bags, cold coffee, breakpoint dot, larger duck
-- **Expression:** tired `_` eyes, flat mouth
-
-### 03 Architect · DRAW
-
-- **Meme:** “let me draw some boxes”
-- **Signature:** thick glasses, side-part hair, collar, pen pointing at hub-and-spoke diagram
-- **Expression:** raised-brow calm planner smile
+| # | Archetype | Code | Hook |
+|---|-----------|------|------|
+| 09 | Rescue Engineer | PATCH | Rebuild vibe-coded prod |
+| 10 | Workflow DJ | MIX | Hooks + MCP + agents |
+| 11 | Terminal Monk | SHELL | GUI is optional |
+| 12 | Readme Never | VOID | Code exists, docs don’t |
+| 13 | Research Rabbit | DEEP | Docs tab infinity |
+| 14 | Trust Dropper | DOUBT | 29% trust, 84% usage |
+| 15 | UI Polisher | GLOW | Pixel pass at 2am |
+| 16 | Chaos Shipper | LFG | Friday deploy energy |
 
 ## Asset map
 
 ```
-characters/01-builder/  builder-character.svg  builder-card.svg
-characters/02-debugger/ debugger-character.svg debugger-card.svg
-characters/03-architect/ architect-character.svg architect-card.svg
+characters/XX-name/  *-mascot.png  *-character.svg  *-card.svg
+badges/XX-name/      *-badge.png    *-badge.svg
+banners/             home-hero.*  share-strip.*  result-header.*
+source/references/   vibe-profiles-v5-board-a.png  board-b.png
+```
+
+## Regenerate
+
+```bash
+cd assests
+python scripts/split-reference.py
+node scripts/sync-raster.mjs
+node scripts/sync-banners.mjs
+node scripts/qa-faces.mjs
 ```

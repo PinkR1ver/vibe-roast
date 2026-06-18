@@ -1,48 +1,43 @@
-# Vibe Profile Visual Pack
-
-First deliverable for [Issue #2](https://github.com/PinkR1ver/vibe-wrapper/issues/2) — creative asset branch only.
-
-## Folder structure
-
-```
-assests/
-├── README.md
-├── preview.html / review.html
-├── characters/
-│   ├── 01-builder/
-│   │   ├── builder-mascot.png      ← slice from reference PNG (source pixels)
-│   │   ├── builder-character.svg   ← PNG embedded as base64
-│   │   └── builder-card.svg
-│   └── … (debugger, architect)
-├── source/references/
-│   └── vibe-mascots-v4-reference.png
-├── scripts/
-│   ├── split-reference.py        ← 1 PNG → 3 mascot slices
-│   ├── sync-raster.mjs           ← slices → character + card SVGs
-│   └── qa-faces.mjs
-└── notes/taxonomy-draft.md
-```
-
-## Preview
-
-Open **`review.html`** in a browser (file:// is fine).
-
-## Art pipeline (pixel match)
-
-Hand-traced SVG paths cannot match the visual model reference exactly. The approved look lives in **`source/references/vibe-mascots-v4-reference.png`**. Regenerate assets from that file:
-
-```bash
-cd assests
-python scripts/split-reference.py
-node scripts/sync-raster.mjs
-node scripts/qa-faces.mjs
-```
-
-Each character SVG is a **self-contained wrapper** with the PNG inlined as `data:image/png;base64,…` (no external `href` — works in browser preview and `<img>` tags).
-
-## Conventions
-
-- **`builder-mascot.png`** = source of truth (one third of the reference board).
-- **Character / card SVG** = embedded raster, not re-drawn vectors.
-- Type labels (`SHIP`, `DEPLOY`, `ERROR`, …) stay inside the reference art — not re-typeset in code.
-
+# Vibe Profile Visual Pack (v5)
+
+PR [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) · Issue #2 · Branch `codex/profile-visual-assets`
+
+## What's in v5
+
+- **8 profiles** in SBTI card style (`sbti-style-reference-board.png`)
+- **8 badges** (64×64 SVG)
+- **3 banners** (home 1200×400, share 1200×400, result 1200×280)
+- Raster PNG → base64 SVG pipeline (pixel match with reference boards)
+
+## Preview
+
+| Page | Purpose |
+|------|---------|
+| `review.html` | Full QA: boards, cards, badges, banners |
+| `preview.html` | 8-card gallery |
+
+## Regenerate
+
+```bash
+cd assests
+python scripts/split-reference.py
+node scripts/sync-raster.mjs
+node scripts/sync-banners.mjs
+node scripts/qa-faces.mjs
+```
+
+Config: `scripts/profiles.json`
+
+## Structure
+
+```
+assests/
+├── characters/01-builder … 08-yolo-shipper/
+├── badges/01-builder … 08-yolo-shipper/
+├── banners/  home-hero.*  share-strip.*  result-header.*
+├── source/references/
+│   ├── sbti-style-reference-board.png      # style anchor
+│   ├── vibe-profiles-v5-board-a.png        # profiles 01–04
+│   └── vibe-profiles-v5-board-b.png        # profiles 05–08
+└── scripts/  split-reference.py  sync-raster.mjs  sync-banners.mjs
+```

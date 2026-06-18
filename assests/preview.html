@@ -3,107 +3,51 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vibe Profile Characters — Preview</title>
+    <title>Vibe Profile · v5 pack preview</title>
     <style>
-      :root {
-        color-scheme: dark;
-        --bg: #090b0f;
-        --ink: #f7f8fb;
-        --muted: #9aa3ad;
-        --mint: #23d6a5;
-      }
+      :root { color-scheme: dark; --bg: #090b0f; --ink: #f7f8fb; --muted: #9aa3ad; --mint: #23d6a5; }
       * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        min-height: 100vh;
-        padding: 40px 24px 64px;
-        background:
-          radial-gradient(circle at 50% 0%, rgba(35, 214, 165, 0.08), transparent 40%),
-          linear-gradient(155deg, #090b0f, #111016 54%, #081016);
-        color: var(--ink);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-      header { max-width: 980px; margin: 0 auto 36px; }
-      .kicker {
-        margin: 0 0 10px;
-        color: var(--mint);
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-      }
-      h1 { margin: 0 0 12px; font-size: 42px; line-height: 1; }
-      p { margin: 0; max-width: 680px; color: var(--muted); line-height: 1.65; }
-      .grid {
-        max-width: 980px;
-        margin: 0 auto;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 28px;
-      }
-      .item { display: grid; gap: 14px; }
-      .card-wrap {
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 8px;
-        background: #3a3a39;
-        padding: 18px;
-        display: grid;
-        place-items: center;
-      }
-      .card-wrap img {
-        width: 310px;
-        max-width: 100%;
-        height: auto;
-        display: block;
-        border-radius: 8px;
-        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
-      }
-      .meta strong { display: block; font-size: 22px; }
-      .meta span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+      body { margin: 0; padding: 40px 24px 64px; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+      header { max-width: 1100px; margin: 0 auto 32px; }
+      .kicker { color: var(--mint); font-size: 11px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; }
+      h1 { margin: 8px 0 12px; font-size: 36px; }
+      p { color: var(--muted); max-width: 720px; line-height: 1.65; }
+      a { color: var(--mint); }
+      .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+      .item { display: grid; gap: 10px; }
+      .card-wrap { background: #0a0a0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 14px; display: grid; place-items: center; }
+      .card-wrap img { width: 310px; max-width: 100%; border-radius: 6px; }
+      .meta strong { font-size: 18px; }
+      .meta span { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
       .meta code { color: var(--mint); font-size: 12px; }
     </style>
   </head>
   <body>
     <header>
-      <p class="kicker">Vibe Profile Visual Pack · Issue #2</p>
-      <h1>First 3 mascots (raster · PNG-identical)</h1>
-      <p>
-        卡片 = 参考图按列切出的 PNG，base64 内嵌进 SVG（与 vibe-mascots-v4-reference.png 像素一致）。
-        请先打开 <a href="review.html" style="color:#23d6a5">review.html</a> 对照 PNG slice 与 card。
-        重建：<code>python scripts/split-reference.py</code> · <code>node scripts/sync-raster.mjs</code>
-      </p>
+      <p class="kicker">Issue #2 · PR #3 revision</p>
+      <h1>8 Vibe Profiles (SBTI style)</h1>
+      <p>Full QA: <a href="review.html">review.html</a> · Rebuild: <code>python scripts/split-reference.py</code> + <code>node scripts/sync-raster.mjs</code></p>
     </header>
-    <section class="grid">
-      <article class="item">
-        <div class="card-wrap">
-          <img src="characters/01-builder/builder-card.svg" width="310" height="420" alt="Builder card" />
-        </div>
-        <div class="meta">
-          <strong>Builder</strong>
-          <span>ships first, refines later</span>
-          <code>SHIP · rocket · deploy chevrons · VIBE-01</code>
-        </div>
-      </article>
-      <article class="item">
-        <div class="card-wrap">
-          <img src="characters/02-debugger/debugger-card.svg" width="310" height="420" alt="Debugger card" />
-        </div>
-        <div class="meta">
-          <strong>Debugger</strong>
-          <span>talks to the duck, fixes the line</span>
-          <code>HUNT · duck · magnifier + X badge · VIBE-02</code>
-        </div>
-      </article>
-      <article class="item">
-        <div class="card-wrap">
-          <img src="characters/03-architect/architect-card.svg" width="310" height="420" alt="Architect card" />
-        </div>
-        <div class="meta">
-          <strong>Architect</strong>
-          <span>boxes before bytes</span>
-          <code>DRAW · screen bot · diagram crown · VIBE-03</code>
-        </div>
-      </article>
-    </section>
+    <section class="grid" id="grid"></section>
+    <script>
+      const items = [
+        ["01-builder", "Builder", "SHIP", "Deploy first"],
+        ["02-debugger", "Debugger", "HUNT", "Duck at midnight"],
+        ["03-architect", "Architect", "DRAW", "Boxes before bytes"],
+        ["04-codex-believer", "Codex Believer", "FAITH", "Agent disciple"],
+        ["05-prompt-priest", "Prompt Priest", "SPELL", "Rules scroll"],
+        ["06-tab-hoarder", "Tab Hoarder", "TABS", "47 localhost tabs"],
+        ["07-context-maxxer", "Context Maxxer", "METER", "Gauge at 99%"],
+        ["08-yolo-shipper", "YOLO Shipper", "YOLO", "Skip review merge"],
+      ];
+      const grid = document.getElementById("grid");
+      for (const [folder, title, code, hook] of items) {
+        const name = folder.replace(/^\d+-/, "");
+        grid.innerHTML += `<article class="item">
+          <div class="card-wrap"><img src="characters/${folder}/${name}-card.svg" width="310" height="420" alt="${title}" /></div>
+          <div class="meta"><strong>${title}</strong><span>${hook}</span><code>${code}</code></div>
+        </article>`;
+      }
+    </script>
   </body>
 </html>

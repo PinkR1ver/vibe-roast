@@ -1,31 +1,58 @@
-"""Split vibe-mascots-v4-reference.png into per-character raster slices."""
+"""Split v5 reference boards into per-profile mascot PNGs and badge crops."""
+import json
 from pathlib import Path
 
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-REF = ROOT / "source" / "references" / "vibe-mascots-v4-reference.png"
+CONFIG = Path(__file__).resolve().parent / "profiles.json"
 
-OUT = [
-    ("01-builder", "builder-mascot.png"),
-    ("02-debugger", "debugger-mascot.png"),
-    ("03-architect", "architect-mascot.png"),
-]
+
+def split_board(board_path: Path, cols: int, profiles: list[dict]) -> None:
+    im = Image.open(board_path).convert("RGBA")
+    w, h = im.size
+    col_w = w // cols
+
+    for i, profile in enumerate(profiles):
+        x0 = i * col_w
+        x1 = (i + 1) * col_w if i < cols - 1 else w
+        crop = im.crop((x0, 0, x1, h))
+
+        char_dir = ROOT / "characters" / profile["folder"]
+        badge_dir = ROOT / "badges" / profile["folder"]
+        char_dir.mkdir(parents=True, exist_ok=True)
+        badge_dir.mkdir(parents=True, exist_ok=True)
+
+        mascot_name = f"{profile['name']}-mascot.png"
+        mascot_path = char_dir / mascot_name
+        crop.save(mascot_path, optimize=True)
+        print(f"wrote {mascot_path} ({crop.size[0]}x{crop.size[1]})")
+
+        make_badge(crop, badge_dir / f"{profile['name']}-badge.png")
+
+
+def make_badge(slice_im: Image.Image, out_path: Path, size: int = 256) -> None:
+    w, h = slice_im.size
+    crop_size = int(min(w, h) * 0.44)
+    cx = w // 2
+    cy = int(h * 0.30)
+    box = (
+        max(0, cx - crop_size // 2),
+        max(0, cy - crop_size // 2),
+        min(w, cx + crop_size // 2),
+        min(h, cy + crop_size // 2),
+    )
+    face = slice_im.crop(box).resize((size, size), Image.LANCZOS)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    face.save(out_path, optimize=True)
+    print(f"wrote {out_path}")
 
 
 def main() -> None:
-    im = Image.open(REF).convert("RGBA")
-    w, h = im.size
-    col_w = w // 3
-
-    for i, (folder, filename) in enumerate(OUT):
-        x0 = i * col_w
-        x1 = (i + 1) * col_w if i < 2 else w
-        crop = im.crop((x0, 0, x1, h))
-        out = ROOT / "characters" / folder / filename
-        out.parent.mkdir(parents=True, exist_ok=True)
-        crop.save(out, optimize=True)
-        print(f"wrote {out} ({crop.size[0]}x{crop.size[1]})")
+    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    for board in config["boards"]:
+        board_path = ROOT / board["file"]
+        split_board(board_path, board["cols"], board["profiles"])
 
 
 if __name__ == "__main__":
