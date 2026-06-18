@@ -22,6 +22,7 @@ PR [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) · Issue #2 · Branch 
 cd assests
 python scripts/split-reference.py
 node scripts/sync-raster.mjs
+python scripts/compose-banners.py
 node scripts/sync-banners.mjs
 node scripts/qa-faces.mjs
 ```

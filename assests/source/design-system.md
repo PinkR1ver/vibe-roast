@@ -51,6 +51,7 @@ All deliverable SVGs embed PNG via `data:image/png;base64` (self-contained, no e
 cd assests
 python scripts/split-reference.py
 node scripts/sync-raster.mjs
+python scripts/compose-banners.py
 node scripts/sync-banners.mjs
 node scripts/qa-faces.mjs
 ```

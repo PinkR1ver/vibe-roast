@@ -1,5 +1,5 @@
 /**
- * Embed banner PNGs as self-contained SVGs.
+ * Embed banner PNGs as self-contained SVGs (1:1 pixel match, no crop).
  */
 import fs from "fs";
 import path from "path";
@@ -23,20 +23,23 @@ function pngSize(filePath) {
 for (const banner of config.banners) {
   const pngPath = path.join(root, banner.file);
   if (!fs.existsSync(pngPath)) {
-    console.error(`Missing ${pngPath}`);
+    console.error(`Missing ${pngPath} — run: python scripts/compose-banners.py`);
     process.exit(1);
   }
   const { w, h } = pngSize(pngPath);
   const b64 = pngBase64(pngPath);
   const outPath = path.join(root, banner.out);
-  const targetW = banner.width;
-  const targetH = banner.height;
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${targetW} ${targetH}" fill="none" aria-label="${banner.label}">
-  <rect width="${targetW}" height="${targetH}" fill="#0a0a0f"/>
-  <image x="0" y="0" width="${targetW}" height="${targetH}" preserveAspectRatio="xMidYMid slice" href="data:image/png;base64,${b64}"/>
+  if (w !== banner.width || h !== banner.height) {
+    console.warn(
+      `warn ${path.basename(pngPath)} is ${w}x${h}, expected ${banner.width}x${banner.height}`
+    );
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${w} ${h}" fill="none" aria-label="${banner.label}">
+  <image width="${w}" height="${h}" href="data:image/png;base64,${b64}"/>
 </svg>
 `;
   fs.writeFileSync(outPath, svg);
-  console.log("banner", outPath, `(source ${w}x${h} → viewBox ${targetW}x${targetH})`);
+  console.log("banner", outPath, `(${w}x${h})`);
 }

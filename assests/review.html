@@ -31,7 +31,8 @@
   <body>
     <h1>Visual QA · v5 SBTI pack (8 profiles)</h1>
     <p>风格锚点：<code>sbti-style-reference-board.png</code> · 生产板 <code>vibe-profiles-v5-board-a/b.png</code></p>
-    <div class="status">QA: <code>python scripts/split-reference.py</code> → <code>node scripts/sync-raster.mjs</code> → <code>node scripts/sync-banners.mjs</code> → <code>node scripts/qa-faces.mjs</code></div>
+    <p>Banners 仅使用已设计的 8 个 mascot 切片拼接（<code>compose-banners.py</code>），无 AI 额外角色；尺寸 1:1 内嵌，不裁切。</p>
+    <div class="status">QA: <code>python scripts/compose-banners.py</code> → <code>node scripts/sync-banners.mjs</code></div>
 
     <h2>Reference boards</h2>
     <div class="boards">
