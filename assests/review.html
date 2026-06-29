@@ -40,6 +40,13 @@
       <div><img src="source/references/vibe-profiles-v5-board-b.png" alt="Board B" /><span>Board B · SPELL TABS METER YOLO</span></div>
     </div>
 
+    <h2>Badge symbols (v6)</h2>
+    <p>独立符号徽章，非 mascot 头像裁切。参考板：<code>vibe-badges-v6-board.png</code></p>
+    <div class="boards" style="max-width:960px;margin-bottom:24px">
+      <img src="source/references/vibe-badges-v6-board.png" alt="Badge board" />
+    </div>
+    <div class="badge-row" id="badges" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:32px"></div>
+
     <h2>Profiles · card + badge</h2>
     <section class="grid" id="profiles"></section>
 
@@ -65,8 +72,14 @@
         ["08-yolo-shipper", "YOLO Shipper", "YOLO"],
       ];
       const root = document.getElementById("profiles");
+      const badgeRow = document.getElementById("badges");
       for (const [folder, title, code] of profiles) {
         const name = folder.replace(/^\d+-/, "");
+        const b = document.createElement("div");
+        b.className = "box badge-box";
+        b.style.width = "80px";
+        b.innerHTML = `<span>${code}</span><img src="badges/${folder}/${name}-badge.svg" width="64" height="64" alt="" />`;
+        badgeRow.appendChild(b);
         const art = document.createElement("article");
         art.className = "panel";
         art.innerHTML = `

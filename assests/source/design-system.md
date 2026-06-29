@@ -9,7 +9,8 @@ Primary style reference: `source/references/sbti-style-reference-board.png`
 | `vibe-profiles-v5-board-a.png` | Profiles 01–04 (4 columns) |
 | `vibe-profiles-v5-board-b.png` | Profiles 05–08 (4 columns) |
 | `characters/*/*-mascot.png` | One column slice per profile |
-| `badges/*/*-badge.png` | Face/icon crop from slice |
+| `vibe-badges-v6-board.png` | Symbolic badge icons (8 columns) |
+| `badges/*/*-badge.png` | Per-profile symbol badge (256×256 source) |
 | `banners/*.png` | Wide banner masters |
 
 All deliverable SVGs embed PNG via `data:image/png;base64` (self-contained, no external href).
@@ -41,7 +42,7 @@ All deliverable SVGs embed PNG via `data:image/png;base64` (self-contained, no e
 |-------|------|
 | Board slice | 384×1024 (from 1536×1024 ÷ 4) |
 | Card SVG | 310×420 |
-| Badge SVG | 64×64 |
+| Badge SVG | 64×64 (symbol icon, not mascot crop) |
 | Home / share banner | 1200×400 (viewBox; source PNG scaled) |
 | Result header banner | 1200×280 |
 
@@ -50,6 +51,7 @@ All deliverable SVGs embed PNG via `data:image/png;base64` (self-contained, no e
 ```bash
 cd assests
 python scripts/split-reference.py
+python scripts/split-badges.py
 node scripts/sync-raster.mjs
 python scripts/compose-banners.py
 node scripts/sync-banners.mjs

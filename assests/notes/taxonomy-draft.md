@@ -51,17 +51,32 @@ SBTI card frame · circuit glow · diamond border accents · chibi or mascot · 
 
 ```
 characters/XX-name/  *-mascot.png  *-character.svg  *-card.svg
-badges/XX-name/      *-badge.png    *-badge.svg
+badges/XX-name/      *-badge.png    *-badge.svg   ← symbolic icon (v6 board)
 banners/             home-hero.*  share-strip.*  result-header.*
-source/references/   vibe-profiles-v5-board-a.png  board-b.png
+source/references/   vibe-profiles-v5-board-a/b.png  vibe-badges-v6-board.png
 ```
+
+## Badge symbols (v6 — not mascot crops)
+
+| Code | Symbol |
+|------|--------|
+| SHIP | Rocket + deploy/play button |
+| HUNT | Error X + rubber duck |
+| DRAW | Three-box flow arrows |
+| FAITH | Terminal + halo |
+| SPELL | Rules scroll |
+| TABS | Stacked tabs + port badges |
+| METER | Gauge at 99% |
+| YOLO | Red panic button + lightning |
 
 ## Regenerate
 
 ```bash
 cd assests
 python scripts/split-reference.py
+python scripts/split-badges.py
 node scripts/sync-raster.mjs
+python scripts/compose-banners.py
 node scripts/sync-banners.mjs
 node scripts/qa-faces.mjs
 ```

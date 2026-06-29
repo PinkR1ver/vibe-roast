@@ -5,7 +5,7 @@ PR [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) · Issue #2 · Branch 
 ## What's in v5
 
 - **8 profiles** in SBTI card style (`sbti-style-reference-board.png`)
-- **8 badges** (64×64 SVG)
+- **8 badges** — v6 **symbolic icons** (64×64 SVG, not mascot crops)
 - **3 banners** (home 1200×400, share 1200×400, result 1200×280)
 - Raster PNG → base64 SVG pipeline (pixel match with reference boards)
 
@@ -21,6 +21,7 @@ PR [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) · Issue #2 · Branch 
 ```bash
 cd assests
 python scripts/split-reference.py
+python scripts/split-badges.py
 node scripts/sync-raster.mjs
 python scripts/compose-banners.py
 node scripts/sync-banners.mjs
@@ -39,6 +40,7 @@ assests/
 ├── source/references/
 │   ├── sbti-style-reference-board.png      # style anchor
 │   ├── vibe-profiles-v5-board-a.png        # profiles 01–04
-│   └── vibe-profiles-v5-board-b.png        # profiles 05–08
-└── scripts/  split-reference.py  sync-raster.mjs  sync-banners.mjs
+│   ├── vibe-profiles-v5-board-b.png        # profiles 05–08
+│   └── vibe-badges-v6-board.png            # symbolic badges
+└── scripts/  split-reference.py  split-badges.py  sync-raster.mjs
 ```

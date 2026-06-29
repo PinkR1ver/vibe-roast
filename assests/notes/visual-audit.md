@@ -6,7 +6,7 @@
 ## Owner feedback addressed
 
 - [x] Expand to **8 profiles** with vibe-coding meme hooks (not mechanical 16 fill)
-- [x] **Badges** per profile (64×64 SVG)
+- [x] **Badges** — v6 symbolic icons per archetype (`vibe-badges-v6-board.png`), 64×64 SVG
 - [x] **Banners** — composed from **8 mascot slices only** (`compose-banners.py`), exact 1200×400 / 1200×280, no crop
 - [x] Style pivot to **`sbti-style-reference-board.png`** (v5 boards A/B)
 - [x] Raster PNG slice embed pipeline retained

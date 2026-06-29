@@ -61,6 +61,11 @@
       ]
     }
   ],
+  "badgeBoard": {
+    "file": "source/references/vibe-badges-v6-board.png",
+    "cols": 8,
+    "note": "Symbolic icons per archetype — not mascot face crops"
+  },
   "banners": [
     {
       "file": "banners/home-hero.png",

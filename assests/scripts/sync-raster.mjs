@@ -1,6 +1,6 @@
 /**
- * Embed mascot PNG slices + badge crops as self-contained SVGs.
- * Reads scripts/profiles.json — run after split-reference.py
+ * Embed mascot PNG slices + symbolic badge PNGs as self-contained SVGs.
+ * Run: python scripts/split-reference.py && python scripts/split-badges.py
  */
 import fs from "fs";
 import path from "path";
@@ -67,19 +67,22 @@ function writeCard(profile, pngPath, w, h) {
 
 function writeBadge(profile, pngPath) {
   const b64 = pngBase64(pngPath);
+  const { w, h } = pngSize(pngPath);
+  const pad = 4;
+  const inner = BADGE_SIZE - pad * 2;
   const out = path.join(
     root,
     "badges",
     profile.folder,
     `${profile.name}-badge.svg`
   );
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${BADGE_SIZE} ${BADGE_SIZE}" fill="none" aria-label="${profile.label} badge">
-  <rect width="${BADGE_SIZE}" height="${BADGE_SIZE}" rx="14" fill="#111821"/>
-  <image x="4" y="4" width="56" height="56" preserveAspectRatio="xMidYMid slice" href="data:image/png;base64,${b64}"/>
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${BADGE_SIZE} ${BADGE_SIZE}" fill="none" aria-label="${profile.label} symbolic badge">
+  <rect width="${BADGE_SIZE}" height="${BADGE_SIZE}" rx="14" fill="#111821" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <image x="${pad}" y="${pad}" width="${inner}" height="${inner}" preserveAspectRatio="xMidYMid meet" href="data:image/png;base64,${b64}"/>
 </svg>
 `;
   fs.writeFileSync(out, svg);
-  console.log("badge", out);
+  console.log("badge", out, `(symbol ${w}x${h})`);
 }
 
 const profiles = config.boards.flatMap((b) => b.profiles);
@@ -107,9 +110,9 @@ for (const profile of profiles) {
   writeCharacter(profile, mascotPath, w, h);
   writeCard(profile, mascotPath, w, h);
 
-  if (fs.existsSync(badgePath)) {
-    writeBadge(profile, badgePath);
-  } else {
-    console.warn("skip badge (no png):", badgePath);
+  if (!fs.existsSync(badgePath)) {
+    console.error(`Missing ${badgePath} — run: python scripts/split-badges.py`);
+    process.exit(1);
   }
+  writeBadge(profile, badgePath);
 }
