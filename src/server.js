@@ -5,6 +5,7 @@ const { exec } = require("node:child_process");
 const { inspectSources } = require("./inspect");
 
 const PORT = process.env.PORT === undefined ? 7681 : Number(process.env.PORT);
+const HOST = process.env.HOST || "127.0.0.1";
 const DIST_DIR = path.join(__dirname, "..", "dashboard", "dist");
 
 const MIME = {
@@ -90,10 +91,10 @@ function openBrowser(url) {
 function start() {
   const server = createServer();
   return new Promise((resolve) => {
-    server.listen(PORT, () => {
+    server.listen(PORT, HOST, () => {
       const address = server.address();
       const port = typeof address === "object" && address ? address.port : PORT;
-      const url = `http://localhost:${port}`;
+      const url = `http://${HOST}:${port}`;
       process.stderr.write(`vibe-wrapper dashboard → ${url}\n`);
       openBrowser(url);
       resolve(server);
