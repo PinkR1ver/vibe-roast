@@ -5,6 +5,49 @@ const { createInterface } = require("node:readline");
 
 const DEFAULT_QUEUE = path.join(os.homedir(), ".tokentracker", "tracker", "queue.jsonl");
 
+// ---------------------------------------------------------------------------
+// Legacy-row corrections — aligned with TokenTracker normalizeQueueRow
+// (src/lib/local-api.js)
+// ---------------------------------------------------------------------------
+
+function isLegacyInclusiveCodexRow(row) {
+  if (!row || (row.source !== "codex" && row.source !== "every-code")) return false;
+  const inputTokens = Number(row.input_tokens || 0);
+  const cachedInputTokens = Number(row.cached_input_tokens || 0);
+  const outputTokens = Number(row.output_tokens || 0);
+  const totalTokens = Number(row.total_tokens || 0);
+  if (!Number.isFinite(inputTokens) || !Number.isFinite(cachedInputTokens)) return false;
+  if (cachedInputTokens <= 0 || inputTokens < cachedInputTokens) return false;
+  // Legacy Codex queue rows stored input inclusive of cache reads, while
+  // total_tokens remained input + output. Canonical rows keep input as pure
+  // non-cached input, identified by this exact invariant.
+  return totalTokens === inputTokens + outputTokens;
+}
+
+function normalizeQueueRow(row) {
+  let normalized = row;
+  if (isLegacyInclusiveCodexRow(normalized)) {
+    normalized = {
+      ...normalized,
+      input_tokens:
+        Number(normalized.input_tokens || 0) - Number(normalized.cached_input_tokens || 0),
+    };
+  }
+  // Legacy Cursor rows from versions ≤ 0.26.5 wrote billable_total_tokens = 0
+  // for "Included in Pro" / "Enterprise" records. The dashboard headline sums
+  // billable_total_tokens, so those rows silently disappeared from totals.
+  // Bump billable up to total_tokens at read time.
+  const sourceName = String(normalized.source || "").toLowerCase();
+  if (sourceName === "cursor") {
+    const totalTokens = Number(normalized.total_tokens || 0);
+    const billable = Number(normalized.billable_total_tokens || 0);
+    if (totalTokens > 0 && billable < totalTokens) {
+      normalized = { ...normalized, billable_total_tokens: totalTokens };
+    }
+  }
+  return normalized;
+}
+
 async function inspectTokenTracker({ queuePath, range } = {}) {
   const file = queuePath || DEFAULT_QUEUE;
   let filesScanned = 0;
@@ -21,12 +64,14 @@ async function inspectTokenTracker({ queuePath, range } = {}) {
       if (!line.trim()) continue;
       let row;
       try {
-        row = JSON.parse(line);
+        row = normalizeQueueRow(JSON.parse(line));
       } catch {
         continue;
       }
 
-      const timestamp = row.hour_start || row.timestamp || row.ended_at || row.created_at;
+      // Match TokenTracker dedup key: (source, model, hour_start) only.
+      // Rows without hour_start are skipped — same as upstream.
+      const timestamp = row.hour_start;
       if (!timestamp || !inRange(timestamp, range)) continue;
 
       const totals = normalizeTotals(row);
@@ -136,7 +181,12 @@ function normalizeTotals(row) {
     total_tokens: number(row.total_tokens),
     billable_total_tokens: number(row.billable_total_tokens),
   };
-  if (!totals.billable_total_tokens) totals.billable_total_tokens = totals.total_tokens;
+  // Match TokenTracker aggregateByDay nullish fallback:
+  // only substitute total_tokens when billable is absent (null / undefined),
+  // not when it is legitimately zero.
+  if (row.billable_total_tokens == null && totals.total_tokens > 0) {
+    totals.billable_total_tokens = totals.total_tokens;
+  }
   return totals;
 }
 
@@ -168,4 +218,4 @@ function number(value) {
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
-module.exports = { inspectTokenTracker };
+module.exports = { inspectTokenTracker, isLegacyInclusiveCodexRow, normalizeQueueRow };
