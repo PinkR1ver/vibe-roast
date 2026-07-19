@@ -81,9 +81,25 @@ Default local sources:
 - Cursor: `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` on macOS
 - TokenTracker activity: `~/.tokentracker/tracker/queue.jsonl`
 
-Cursor support is currently best-effort. It reads user `bubbleId` rows from `cursorDiskKV`, but those compact prompt rows may not include reliable timestamps or token usage.
+Cursor support is currently best-effort. It reads user `bubbleId` / composer / chat rows from `ItemTable` and `cursorDiskKV` (requires local `sqlite3`). Compact Cursor rows often omit token usage; prompts without timestamps are omitted from date-filtered views.
 
 The dashboard 3D heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+
+## Testing
+
+```bash
+npm test
+```
+
+Coverage for the three primary session sources:
+
+| Source | Fixtures | What tests cover |
+| --- | --- | --- |
+| Codex | `test/fixtures/codex/sessions/**/*.jsonl` | JSONL prompt/token parse, date range, inspect + CLI |
+| Claude Code | `test/fixtures/claude/projects/**/*.jsonl` | user-message extract, tokens, inspect + CLI |
+| Cursor | `test/fixtures/cursor/state.vscdb` | SQLite row parse, path resolution, date filter, inspect + CLI |
+
+Multi-source `inspectSources` also asserts `profile_signals` and `vibe_profile` (agent score / figure paths) when Codex + Claude + Cursor fixtures are combined. TokenTracker activity uses `test/fixtures/tokentracker/queue.jsonl`.
 
 ## Hooks (optional)
 

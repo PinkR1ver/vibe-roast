@@ -54,7 +54,7 @@ function readCursorRows(dbPath) {
   const itemSql =
     "SELECT key, value FROM ItemTable WHERE key LIKE '%bubble%' OR key LIKE '%composer%' OR key LIKE '%chat%' LIMIT 20000;";
   const diskSql =
-    "SELECT key, json_object('type', json_extract(value, '$.type'), 'text', json_extract(value, '$.text')) AS value FROM cursorDiskKV WHERE key LIKE 'bubbleId:%' AND json_extract(value, '$.type') = 1 AND length(COALESCE(json_extract(value, '$.text'), '')) > 0 LIMIT 20000;";
+    "SELECT key, json_object('type', json_extract(value, '$.type'), 'text', json_extract(value, '$.text'), 'timestamp', json_extract(value, '$.timestamp'), 'createdAt', json_extract(value, '$.createdAt')) AS value FROM cursorDiskKV WHERE key LIKE 'bubbleId:%' AND json_extract(value, '$.type') = 1 AND length(COALESCE(json_extract(value, '$.text'), '')) > 0 LIMIT 20000;";
   return [...readSqliteRows(dbPath, itemSql), ...readSqliteRows(dbPath, diskSql)];
 }
 

@@ -34,6 +34,61 @@ test("inspectSources extracts Codex and Claude prompts inside date range", async
   assert.ok(report.prompts.every((p) => p.timestamp.startsWith("2026-06-07")));
 });
 
+test("inspectSources includes Codex, Claude, and Cursor when fixtures are present", async () => {
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-07",
+    sources: ["codex", "claude", "cursor"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      claude: path.join(fixtures, "claude", "projects"),
+      cursor: path.join(fixtures, "cursor", "state.vscdb"),
+    },
+  });
+
+  assert.equal(report.summary.source_count, 3);
+  assert.equal(report.summary.prompt_count, 5);
+  assert.equal(report.sources.codex.prompt_count, 2);
+  assert.equal(report.sources.claude.prompt_count, 1);
+  assert.equal(report.sources.cursor.prompt_count, 2);
+  assert.equal(report.summary.token_totals.total_tokens, 3600);
+  assert.deepEqual(
+    [...new Set(report.prompts.map((prompt) => prompt.source))].sort(),
+    ["claude", "codex", "cursor"],
+  );
+  assert.ok(report.prompts.every((p) => p.timestamp.startsWith("2026-06-07")));
+});
+
+test("inspectSources builds vibe_profile from multi-source prompts", async () => {
+  const home = path.join(fixtures, "home");
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-07",
+    sources: ["codex", "claude", "cursor"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      claude: path.join(fixtures, "claude", "projects"),
+      cursor: path.join(fixtures, "cursor", "state.vscdb"),
+      home,
+      codexHome: path.join(home, ".codex"),
+    },
+  });
+
+  const vibe = report.vibe_profile;
+  assert.ok(vibe);
+  assert.ok(Number.isFinite(vibe.total));
+  assert.ok(vibe.tier?.id);
+  assert.ok(vibe.archetype?.id);
+  assert.match(vibe.figure, /^\/assests\/characters\/.+-figure\.png$/);
+  assert.match(vibe.badge, /^\/assests\/badges\/.+-badge\.svg$/);
+  assert.equal(vibe.dimensions.length, 6);
+  assert.equal(
+    vibe.signals.find((signal) => signal.label === "Sources")?.value,
+    "3",
+  );
+  assert.ok(report.profile_signals.prompt_analysis.useful_prompt_count >= 4);
+});
+
 test("Cursor row parser extracts prompt-like values from SQLite key/value rows", () => {
   const entries = extractCursorEntriesFromRows([
     {

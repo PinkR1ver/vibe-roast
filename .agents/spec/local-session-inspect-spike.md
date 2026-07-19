@@ -27,7 +27,11 @@ Build a minimal CLI that verifies whether this project can read local Codex, Cla
 
 ## Testing Notes
 
-Use Node's built-in test runner with fixture session files. Cursor tests use fake rows through parser functions instead of requiring a real SQLite database.
+Use Node's built-in test runner (`npm test`) with fixture session files:
+
+- Codex / Claude Code: JSONL under `test/fixtures/codex` and `test/fixtures/claude`
+- Cursor: SQLite `test/fixtures/cursor/state.vscdb` plus parser unit tests; live reads need `sqlite3` on PATH
+- Multi-source inspect asserts all three adapters plus `vibe_profile`
 
 2026-06-11 maintenance note: phrase extraction now splits English identifiers such as `SessionEnd` and `session_id` so Claude Code session/hook terminology contributes searchable words like `session`, `end`, and `hook`.
 
