@@ -57,7 +57,7 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
     range: { from: from || null, to: to || null },
     summary,
     sources: sourceReports,
-    activity: buildActivity(tokenTrackerActivity),
+    activity: buildActivity(tokenTrackerActivity, prompts),
     word_frequencies: wordFrequencies(promptAnalysis.useful_prompts),
     profile_signals: {
       prompt_analysis: promptAnalysis,
@@ -68,7 +68,7 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
   };
 }
 
-function buildActivity(tokenTrackerActivity) {
+function buildActivity(tokenTrackerActivity, prompts = []) {
   if (tokenTrackerActivity?.daily_rows?.length > 0) {
     return {
       source: "token-tracker",
@@ -77,16 +77,45 @@ function buildActivity(tokenTrackerActivity) {
       total_tokens: tokenTrackerActivity.token_totals?.total_tokens || 0,
       active_day_count: tokenTrackerActivity.active_day_count || 0,
       bucket_count: tokenTrackerActivity.bucket_count || 0,
+      daily_row_count: tokenTrackerActivity.daily_rows.length,
       root: tokenTrackerActivity.root,
     };
   }
+
+  const byDay = new Map();
+  for (const prompt of prompts || []) {
+    if (!prompt?.timestamp) continue;
+    const day = String(prompt.timestamp).slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) continue;
+    const row = byDay.get(day) || { day, value: 0, conversation_count: 0, models: {}, sources: {} };
+    row.value += 1;
+    row.conversation_count += 1;
+    const source = prompt.source || "unknown";
+    row.sources[source] = (row.sources[source] || 0) + 1;
+    row.models[source] = (row.models[source] || 0) + 1;
+    byDay.set(day, row);
+  }
+
+  const daily_rows = [...byDay.values()]
+    .sort((a, b) => a.day.localeCompare(b.day))
+    .map((row) => ({
+      day: row.day,
+      value: row.value,
+      total_tokens: row.value,
+      billable_total_tokens: row.value,
+      conversation_count: row.conversation_count,
+      models: row.models,
+      sources: row.sources,
+    }));
+
   return {
     source: "prompts",
     metric: "prompts",
-    daily_rows: [],
+    daily_rows,
     total_tokens: 0,
-    active_day_count: 0,
+    active_day_count: daily_rows.length,
     bucket_count: 0,
+    daily_row_count: daily_rows.length,
     root: null,
   };
 }

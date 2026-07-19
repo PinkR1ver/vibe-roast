@@ -124,8 +124,10 @@ function start() {
       const address = server.address();
       const port = typeof address === "object" && address ? address.port : PORT;
       const url = `http://localhost:${port}`;
-      process.stderr.write(`vibe-wrapper dashboard → ${url}\n`);
-      process.stderr.write(`visual demo           → ${url}/assests/result.html\n`);
+      process.stderr.write(`vibe-wrapper roast result → ${url}\n`);
+      process.stderr.write(`dashboard               → ${url} (nav → Dashboard)\n`);
+      process.stderr.write(`static live report      → ${url}/assests/live-report.html\n`);
+      process.stderr.write(`visual demo             → ${url}/assests/result.html\n`);
       openBrowser(url);
       resolve(server);
     });

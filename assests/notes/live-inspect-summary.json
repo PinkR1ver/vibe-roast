@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-19T17:46:30.094Z",
+  "generated_at": "2026-07-19T18:00:42.074Z",
   "range": {
     "from": null,
     "to": null
@@ -7,9 +7,9 @@
   "summary": {
     "source_count": 3,
     "files_scanned": 1,
-    "prompt_count": 322,
+    "prompt_count": 328,
     "first_prompt_at": "2026-04-18T01:05:16.348Z",
-    "last_prompt_at": "2026-07-19T17:46:09.535Z",
+    "last_prompt_at": "2026-07-19T17:57:49.086Z",
     "token_totals": {
       "input_tokens": 0,
       "cached_input_tokens": 0,
@@ -32,8 +32,7 @@
         "output_tokens": 0,
         "reasoning_output_tokens": 0,
         "total_tokens": 0
-      },
-      "notes": null
+      }
     },
     "claude": {
       "source": "claude",
@@ -47,14 +46,13 @@
         "output_tokens": 0,
         "reasoning_output_tokens": 0,
         "total_tokens": 0
-      },
-      "notes": null
+      }
     },
     "cursor": {
       "source": "cursor",
       "root": "/Users/zhuyanhao/Library/Application Support/Cursor/User/globalStorage/state.vscdb",
       "files_scanned": 1,
-      "prompt_count": 322,
+      "prompt_count": 328,
       "token_totals": {
         "input_tokens": 0,
         "cached_input_tokens": 0,
@@ -71,10 +69,343 @@
   "activity": {
     "source": "prompts",
     "metric": "prompts",
+    "daily_rows": [
+      {
+        "day": "2026-04-18",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-04-19",
+        "value": 41,
+        "conversation_count": 41,
+        "models": {
+          "cursor": 41
+        },
+        "sources": {
+          "cursor": 41
+        }
+      },
+      {
+        "day": "2026-04-21",
+        "value": 8,
+        "conversation_count": 8,
+        "models": {
+          "cursor": 8
+        },
+        "sources": {
+          "cursor": 8
+        }
+      },
+      {
+        "day": "2026-04-23",
+        "value": 4,
+        "conversation_count": 4,
+        "models": {
+          "cursor": 4
+        },
+        "sources": {
+          "cursor": 4
+        }
+      },
+      {
+        "day": "2026-05-07",
+        "value": 13,
+        "conversation_count": 13,
+        "models": {
+          "cursor": 13
+        },
+        "sources": {
+          "cursor": 13
+        }
+      },
+      {
+        "day": "2026-05-09",
+        "value": 3,
+        "conversation_count": 3,
+        "models": {
+          "cursor": 3
+        },
+        "sources": {
+          "cursor": 3
+        }
+      },
+      {
+        "day": "2026-05-16",
+        "value": 13,
+        "conversation_count": 13,
+        "models": {
+          "cursor": 13
+        },
+        "sources": {
+          "cursor": 13
+        }
+      },
+      {
+        "day": "2026-05-18",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-05-20",
+        "value": 24,
+        "conversation_count": 24,
+        "models": {
+          "cursor": 24
+        },
+        "sources": {
+          "cursor": 24
+        }
+      },
+      {
+        "day": "2026-05-21",
+        "value": 13,
+        "conversation_count": 13,
+        "models": {
+          "cursor": 13
+        },
+        "sources": {
+          "cursor": 13
+        }
+      },
+      {
+        "day": "2026-05-22",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-05-28",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-05-30",
+        "value": 2,
+        "conversation_count": 2,
+        "models": {
+          "cursor": 2
+        },
+        "sources": {
+          "cursor": 2
+        }
+      },
+      {
+        "day": "2026-06-06",
+        "value": 15,
+        "conversation_count": 15,
+        "models": {
+          "cursor": 15
+        },
+        "sources": {
+          "cursor": 15
+        }
+      },
+      {
+        "day": "2026-06-07",
+        "value": 12,
+        "conversation_count": 12,
+        "models": {
+          "cursor": 12
+        },
+        "sources": {
+          "cursor": 12
+        }
+      },
+      {
+        "day": "2026-06-08",
+        "value": 2,
+        "conversation_count": 2,
+        "models": {
+          "cursor": 2
+        },
+        "sources": {
+          "cursor": 2
+        }
+      },
+      {
+        "day": "2026-06-10",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-06-11",
+        "value": 22,
+        "conversation_count": 22,
+        "models": {
+          "cursor": 22
+        },
+        "sources": {
+          "cursor": 22
+        }
+      },
+      {
+        "day": "2026-06-16",
+        "value": 28,
+        "conversation_count": 28,
+        "models": {
+          "cursor": 28
+        },
+        "sources": {
+          "cursor": 28
+        }
+      },
+      {
+        "day": "2026-06-17",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-06-18",
+        "value": 4,
+        "conversation_count": 4,
+        "models": {
+          "cursor": 4
+        },
+        "sources": {
+          "cursor": 4
+        }
+      },
+      {
+        "day": "2026-06-19",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-06-22",
+        "value": 18,
+        "conversation_count": 18,
+        "models": {
+          "cursor": 18
+        },
+        "sources": {
+          "cursor": 18
+        }
+      },
+      {
+        "day": "2026-06-23",
+        "value": 3,
+        "conversation_count": 3,
+        "models": {
+          "cursor": 3
+        },
+        "sources": {
+          "cursor": 3
+        }
+      },
+      {
+        "day": "2026-06-24",
+        "value": 5,
+        "conversation_count": 5,
+        "models": {
+          "cursor": 5
+        },
+        "sources": {
+          "cursor": 5
+        }
+      },
+      {
+        "day": "2026-06-25",
+        "value": 13,
+        "conversation_count": 13,
+        "models": {
+          "cursor": 13
+        },
+        "sources": {
+          "cursor": 13
+        }
+      },
+      {
+        "day": "2026-06-26",
+        "value": 1,
+        "conversation_count": 1,
+        "models": {
+          "cursor": 1
+        },
+        "sources": {
+          "cursor": 1
+        }
+      },
+      {
+        "day": "2026-07-08",
+        "value": 3,
+        "conversation_count": 3,
+        "models": {
+          "cursor": 3
+        },
+        "sources": {
+          "cursor": 3
+        }
+      },
+      {
+        "day": "2026-07-16",
+        "value": 2,
+        "conversation_count": 2,
+        "models": {
+          "cursor": 2
+        },
+        "sources": {
+          "cursor": 2
+        }
+      },
+      {
+        "day": "2026-07-19",
+        "value": 71,
+        "conversation_count": 71,
+        "models": {
+          "cursor": 71
+        },
+        "sources": {
+          "cursor": 71
+        }
+      }
+    ],
     "total_tokens": 0,
-    "active_day_count": 0,
+    "active_day_count": 30,
     "bucket_count": 0,
-    "daily_row_count": 0
+    "daily_row_count": 30,
+    "root": null
   },
   "word_frequencies": [
     {
@@ -200,16 +531,16 @@
   ],
   "profile_signals": {
     "prompt_analysis": {
-      "total_prompts": 322,
-      "useful_prompt_count": 320,
+      "total_prompts": 328,
+      "useful_prompt_count": 326,
       "reference_prompt_count": 2,
-      "useful_ratio": 0.9938,
+      "useful_ratio": 0.9939,
       "categories": {
         "planning": {
           "count": 11
         },
         "debugging": {
-          "count": 22
+          "count": 24
         },
         "implementation": {
           "count": 199
@@ -218,7 +549,7 @@
           "count": 4
         },
         "testing": {
-          "count": 29
+          "count": 31
         },
         "packaging": {
           "count": 2
@@ -230,7 +561,7 @@
           "count": 7
         },
         "ui_design": {
-          "count": 6
+          "count": 8
         },
         "workflow": {
           "count": 7
@@ -321,12 +652,12 @@
     "scores": {
       "orchestration": 0.3,
       "promptCraft": 17.9,
-      "build": 11.3,
+      "build": 11.1,
       "debug": 1,
       "context": 15.9,
       "ship": 4.3
     },
-    "total": 50.7,
+    "total": 50.5,
     "tier": {
       "id": "NPC",
       "min": 35,
@@ -372,8 +703,8 @@
         "labelZh": "构建吞吐",
         "hint": "Implementation & packaging density",
         "max": 18,
-        "value": 11.3,
-        "score": 0.63
+        "value": 11.1,
+        "score": 0.62
       },
       {
         "key": "debug",
@@ -407,7 +738,7 @@
       {
         "label": "Useful prompts",
         "labelZh": "有效提示",
-        "value": "320"
+        "value": "326"
       },
       {
         "label": "Sources",
@@ -427,7 +758,7 @@
   },
   "prompts": {
     "_redacted": true,
-    "count": 322
+    "count": 328
   },
-  "_redaction_note": "Prompt bodies, useful_prompts text, and reference examples stripped. Aggregates only."
+  "_redaction_note": "Prompt bodies, category examples, useful_prompts text stripped. Aggregates + activity daily_rows + word_frequencies kept."
 }

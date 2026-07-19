@@ -213,6 +213,25 @@ test("inspectSources filters TokenTracker activity by date range", async () => {
   assert.equal(report.activity.daily_rows[0].models["claude/sonnet"], 750);
 });
 
+test("inspectSources builds prompt daily_rows when TokenTracker is absent", async () => {
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-07",
+    sources: ["codex", "claude"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      claude: path.join(fixtures, "claude", "projects"),
+      tokenTrackerQueue: path.join(fixtures, "missing-tokentracker.jsonl"),
+    },
+  });
+
+  assert.equal(report.activity.source, "prompts");
+  assert.equal(report.activity.metric, "prompts");
+  assert.ok(report.activity.daily_rows.length >= 1);
+  assert.equal(report.activity.daily_rows[0].day, "2026-06-07");
+  assert.ok(report.activity.daily_rows[0].value >= 1);
+});
+
 test("inspectSources computes useful high-frequency terms", async () => {
   const report = await inspectSources({
     from: "2026-06-07",

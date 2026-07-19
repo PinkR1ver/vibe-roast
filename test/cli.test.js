@@ -26,7 +26,7 @@ test("CLI starts the dashboard when no command is provided", async () => {
   });
 
   try {
-    await waitForOutput(() => stderr.includes("vibe-wrapper dashboard"));
+    await waitForOutput(() => stderr.includes("vibe-wrapper roast result"));
     assert.match(stderr, /http:\/\/localhost:\d+/);
     assert.doesNotMatch(stderr, /http:\/\/localhost:7681/);
     assert.equal(stdout, "");

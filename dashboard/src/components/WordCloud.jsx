@@ -14,6 +14,8 @@ export default function WordCloud({
   shape = "circle",
   ellipticity = 1.0,
   minSize = 0,
+  colors = null,
+  fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
 }) {
   const canvasRef = useRef(null);
 
@@ -33,18 +35,17 @@ export default function WordCloud({
     const ctx = canvas.getContext("2d");
     ctx.scale(dpr, dpr);
 
+    const palette = colors || [
+      "#059669", "#10b981", "#34d399", "#047857", "#065f46",
+      "#8b5cf6", "#6366f1", "#3b82f6", "#f59e0b", "#ec4899",
+    ];
+
     draw(canvas, {
       list,
       gridSize: gridSize ?? Math.max(4, Math.round((12 * width) / 1024)),
       weightFactor: (w) => (w / max) * (Math.min(width, height) / weightDivisor),
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      color: () => {
-        const colors = [
-          "#059669", "#10b981", "#34d399", "#047857", "#065f46",
-          "#8b5cf6", "#6366f1", "#3b82f6", "#f59e0b", "#ec4899",
-        ];
-        return colors[Math.floor(Math.random() * colors.length)];
-      },
+      fontFamily,
+      color: () => palette[Math.floor(Math.random() * palette.length)],
       rotateRatio,
       minRotation,
       maxRotation,
@@ -57,8 +58,8 @@ export default function WordCloud({
     });
 
     return () => {
-      const dpr = window.devicePixelRatio || 1;
-      ctx && ctx.clearRect(0, 0, width * dpr, height * dpr);
+      const dpr2 = window.devicePixelRatio || 1;
+      ctx && ctx.clearRect(0, 0, width * dpr2, height * dpr2);
     };
   }, [
     words,
@@ -72,6 +73,8 @@ export default function WordCloud({
     shape,
     ellipticity,
     minSize,
+    colors,
+    fontFamily,
   ]);
 
   if (!words || words.length === 0) {

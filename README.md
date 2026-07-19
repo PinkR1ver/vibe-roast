@@ -11,8 +11,9 @@ npm run build          # builds dashboard/dist
 npm run serve          # http://localhost:7681
 ```
 
-- Dashboard (activity + DNA radar): `http://localhost:7681/`
-- Live profile result (score · tier · radar · roast · figure): open **Open roast result** from the dashboard personality panel
+- **Roast Result** (default landing): `http://localhost:7681/` — score · tier · radar · roast · word cloud · 3D activity · `#hashtags` · 竖屏分享海报 (3:4)
+- Dashboard (activity + DNA radar): top nav → **Dashboard**
+- Static live report: `http://localhost:7681/assests/live-report.html`
 - Visual asset demo (static, no inspect): `http://localhost:7681/assests/result.html`
 
 Dev mode (API + Vite HMR):

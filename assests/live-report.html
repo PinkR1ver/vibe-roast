@@ -243,26 +243,6 @@
         image-rendering: auto;
       }
 
-      .badge-chip {
-        position: absolute;
-        right: 4%;
-        bottom: 8%;
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        background: rgba(255, 252, 247, 0.92);
-        border: 0;
-        box-shadow: 0 10px 22px rgba(40, 28, 12, 0.12);
-        overflow: hidden;
-        backdrop-filter: blur(6px);
-      }
-
-      .badge-chip img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
       .meta-panel {
         margin-top: 6px;
         padding: 16px 14px 14px;
@@ -324,6 +304,70 @@
         color: color-mix(in srgb, var(--accent) 70%, #222);
         font-size: 12px;
         font-weight: 700;
+      }
+
+      .hashtag-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        margin: 12px 0 4px;
+      }
+
+      .hashtag-row span {
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 14%, #fffcf7);
+        color: color-mix(in srgb, var(--accent) 72%, #222);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .cloud-stage,
+      .activity-stage {
+        border-radius: 14px;
+        background: #f7f4ef;
+        overflow: hidden;
+      }
+
+      .cloud-stage {
+        min-height: 220px;
+        display: grid;
+        place-items: center;
+      }
+
+      .cloud-stage canvas {
+        width: 100%;
+        height: 220px;
+        display: block;
+      }
+
+      .activity-stage {
+        min-height: 260px;
+        padding: 8px;
+      }
+
+      .poster-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .poster-bar .hint {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .cta.secondary {
+        width: auto;
+        margin: 0;
+        padding: 10px 16px;
+        white-space: nowrap;
       }
 
       .signal-grid {
@@ -699,6 +743,11 @@
     <main class="shell">
       <div class="live-banner" id="banner"></div>
 
+      <div class="poster-bar">
+        <div class="hint" id="posterHint">Roast Result · 竖屏海报比例 3:4</div>
+        <button class="cta secondary" type="button" id="posterBtn">生成竖屏分享海报 (3:4)</button>
+      </div>
+
       <section class="layout is-animating" id="stage">
         <aside class="profile-card" id="profileCard"></aside>
         <div class="stack">
@@ -719,6 +768,18 @@
             </div>
             <div class="roast" id="roast"></div>
           </article>
+
+          <article class="card panel">
+            <h2>Word cloud</h2>
+            <p class="sub">From inspect word_frequencies</p>
+            <div class="cloud-stage"><canvas id="wordCloud" width="640" height="220"></canvas></div>
+          </article>
+
+          <article class="card panel">
+            <h2>3D Activity</h2>
+            <p class="sub">Isometric heatmap · cream card style</p>
+            <div class="activity-stage" id="activityMap"></div>
+          </article>
         </div>
       </section>
 
@@ -729,8 +790,41 @@
     </main>
 
     <script type="module">
-      const LIVE = {"scores": {"orchestration": 0.3, "promptCraft": 17.9, "build": 11.3, "debug": 1, "context": 15.9, "ship": 4.3}, "total": 50.7, "tier": {"id": "NPC", "min": 35, "color": "#8b8680", "emoji": "😐", "blurb": "Background cast · needs plot", "blurbZh": "路人甲 · 缺主线"}, "archetype": {"id": "05-prompt-priest", "folder": "05-prompt-priest", "name": "prompt-priest", "title": "Prompt Priest", "code": "SPELL", "accent": "#f0c14a", "hook": "Rules scroll", "hookZh": "规则卷轴"}, "figure": "characters/05-prompt-priest/prompt-priest-figure.png", "badge": "badges/05-prompt-priest/prompt-priest-badge.svg", "dimensions": [{"key": "orchestration", "label": "Agent orchestration", "labelZh": "Agent 编排", "hint": "Skills · MCP · multi-agent workflow", "max": 20, "value": 0.3, "score": 0.02}, {"key": "promptCraft", "label": "Prompt craft", "labelZh": "提示词手艺", "hint": "Useful intent vs paste dumps", "max": 18, "value": 17.9, "score": 0.99}, {"key": "build", "label": "Build throughput", "labelZh": "构建吞吐", "hint": "Implementation & packaging density", "max": 18, "value": 11.3, "score": 0.63}, {"key": "debug", "label": "Debug resilience", "labelZh": "调试韧性", "hint": "Breakpoint stamina & root-cause chase", "max": 14, "value": 1, "score": 0.07}, {"key": "context", "label": "Context discipline", "labelZh": "上下文纪律", "hint": "Window hygiene · no log farming", "max": 16, "value": 15.9, "score": 0.99}, {"key": "ship", "label": "Ship courage", "labelZh": "上线勇气", "hint": "Merge energy vs review paralysis", "max": 14, "value": 4.3, "score": 0.31}], "signals": [{"label": "Useful prompts", "labelZh": "有效提示", "value": "320"}, {"label": "Sources", "labelZh": "数据源", "value": "3"}, {"label": "Top category", "labelZh": "主类别", "value": "implementation"}], "roast": "🔥 Your system prompt has chapters. Prompt craft 17.9/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.", "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.9/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。", "tldr": "Prompt Priest: liturgy excellence, deployment fasting.", "tldrZh": "Prompt Priest：礼仪满分，部署斋戒。"};
-      const META = {"generated_at": "2026-07-19T17:46:30.094Z", "prompt_count": 322, "source_count": 3, "sources": {"codex": 0, "claude": 0, "cursor": 322}};
+      import {
+        buildHashtags,
+        renderWordCloud,
+        renderActivityIso,
+        downloadSharePoster,
+      } from "./scripts/roast-extras.js";
+      import { EMBED } from "./scripts/live-report-boot.js";
+
+      async function loadPayload() {
+        try {
+          const res = await fetch("notes/live-inspect-summary.json", { cache: "no-store" });
+          if (!res.ok) throw new Error("fetch failed");
+          const summary = await res.json();
+          const vibe = { ...summary.vibe_profile };
+          const rel = (p) => String(p || "").replace(/^\/assests\//, "");
+          vibe.figure = rel(vibe.figure);
+          vibe.badge = rel(vibe.badge);
+          return {
+            LIVE: vibe,
+            META: {
+              generated_at: summary.generated_at,
+              prompt_count: summary.summary?.prompt_count,
+              source_count: summary.summary?.source_count,
+              sources: Object.fromEntries(
+                Object.entries(summary.sources || {}).map(([k, v]) => [k, v.prompt_count || 0]),
+              ),
+            },
+            WORDS: summary.word_frequencies || [],
+            ACTIVITY: summary.activity || {},
+            CATEGORIES: summary.profile_signals?.prompt_analysis?.categories || {},
+          };
+        } catch {
+          return EMBED;
+        }
+      }
 
       const profileCard = document.getElementById("profileCard");
       const radar = document.getElementById("radar");
@@ -740,11 +834,26 @@
       const langZh = document.getElementById("langZh");
       const langEn = document.getElementById("langEn");
       const banner = document.getElementById("banner");
+      const posterBtn = document.getElementById("posterBtn");
+      const wordCloud = document.getElementById("wordCloud");
+      const activityMap = document.getElementById("activityMap");
 
       let lang = "zh";
+      let payload = EMBED;
 
       langZh.addEventListener("click", () => { lang = "zh"; render(); });
       langEn.addEventListener("click", () => { lang = "en"; render(); });
+      posterBtn.addEventListener("click", async () => {
+        posterBtn.disabled = true;
+        posterBtn.textContent = lang === "zh" ? "生成中…" : "Generating…";
+        try {
+          const hashtags = buildHashtags(payload.LIVE, payload.CATEGORIES);
+          await downloadSharePoster({ vibe: payload.LIVE, hashtags, lang });
+        } finally {
+          posterBtn.disabled = false;
+          posterBtn.textContent = "生成竖屏分享海报 (3:4)";
+        }
+      });
 
       function escapeHtml(value) {
         return String(value)
@@ -756,7 +865,8 @@
       const escapeXml = escapeHtml;
 
       function render() {
-        const vibe = LIVE;
+        const vibe = payload.LIVE;
+        const META = payload.META;
         const arch = vibe.archetype;
         const tier = vibe.tier;
         const score = Number(vibe.total);
@@ -764,7 +874,7 @@
         langZh.classList.toggle("is-active", lang === "zh");
         langEn.classList.toggle("is-active", lang === "en");
 
-        const srcBits = Object.entries(META.sources)
+        const srcBits = Object.entries(META.sources || {})
           .map(([k, v]) => `${k} ${v}`)
           .join(" · ");
         banner.innerHTML = `<b>Live inspect</b> · ${escapeHtml(META.generated_at)} · prompts ${META.prompt_count} · sources ${META.source_count} (${escapeHtml(srcBits)}) · redacted aggregates only`;
@@ -772,6 +882,7 @@
         const hook = lang === "zh" ? arch.hookZh : arch.hook;
         const blurb = lang === "zh" ? tier.blurbZh : tier.blurb;
         const percentile = Math.min(99.5, Math.round((score / 100) * 97 + 2));
+        const hashtags = buildHashtags(vibe, payload.CATEGORIES);
 
         profileCard.innerHTML = `
           <div class="profile-stage">
@@ -779,10 +890,8 @@
             <p class="name">${escapeHtml(arch.title)} · ${escapeHtml(hook)}</p>
             <div class="mascot-wrap">
               <img src="${escapeHtml(vibe.figure)}" width="384" height="512" alt="${escapeHtml(arch.title)}" />
-              <div class="badge-chip" title="${escapeHtml(arch.code)}">
-                <img src="${escapeHtml(vibe.badge)}" width="64" height="64" alt="" />
-              </div>
             </div>
+            <div class="hashtag-row">${hashtags.map((t) => `<span>${escapeHtml(t)}</span>`).join("")}</div>
           </div>
           <div class="meta-panel">
             <div class="score-block">
@@ -790,7 +899,6 @@
             </div>
             <div class="tier">${tier.emoji} ${escapeHtml(tier.id)}</div>
             <p class="tier-blurb">${escapeHtml(blurb)}</p>
-            <div class="tags"><span>${escapeHtml(arch.folder)}</span><span>${escapeHtml(arch.code)}</span></div>
             <div class="signal-grid">
               ${vibe.signals
                 .map(
@@ -821,6 +929,9 @@
         const body = lang === "zh" ? vibe.roastZh : vibe.roast;
         const tldr = lang === "zh" ? vibe.tldrZh : vibe.tldr;
         roast.innerHTML = `${escapeHtml(body)}<p class="tldr"><b>TL;DR</b> · ${escapeHtml(tldr)}</p>`;
+
+        renderWordCloud(wordCloud, payload.WORDS, arch.accent);
+        renderActivityIso(activityMap, payload.ACTIVITY, 20);
 
         stage.classList.remove("is-animating");
         void stage.offsetWidth;
@@ -887,7 +998,12 @@
         </svg>`;
       }
 
+      payload = await loadPayload();
       render();
+      window.addEventListener("resize", () => {
+        renderWordCloud(wordCloud, payload.WORDS, payload.LIVE.archetype.accent);
+      });
     </script>
+
   </body>
 </html>
