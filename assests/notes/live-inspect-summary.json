@@ -1,0 +1,433 @@
+{
+  "generated_at": "2026-07-19T17:46:30.094Z",
+  "range": {
+    "from": null,
+    "to": null
+  },
+  "summary": {
+    "source_count": 3,
+    "files_scanned": 1,
+    "prompt_count": 322,
+    "first_prompt_at": "2026-04-18T01:05:16.348Z",
+    "last_prompt_at": "2026-07-19T17:46:09.535Z",
+    "token_totals": {
+      "input_tokens": 0,
+      "cached_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_output_tokens": 0,
+      "total_tokens": 0
+    }
+  },
+  "sources": {
+    "codex": {
+      "source": "codex",
+      "root": "/Users/zhuyanhao/.codex/sessions",
+      "files_scanned": 0,
+      "prompt_count": 0,
+      "token_totals": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 0
+      },
+      "notes": null
+    },
+    "claude": {
+      "source": "claude",
+      "root": "/Users/zhuyanhao/.claude/projects",
+      "files_scanned": 0,
+      "prompt_count": 0,
+      "token_totals": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 0
+      },
+      "notes": null
+    },
+    "cursor": {
+      "source": "cursor",
+      "root": "/Users/zhuyanhao/Library/Application Support/Cursor/User/globalStorage/state.vscdb",
+      "files_scanned": 1,
+      "prompt_count": 322,
+      "token_totals": {
+        "input_tokens": 0,
+        "cached_input_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "output_tokens": 0,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 0
+      },
+      "notes": [
+        "Cursor bubble rows expose prompt text but not reliable timestamps in the compact local query; date-filtered views omit undated Cursor prompts."
+      ]
+    }
+  },
+  "activity": {
+    "source": "prompts",
+    "metric": "prompts",
+    "total_tokens": 0,
+    "active_day_count": 0,
+    "bucket_count": 0,
+    "daily_row_count": 0
+  },
+  "word_frequencies": [
+    {
+      "term": "adv",
+      "count": 106
+    },
+    {
+      "term": "xs",
+      "count": 100
+    },
+    {
+      "term": "adv_xs",
+      "count": 98
+    },
+    {
+      "term": "model",
+      "count": 65
+    },
+    {
+      "term": "grad",
+      "count": 63
+    },
+    {
+      "term": "self",
+      "count": 60
+    },
+    {
+      "term": "label",
+      "count": 51
+    },
+    {
+      "term": "imgs",
+      "count": 49
+    },
+    {
+      "term": "labels",
+      "count": 48
+    },
+    {
+      "term": "key",
+      "count": 41
+    },
+    {
+      "term": "todo",
+      "count": 40
+    },
+    {
+      "term": "def",
+      "count": 36
+    },
+    {
+      "term": "torch",
+      "count": 36
+    },
+    {
+      "term": "loss",
+      "count": 35
+    },
+    {
+      "term": "true",
+      "count": 35
+    },
+    {
+      "term": "detach",
+      "count": 34
+    },
+    {
+      "term": "ax",
+      "count": 32
+    },
+    {
+      "term": "pred",
+      "count": 32
+    },
+    {
+      "term": "client",
+      "count": 31
+    },
+    {
+      "term": "set",
+      "count": 28
+    },
+    {
+      "term": "data",
+      "count": 27
+    },
+    {
+      "term": "epsilon",
+      "count": 27
+    },
+    {
+      "term": "nn",
+      "count": 26
+    },
+    {
+      "term": "plt",
+      "count": 26
+    },
+    {
+      "term": "代码",
+      "count": 26
+    },
+    {
+      "term": "size",
+      "count": 25
+    },
+    {
+      "term": "import",
+      "count": 23
+    },
+    {
+      "term": "ngrok",
+      "count": 23
+    },
+    {
+      "term": "修改",
+      "count": 23
+    },
+    {
+      "term": "train",
+      "count": 22
+    }
+  ],
+  "profile_signals": {
+    "prompt_analysis": {
+      "total_prompts": 322,
+      "useful_prompt_count": 320,
+      "reference_prompt_count": 2,
+      "useful_ratio": 0.9938,
+      "categories": {
+        "planning": {
+          "count": 11
+        },
+        "debugging": {
+          "count": 22
+        },
+        "implementation": {
+          "count": 199
+        },
+        "refactor": {
+          "count": 4
+        },
+        "testing": {
+          "count": 29
+        },
+        "packaging": {
+          "count": 2
+        },
+        "explanation": {
+          "count": 33
+        },
+        "research": {
+          "count": 7
+        },
+        "ui_design": {
+          "count": 6
+        },
+        "workflow": {
+          "count": 7
+        },
+        "reference": {
+          "count": 2
+        }
+      },
+      "useful_prompts": {
+        "_redacted": true,
+        "count": 60
+      },
+      "reference_summary": {
+        "count": 2,
+        "code_or_log_count": 2,
+        "signals": {
+          "languages": {
+            "python": 1
+          },
+          "file_extensions": {
+            ".py": 2
+          },
+          "error_types": {
+            "Traceback": 1
+          },
+          "files": [
+            {
+              "path": "/tmp/ipykernel_2420/1904327038.py",
+              "extension": ".py"
+            },
+            {
+              "path": "/tmp/ipykernel_2420/3142558117.py",
+              "extension": ".py"
+            }
+          ]
+        },
+        "examples": {
+          "_redacted": true,
+          "count": 2
+        }
+      }
+    },
+    "environment": {
+      "codex": {
+        "home": "/Users/zhuyanhao/.codex",
+        "skills": {
+          "count": 0,
+          "user_count": 0,
+          "plugin_count": 0,
+          "names": [],
+          "user_names": [],
+          "plugin_names": []
+        },
+        "mcp_servers": {
+          "count": 0,
+          "names": []
+        },
+        "plugins": {
+          "count": 0,
+          "enabled_count": 0,
+          "names": []
+        },
+        "config": {
+          "present": false,
+          "model": null,
+          "personality": null,
+          "sandbox_mode": null,
+          "approval_policy": null
+        },
+        "custom_instructions": {
+          "present": false,
+          "path": "/Users/zhuyanhao/.codex/AGENTS.md",
+          "char_count": 0,
+          "line_count": 0,
+          "preview": ""
+        },
+        "system_prompt": {
+          "present": false,
+          "path": "/Users/zhuyanhao/.codex/AGENTS.md",
+          "char_count": 0,
+          "line_count": 0,
+          "preview": ""
+        }
+      }
+    }
+  },
+  "vibe_profile": {
+    "scores": {
+      "orchestration": 0.3,
+      "promptCraft": 17.9,
+      "build": 11.3,
+      "debug": 1,
+      "context": 15.9,
+      "ship": 4.3
+    },
+    "total": 50.7,
+    "tier": {
+      "id": "NPC",
+      "min": 35,
+      "color": "#8b8680",
+      "emoji": "😐",
+      "blurb": "Background cast · needs plot",
+      "blurbZh": "路人甲 · 缺主线"
+    },
+    "archetype": {
+      "id": "05-prompt-priest",
+      "folder": "05-prompt-priest",
+      "name": "prompt-priest",
+      "title": "Prompt Priest",
+      "code": "SPELL",
+      "accent": "#f0c14a",
+      "hook": "Rules scroll",
+      "hookZh": "规则卷轴"
+    },
+    "figure": "/assests/characters/05-prompt-priest/prompt-priest-figure.png",
+    "badge": "/assests/badges/05-prompt-priest/prompt-priest-badge.svg",
+    "dimensions": [
+      {
+        "key": "orchestration",
+        "label": "Agent orchestration",
+        "labelZh": "Agent 编排",
+        "hint": "Skills · MCP · multi-agent workflow",
+        "max": 20,
+        "value": 0.3,
+        "score": 0.02
+      },
+      {
+        "key": "promptCraft",
+        "label": "Prompt craft",
+        "labelZh": "提示词手艺",
+        "hint": "Useful intent vs paste dumps",
+        "max": 18,
+        "value": 17.9,
+        "score": 0.99
+      },
+      {
+        "key": "build",
+        "label": "Build throughput",
+        "labelZh": "构建吞吐",
+        "hint": "Implementation & packaging density",
+        "max": 18,
+        "value": 11.3,
+        "score": 0.63
+      },
+      {
+        "key": "debug",
+        "label": "Debug resilience",
+        "labelZh": "调试韧性",
+        "hint": "Breakpoint stamina & root-cause chase",
+        "max": 14,
+        "value": 1,
+        "score": 0.07
+      },
+      {
+        "key": "context",
+        "label": "Context discipline",
+        "labelZh": "上下文纪律",
+        "hint": "Window hygiene · no log farming",
+        "max": 16,
+        "value": 15.9,
+        "score": 0.99
+      },
+      {
+        "key": "ship",
+        "label": "Ship courage",
+        "labelZh": "上线勇气",
+        "hint": "Merge energy vs review paralysis",
+        "max": 14,
+        "value": 4.3,
+        "score": 0.31
+      }
+    ],
+    "signals": [
+      {
+        "label": "Useful prompts",
+        "labelZh": "有效提示",
+        "value": "320"
+      },
+      {
+        "label": "Sources",
+        "labelZh": "数据源",
+        "value": "3"
+      },
+      {
+        "label": "Top category",
+        "labelZh": "主类别",
+        "value": "implementation"
+      }
+    ],
+    "roast": "🔥 Your system prompt has chapters. Prompt craft 17.9/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.",
+    "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.9/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。",
+    "tldr": "Prompt Priest: liturgy excellence, deployment fasting.",
+    "tldrZh": "Prompt Priest：礼仪满分，部署斋戒。"
+  },
+  "prompts": {
+    "_redacted": true,
+    "count": 322
+  },
+  "_redaction_note": "Prompt bodies, useful_prompts text, and reference examples stripped. Aggregates only."
+}

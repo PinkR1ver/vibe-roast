@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Report · Prompt Priest · vibe-wrapper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f3f1ec;
+        --bg-deep: #e8e4db;
+        --card: #fffcf7;
+        --ink: #1a1a1a;
+        --muted: #6b6560;
+        --line: #e4dfd6;
+        --orange: #ff5a1f;
+        --orange-soft: #fff0e8;
+        --shadow: 0 10px 30px rgba(40, 28, 12, 0.06);
+        --radius: 18px;
+        --accent: #ff5a1f;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: Outfit, sans-serif;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, #ffe7d6 0%, transparent 55%),
+          radial-gradient(900px 500px at 100% 0%, #d9fff3 0%, transparent 50%),
+          linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .topnav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 28px;
+        backdrop-filter: blur(12px);
+        background: rgba(243, 241, 236, 0.82);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background:
+          conic-gradient(from 210deg, var(--orange), #23d6a5, #5b8cff, var(--orange));
+        box-shadow: inset 0 0 0 5px #fffcf7;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .nav-links a:hover {
+        color: var(--ink);
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 80px;
+      }
+
+      .back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 18px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+
+      .picker button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: rgba(255, 252, 247, 0.8);
+        color: var(--muted);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: 160ms ease;
+      }
+
+      .picker button:hover,
+      .picker button.is-active {
+        color: #fff;
+        border-color: transparent;
+        background: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+
+      .profile-card {
+        padding: 8px 4px 0;
+        text-align: center;
+        position: relative;
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .profile-stage {
+        position: relative;
+        margin: 0 auto 8px;
+        padding: 12px 8px 0;
+      }
+
+      .profile-stage::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 8%;
+        width: 118%;
+        height: 78%;
+        transform: translateX(-50%);
+        border-radius: 46% 54% 42% 58% / 48% 44% 56% 52%;
+        background:
+          radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 28%, #fff), transparent 58%),
+          radial-gradient(circle at 70% 65%, color-mix(in srgb, var(--accent) 16%, #f3f1ec), transparent 62%);
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .profile-stage::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 6%;
+        width: 58%;
+        height: 18px;
+        transform: translateX(-50%);
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        filter: blur(8px);
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .handle {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--accent);
+      }
+
+      .name {
+        position: relative;
+        z-index: 1;
+        margin: 4px 0 6px;
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .mascot-wrap {
+        position: relative;
+        z-index: 1;
+        width: min(100%, 300px);
+        margin: 0 auto;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        animation: floaty 4.8s ease-in-out infinite;
+      }
+
+      .mascot-wrap img {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        height: auto;
+        display: block;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        /* transparent PNG sits unframed on stage blob */
+        image-rendering: auto;
+      }
+
+      .badge-chip {
+        position: absolute;
+        right: 4%;
+        bottom: 8%;
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: rgba(255, 252, 247, 0.92);
+        border: 0;
+        box-shadow: 0 10px 22px rgba(40, 28, 12, 0.12);
+        overflow: hidden;
+        backdrop-filter: blur(6px);
+      }
+
+      .badge-chip img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .meta-panel {
+        margin-top: 6px;
+        padding: 16px 14px 14px;
+        border-radius: 18px;
+        background: rgba(255, 252, 247, 0.78);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .score-block {
+        position: relative;
+        margin: 8px 0 6px;
+      }
+
+      .score-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 44px;
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        line-height: 1;
+        color: var(--accent);
+      }
+
+      .score-num span {
+        font-size: 18px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+
+      .tier {
+        margin: 8px 0 4px;
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: var(--accent);
+      }
+
+      .tier-blurb {
+        margin: 0 0 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+
+      .tags span {
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 12%, white);
+        color: color-mix(in srgb, var(--accent) 70%, #222);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .signal-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: left;
+      }
+
+      .signal {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f6f3ee;
+        font-size: 13px;
+      }
+
+      .signal strong {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+      }
+
+      .stack {
+        display: grid;
+        gap: 16px;
+      }
+
+      .panel {
+        padding: 22px 22px 20px;
+      }
+
+      .panel h2 {
+        margin: 0 0 4px;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      .panel .sub {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .radar-wrap {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .radar-stage {
+        position: relative;
+        min-height: 320px;
+        display: grid;
+        place-items: center;
+      }
+
+      .radar-stage svg {
+        width: min(100%, 340px);
+        height: auto;
+        overflow: visible;
+      }
+
+      .axis-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .axis-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        align-items: baseline;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #f7f4ef;
+      }
+
+      .axis-row .label {
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .axis-row .hint {
+        grid-column: 1 / -1;
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .axis-row .val {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .featured {
+        display: grid;
+        gap: 10px;
+      }
+
+      .feat {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+        transition: 160ms ease;
+      }
+
+      .feat:hover {
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+        transform: translateX(2px);
+      }
+
+      .feat strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .feat span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .roast {
+        position: relative;
+        padding: 20px 20px 18px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #fff7f2, #fff);
+        border: 1px solid #ffd7c4;
+        line-height: 1.7;
+        font-size: 15px;
+      }
+
+      .roast .tldr {
+        margin: 14px 0 0;
+        padding-top: 12px;
+        border-top: 1px dashed #ffd7c4;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .roast .tldr b {
+        color: var(--ink);
+      }
+
+      .lang-toggle {
+        display: inline-flex;
+        margin-bottom: 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .lang-toggle button {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 6px 12px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .lang-toggle button.is-active {
+        background: var(--ink);
+        color: #fff;
+      }
+
+      .standing {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 14px;
+        background: #fff;
+        border: 1px solid var(--line);
+        text-align: left;
+      }
+
+      .standing .rank {
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .standing .pct {
+        margin-top: 4px;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .cta {
+        margin-top: 12px;
+        width: 100%;
+        appearance: none;
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: var(--orange);
+        color: #fff;
+        font: inherit;
+        font-weight: 750;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(255, 90, 31, 0.25);
+      }
+
+      .cta:hover {
+        filter: brightness(1.05);
+      }
+
+      .float-notes {
+        position: relative;
+        height: 0;
+      }
+
+      .note {
+        position: absolute;
+        max-width: 180px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        font-size: 12px;
+        font-weight: 650;
+        color: var(--muted);
+        animation: bob 5s ease-in-out infinite;
+        pointer-events: none;
+      }
+
+      .note b {
+        color: var(--ink);
+      }
+
+      .note.n1 {
+        top: 40px;
+        right: -10px;
+        animation-delay: 0.2s;
+      }
+      .note.n2 {
+        top: 280px;
+        right: 20px;
+        animation-delay: 1.1s;
+      }
+
+      footer.page-foot {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      footer.page-foot a {
+        color: var(--orange);
+        font-weight: 700;
+      }
+
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-1deg);
+        }
+        50% {
+          transform: translateY(-6px) rotate(1deg);
+        }
+      }
+
+      @keyframes drawIn {
+        from {
+          opacity: 0;
+          transform: scale(0.92);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .is-animating .radar-stage svg {
+        animation: drawIn 420ms ease both;
+      }
+
+      @media (max-width: 720px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .radar-wrap {
+          grid-template-columns: 1fr;
+        }
+        .float-notes,
+        .nav-links {
+          display: none;
+        }
+        .topnav {
+          padding: 12px 16px;
+        }
+      }
+    
+      .live-banner {
+        margin-bottom: 18px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--accent) 12%, #fffcf7);
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, #e4dfd6);
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .live-banner b { color: var(--ink); }
+      .picker { display: none; }
+    </style>
+  </head>
+  <body>
+    <header class="topnav">
+      <div class="brand"><span class="brand-mark" aria-hidden="true"></span> vibe-wrapper · live report</div>
+      <nav class="nav-links">
+        <a href="result.html">Demo Roast</a>
+        <a href="live-report.html">Live</a>
+        <a href="notes/live-flow-report.md">Flow notes</a>
+      </nav>
+    </header>
+
+    <main class="shell">
+      <div class="live-banner" id="banner"></div>
+
+      <section class="layout is-animating" id="stage">
+        <aside class="profile-card" id="profileCard"></aside>
+        <div class="stack">
+          <article class="card panel">
+            <h2>Score breakdown</h2>
+            <p class="sub">Six agent-native axes · live inspect</p>
+            <div class="radar-wrap">
+              <div class="radar-stage" id="radar"></div>
+              <div class="axis-list" id="axisList"></div>
+            </div>
+          </article>
+
+          <article class="card panel">
+            <h2>🔥 Full roast</h2>
+            <div class="lang-toggle" role="group" aria-label="Roast language">
+              <button type="button" id="langZh" class="is-active">中文</button>
+              <button type="button" id="langEn">EN</button>
+            </div>
+            <div class="roast" id="roast"></div>
+          </article>
+        </div>
+      </section>
+
+      <footer class="page-foot">
+        Static snapshot from redacted live inspect · no prompt bodies ·
+        <a href="notes/live-inspect-summary.json">JSON</a>
+      </footer>
+    </main>
+
+    <script type="module">
+      const LIVE = {"scores": {"orchestration": 0.3, "promptCraft": 17.9, "build": 11.3, "debug": 1, "context": 15.9, "ship": 4.3}, "total": 50.7, "tier": {"id": "NPC", "min": 35, "color": "#8b8680", "emoji": "😐", "blurb": "Background cast · needs plot", "blurbZh": "路人甲 · 缺主线"}, "archetype": {"id": "05-prompt-priest", "folder": "05-prompt-priest", "name": "prompt-priest", "title": "Prompt Priest", "code": "SPELL", "accent": "#f0c14a", "hook": "Rules scroll", "hookZh": "规则卷轴"}, "figure": "characters/05-prompt-priest/prompt-priest-figure.png", "badge": "badges/05-prompt-priest/prompt-priest-badge.svg", "dimensions": [{"key": "orchestration", "label": "Agent orchestration", "labelZh": "Agent 编排", "hint": "Skills · MCP · multi-agent workflow", "max": 20, "value": 0.3, "score": 0.02}, {"key": "promptCraft", "label": "Prompt craft", "labelZh": "提示词手艺", "hint": "Useful intent vs paste dumps", "max": 18, "value": 17.9, "score": 0.99}, {"key": "build", "label": "Build throughput", "labelZh": "构建吞吐", "hint": "Implementation & packaging density", "max": 18, "value": 11.3, "score": 0.63}, {"key": "debug", "label": "Debug resilience", "labelZh": "调试韧性", "hint": "Breakpoint stamina & root-cause chase", "max": 14, "value": 1, "score": 0.07}, {"key": "context", "label": "Context discipline", "labelZh": "上下文纪律", "hint": "Window hygiene · no log farming", "max": 16, "value": 15.9, "score": 0.99}, {"key": "ship", "label": "Ship courage", "labelZh": "上线勇气", "hint": "Merge energy vs review paralysis", "max": 14, "value": 4.3, "score": 0.31}], "signals": [{"label": "Useful prompts", "labelZh": "有效提示", "value": "320"}, {"label": "Sources", "labelZh": "数据源", "value": "3"}, {"label": "Top category", "labelZh": "主类别", "value": "implementation"}], "roast": "🔥 Your system prompt has chapters. Prompt craft 17.9/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.", "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.9/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。", "tldr": "Prompt Priest: liturgy excellence, deployment fasting.", "tldrZh": "Prompt Priest：礼仪满分，部署斋戒。"};
+      const META = {"generated_at": "2026-07-19T17:46:30.094Z", "prompt_count": 322, "source_count": 3, "sources": {"codex": 0, "claude": 0, "cursor": 322}};
+
+      const profileCard = document.getElementById("profileCard");
+      const radar = document.getElementById("radar");
+      const axisList = document.getElementById("axisList");
+      const roast = document.getElementById("roast");
+      const stage = document.getElementById("stage");
+      const langZh = document.getElementById("langZh");
+      const langEn = document.getElementById("langEn");
+      const banner = document.getElementById("banner");
+
+      let lang = "zh";
+
+      langZh.addEventListener("click", () => { lang = "zh"; render(); });
+      langEn.addEventListener("click", () => { lang = "en"; render(); });
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      }
+      const escapeXml = escapeHtml;
+
+      function render() {
+        const vibe = LIVE;
+        const arch = vibe.archetype;
+        const tier = vibe.tier;
+        const score = Number(vibe.total);
+        document.documentElement.style.setProperty("--accent", arch.accent);
+        langZh.classList.toggle("is-active", lang === "zh");
+        langEn.classList.toggle("is-active", lang === "en");
+
+        const srcBits = Object.entries(META.sources)
+          .map(([k, v]) => `${k} ${v}`)
+          .join(" · ");
+        banner.innerHTML = `<b>Live inspect</b> · ${escapeHtml(META.generated_at)} · prompts ${META.prompt_count} · sources ${META.source_count} (${escapeHtml(srcBits)}) · redacted aggregates only`;
+
+        const hook = lang === "zh" ? arch.hookZh : arch.hook;
+        const blurb = lang === "zh" ? tier.blurbZh : tier.blurb;
+        const percentile = Math.min(99.5, Math.round((score / 100) * 97 + 2));
+
+        profileCard.innerHTML = `
+          <div class="profile-stage">
+            <h1 class="handle">@${escapeHtml(arch.code.toLowerCase())}</h1>
+            <p class="name">${escapeHtml(arch.title)} · ${escapeHtml(hook)}</p>
+            <div class="mascot-wrap">
+              <img src="${escapeHtml(vibe.figure)}" width="384" height="512" alt="${escapeHtml(arch.title)}" />
+              <div class="badge-chip" title="${escapeHtml(arch.code)}">
+                <img src="${escapeHtml(vibe.badge)}" width="64" height="64" alt="" />
+              </div>
+            </div>
+          </div>
+          <div class="meta-panel">
+            <div class="score-block">
+              <div class="score-num">${score.toFixed(1)} <span>/ 100</span></div>
+            </div>
+            <div class="tier">${tier.emoji} ${escapeHtml(tier.id)}</div>
+            <p class="tier-blurb">${escapeHtml(blurb)}</p>
+            <div class="tags"><span>${escapeHtml(arch.folder)}</span><span>${escapeHtml(arch.code)}</span></div>
+            <div class="signal-grid">
+              ${vibe.signals
+                .map(
+                  (s) =>
+                    `<div class="signal"><span>${escapeHtml(lang === "zh" ? s.labelZh : s.label)}</span><strong>${escapeHtml(s.value)}</strong></div>`,
+                )
+                .join("")}
+            </div>
+            <div class="standing">
+              <div class="rank">${lang === "zh" ? "Agent 使用力分位" : "Agent-usage percentile"}</div>
+              <div class="pct">${lang === "zh" ? `击败 ${percentile}% 的 vibe coder` : `Beats ${percentile}% of vibe coders`}</div>
+            </div>
+          </div>
+        `;
+
+        axisList.innerHTML = vibe.dimensions
+          .map(
+            (dim) => `<div class="axis-row">
+            <div class="label">${escapeHtml(lang === "zh" ? dim.labelZh : dim.label)}</div>
+            <div class="val">${Number(dim.value).toFixed(1)} / ${dim.max}</div>
+            <div class="hint">${escapeHtml(dim.hint)}</div>
+          </div>`,
+          )
+          .join("");
+
+        radar.innerHTML = renderRadar(vibe.dimensions, arch.accent);
+
+        const body = lang === "zh" ? vibe.roastZh : vibe.roast;
+        const tldr = lang === "zh" ? vibe.tldrZh : vibe.tldr;
+        roast.innerHTML = `${escapeHtml(body)}<p class="tldr"><b>TL;DR</b> · ${escapeHtml(tldr)}</p>`;
+
+        stage.classList.remove("is-animating");
+        void stage.offsetWidth;
+        stage.classList.add("is-animating");
+        document.title = `${arch.title} — ${score.toFixed(1)}/100 · ${tier.id} | live report`;
+      }
+
+      function renderRadar(dimensions, accent) {
+        const size = 340;
+        const center = size / 2;
+        const maxRadius = 110;
+        const rings = [0.33, 0.66, 1];
+        const points = dimensions.map((dim, index) => {
+          const angle = -Math.PI / 2 + (index * Math.PI * 2) / dimensions.length;
+          const ratio = Math.min(1, Number(dim.score || 0));
+          const radius = 28 + ratio * (maxRadius - 28);
+          const labelR = maxRadius + 28;
+          return {
+            ...dim,
+            x: center + Math.cos(angle) * radius,
+            y: center + Math.sin(angle) * radius,
+            axisX: center + Math.cos(angle) * maxRadius,
+            axisY: center + Math.sin(angle) * maxRadius,
+            labelX: center + Math.cos(angle) * labelR,
+            labelY: center + Math.sin(angle) * labelR,
+          };
+        });
+        const polygon = points.map((p) => `${p.x},${p.y}`).join(" ");
+        const ringPolys = rings
+          .map((ring) => {
+            const pts = dimensions
+              .map((_, index) => {
+                const angle = -Math.PI / 2 + (index * Math.PI * 2) / dimensions.length;
+                return `${center + Math.cos(angle) * maxRadius * ring},${center + Math.sin(angle) * maxRadius * ring}`;
+              })
+              .join(" ");
+            return `<polygon points="${pts}" fill="none" stroke="rgba(40,30,20,0.12)" stroke-width="1" />`;
+          })
+          .join("");
+        const axes = points
+          .map((p) => `<line x1="${center}" y1="${center}" x2="${p.axisX}" y2="${p.axisY}" stroke="rgba(40,30,20,0.1)" stroke-width="1" />`)
+          .join("");
+        const dots = points
+          .map((p) => `<circle cx="${p.x}" cy="${p.y}" r="4.5" fill="${accent}" stroke="#fff" stroke-width="2" />`)
+          .join("");
+        const labels = points
+          .map((p) => {
+            const anchor = p.labelX < center - 8 ? "end" : p.labelX > center + 8 ? "start" : "middle";
+            const text = lang === "zh" ? p.labelZh : p.label;
+            const scoreText = `${Number(p.value).toFixed(1)}/${p.max}`;
+            return `<text x="${p.labelX}" y="${p.labelY - 7}" text-anchor="${anchor}" fill="#1a1a1a" font-size="11" font-weight="700" font-family="Outfit,sans-serif">${escapeXml(text)}</text>
+              <text x="${p.labelX}" y="${p.labelY + 8}" text-anchor="${anchor}" fill="${accent}" font-size="11" font-weight="700" font-family="JetBrains Mono,monospace">${scoreText}</text>`;
+          })
+          .join("");
+
+        return `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Score radar">
+          ${ringPolys}
+          ${axes}
+          <polygon points="${polygon}" fill="${accent}33" stroke="${accent}" stroke-width="2.5" />
+          ${dots}
+          ${labels}
+        </svg>`;
+      }
+
+      render();
+    </script>
+  </body>
+</html>
