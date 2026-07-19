@@ -1,0 +1,14 @@
+model = "gpt-5.5"
+personality = "pragmatic"
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."unused@example"]
+enabled = false
+
+[mcp_servers.node_repl]
+command = "node-repl"
+
+[mcp_servers.browser]
+command = "browser"

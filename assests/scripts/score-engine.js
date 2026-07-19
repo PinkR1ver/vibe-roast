@@ -55,9 +55,17 @@ export const TIERS = [
   { id: "TRASH", min: 0, color: "#e24b4b", emoji: "💩", blurb: "Low-signal · vibe-farmed", blurbZh: "低信号 · 疑似 vibe 刷分" },
 ];
 
+function categoryCount(categories, name) {
+  const row = categories[name];
+  if (row == null) return 0;
+  if (typeof row === "number") return Number.isFinite(row) ? row : 0;
+  const count = Number(row.count);
+  return Number.isFinite(count) ? count : 0;
+}
+
 /** Map DNA category counts → absolute axis scores (0..max). */
 export function scoreFromCategories(categories = {}, env = {}) {
-  const c = (name) => Number(categories[name]?.count || categories[name] || 0);
+  const c = (name) => categoryCount(categories, name);
   const totalUseful = Math.max(
     1,
     c("implementation") +
@@ -72,7 +80,7 @@ export function scoreFromCategories(categories = {}, env = {}) {
       c("workflow"),
   );
   const reference = c("reference");
-  const usefulRatio = totalUseful / (totalUseful + reference || 1);
+  const usefulRatio = totalUseful / Math.max(totalUseful + reference, 1);
 
   const skills = Number(env.skills?.count ?? 0);
   const mcp = Number(env.mcp_servers?.count ?? env.mcp_servers?.names?.length ?? 0);
@@ -86,7 +94,11 @@ export function scoreFromCategories(categories = {}, env = {}) {
   const contextRaw = usefulRatio * 12 + Math.max(0, 4 - reference / Math.max(totalUseful, 1) * 4);
   const shipRaw = ((c("packaging") + c("testing") * 0.4) / totalUseful) * 10 + (1 - Math.min(c("planning") / totalUseful, 0.6)) * 4;
 
-  const clamp = (v, max) => Math.round(Math.min(max, Math.max(0, v)) * 10) / 10;
+  const clamp = (v, max) => {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(Math.min(max, Math.max(0, n)) * 10) / 10;
+  };
 
   return {
     orchestration: clamp(orchestrationRaw, 20),

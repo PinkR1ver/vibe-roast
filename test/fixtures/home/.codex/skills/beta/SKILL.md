@@ -1,0 +1,5 @@
+---
+name: beta
+---
+
+Beta skill.
