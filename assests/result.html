@@ -92,6 +92,7 @@
         width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
         padding: 28px 0 80px;
+        overflow-x: clip;
       }
 
       .back {
@@ -138,6 +139,7 @@
         grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
         gap: 20px;
         align-items: start;
+        min-width: 0;
       }
 
       .card {
@@ -155,12 +157,14 @@
         background: transparent;
         border: 0;
         box-shadow: none;
+        min-width: 0;
       }
 
       .profile-stage {
         position: relative;
         margin: 0 auto 8px;
         padding: 12px 8px 0;
+        isolation: isolate;
       }
 
       .profile-stage::before {
@@ -168,7 +172,7 @@
         position: absolute;
         left: 50%;
         top: 8%;
-        width: 118%;
+        width: 100%;
         height: 78%;
         transform: translateX(-50%);
         border-radius: 46% 54% 42% 58% / 48% 44% 56% 52%;
@@ -281,6 +285,7 @@
         letter-spacing: -0.05em;
         line-height: 1;
         color: var(--accent);
+        white-space: nowrap;
       }
 
       .score-num span {
@@ -295,6 +300,7 @@
         font-weight: 800;
         letter-spacing: 0.04em;
         color: var(--accent);
+        white-space: nowrap;
       }
 
       .tier-blurb {
@@ -335,11 +341,21 @@
         border-radius: 12px;
         background: #f6f3ee;
         font-size: 13px;
+        min-width: 0;
+      }
+
+      .signal span {
+        min-width: 0;
+        overflow-wrap: anywhere;
       }
 
       .signal strong {
         font-family: "JetBrains Mono", monospace;
         font-weight: 700;
+        flex-shrink: 0;
+        max-width: 58%;
+        text-align: right;
+        overflow-wrap: anywhere;
       }
 
       .stack {
@@ -365,27 +381,32 @@
 
       .radar-wrap {
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 8px;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+        gap: 12px;
         align-items: center;
       }
 
       .radar-stage {
         position: relative;
-        min-height: 320px;
+        min-height: 340px;
         display: grid;
         place-items: center;
+        padding: 8px;
+        overflow: visible;
+        min-width: 0;
       }
 
       .radar-stage svg {
-        width: min(100%, 340px);
+        width: min(100%, 360px);
         height: auto;
         overflow: visible;
+        display: block;
       }
 
       .axis-list {
         display: grid;
         gap: 10px;
+        min-width: 0;
       }
 
       .axis-row {
@@ -536,22 +557,26 @@
       }
 
       .float-notes {
-        position: relative;
-        height: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 16px;
+        position: static;
+        height: auto;
       }
 
       .note {
-        position: absolute;
-        max-width: 180px;
-        padding: 10px 12px;
+        position: static;
+        max-width: none;
+        padding: 8px 12px;
         border-radius: 12px;
-        background: #fff;
+        background: rgba(255, 252, 247, 0.92);
         border: 1px solid var(--line);
-        box-shadow: var(--shadow);
+        box-shadow: none;
         font-size: 12px;
         font-weight: 650;
         color: var(--muted);
-        animation: bob 5s ease-in-out infinite;
+        animation: none;
         pointer-events: none;
       }
 
@@ -559,15 +584,11 @@
         color: var(--ink);
       }
 
-      .note.n1 {
-        top: 40px;
-        right: -10px;
-        animation-delay: 0.2s;
-      }
+      .note.n1,
       .note.n2 {
-        top: 280px;
-        right: 20px;
-        animation-delay: 1.1s;
+        top: auto;
+        right: auto;
+        animation-delay: 0s;
       }
 
       footer.page-foot {
@@ -617,19 +638,38 @@
         animation: drawIn 420ms ease both;
       }
 
-      @media (max-width: 720px) {
+      @media (max-width: 960px) {
         .layout {
           grid-template-columns: 1fr;
         }
         .radar-wrap {
           grid-template-columns: 1fr;
         }
+        .radar-stage {
+          min-height: 300px;
+        }
+      }
+
+      @media (max-width: 720px) {
         .float-notes,
         .nav-links {
           display: none;
         }
         .topnav {
           padding: 12px 16px;
+        }
+        .shell {
+          width: min(1120px, calc(100% - 24px));
+          padding: 20px 0 64px;
+        }
+        .score-num {
+          font-size: 38px;
+        }
+        .tier {
+          font-size: 24px;
+        }
+        .mascot-wrap {
+          width: min(100%, 260px);
         }
       }
     </style>
@@ -829,15 +869,16 @@
       }
 
       function renderRadar(scores, accent) {
-        const size = 340;
+        const size = 360;
+        const pad = 36;
         const center = size / 2;
-        const maxRadius = 110;
+        const maxRadius = 108;
         const rings = [0.33, 0.66, 1];
         const points = DIMENSIONS.map((dim, index) => {
           const angle = -Math.PI / 2 + (index * Math.PI * 2) / DIMENSIONS.length;
           const ratio = Math.min(1, Number(scores[dim.key] || 0) / dim.max);
           const radius = 28 + ratio * (maxRadius - 28);
-          const labelR = maxRadius + 28;
+          const labelR = maxRadius + 34;
           return {
             ...dim,
             value: scores[dim.key],
@@ -873,17 +914,20 @@
             const anchor = p.labelX < center - 8 ? "end" : p.labelX > center + 8 ? "start" : "middle";
             const text = lang === "zh" ? p.labelZh : p.label;
             const scoreText = `${Number(p.value).toFixed(1)}/${p.max}`;
-            return `<text x="${p.labelX}" y="${p.labelY - 7}" text-anchor="${anchor}" fill="#1a1a1a" font-size="11" font-weight="700" font-family="Outfit,sans-serif">${escapeXml(text)}</text>
-              <text x="${p.labelX}" y="${p.labelY + 8}" text-anchor="${anchor}" fill="${accent}" font-size="11" font-weight="700" font-family="JetBrains Mono,monospace">${scoreText}</text>`;
+            const dy = p.labelY < center - 40 ? -2 : p.labelY > center + 40 ? 2 : 0;
+            return `<text x="${p.labelX}" y="${p.labelY - 7 + dy}" text-anchor="${anchor}" fill="#1a1a1a" font-size="11" font-weight="700" font-family="Outfit,sans-serif">${escapeXml(text)}</text>
+              <text x="${p.labelX}" y="${p.labelY + 8 + dy}" text-anchor="${anchor}" fill="${accent}" font-size="11" font-weight="700" font-family="JetBrains Mono,monospace">${scoreText}</text>`;
           })
           .join("");
 
-        return `<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="Score radar">
+        return `<svg viewBox="${-pad} ${-pad} ${size + pad * 2} ${size + pad * 2}" role="img" aria-label="Score radar">
+          <g transform="translate(0,0)">
           ${ringPolys}
           ${axes}
           <polygon points="${polygon}" fill="${accent}33" stroke="${accent}" stroke-width="2.5" />
           ${dots}
           ${labels}
+          </g>
         </svg>`;
       }
 
