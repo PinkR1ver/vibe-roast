@@ -1,93 +1,43 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { useLocale } from "../contexts/LocaleContext.jsx";
-import WordCloud from "../components/WordCloud.jsx";
-import ActivityHeatmap3DPanel from "../components/ActivityHeatmap3DPanel.jsx";
-import { buildHashtags } from "../lib/hashtags.js";
-import { downloadCanvasPng, renderSharePoster } from "../lib/share-poster.js";
-
-const ROAST_CLOUD_COLORS = [
-  "#ff5a1f", "#f0c14a", "#e07a3a", "#c45c26", "#8b5a2b",
-  "#23d6a5", "#5b8cff", "#6b6560", "#d97706", "#b45309",
-];
 
 export default function ProfileResult({ data, onBack }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
   const vibe = data?.vibe_profile;
   const summary = data?.summary || {};
-  const [posterBusy, setPosterBusy] = useState(false);
-  const [posterError, setPosterError] = useState("");
-
-  const categories = data?.profile_signals?.prompt_analysis?.categories || {};
-  const hashtags = useMemo(() => buildHashtags(vibe, categories), [vibe, categories]);
-  const words = data?.word_frequencies || [];
-  const accent = vibe?.archetype?.accent || "#ff5a1f";
 
   if (!vibe) {
     return (
       <div className="min-h-[calc(100vh-49px)] bg-[#f3f1ec] text-[#1a1a1a] px-6 py-10">
-        {onBack && (
-          <button type="button" onClick={onBack} className="text-sm font-semibold text-[#6b6560] mb-6">
-            ← {t("profile.back")}
-          </button>
-        )}
+        <button type="button" onClick={onBack} className="text-sm font-semibold text-[#6b6560] mb-6">
+          ← {t("profile.back")}
+        </button>
         <p className="text-[#6b6560]">{t("profile.empty")}</p>
       </div>
     );
   }
 
+  const accent = vibe.archetype.accent || "#ff5a1f";
   const roast = zh ? vibe.roastZh : vibe.roast;
   const tldr = zh ? vibe.tldrZh : vibe.tldr;
   const tierBlurb = zh ? vibe.tier.blurbZh : vibe.tier.blurb;
   const hook = zh ? vibe.archetype.hookZh : vibe.archetype.hook;
 
-  async function handleSharePoster() {
-    setPosterBusy(true);
-    setPosterError("");
-    try {
-      const canvas = await renderSharePoster({ vibe, hashtags });
-      const code = (vibe.archetype?.code || "vibe").toLowerCase();
-      downloadCanvasPng(canvas, `vibe-roast-${code}-3x4.png`);
-    } catch (err) {
-      setPosterError(err?.message || String(err));
-    } finally {
-      setPosterBusy(false);
-    }
-  }
-
   return (
-    <div
-      className="min-h-[calc(100vh-49px)] bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a]"
-      style={{ ["--roast-accent"]: accent }}
-    >
-      <div className="mx-auto w-full max-w-[1120px] px-4 py-8 pb-20">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6b6560] hover:text-[#1a1a1a]"
-            >
-              ← {t("profile.back")}
-            </button>
-          ) : (
-            <span className="text-sm font-semibold text-[#6b6560]">{t("profile.heroLabel")}</span>
-          )}
-          <button
-            type="button"
-            onClick={handleSharePoster}
-            disabled={posterBusy}
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_rgba(255,90,31,0.25)] disabled:opacity-60"
-            style={{ background: accent }}
-          >
-            {posterBusy ? t("profile.posterBusy") : t("profile.posterCta")}
-          </button>
-        </div>
-        {posterError && <p className="mb-4 text-sm text-[#e24b4b]">{posterError}</p>}
+    <div className="min-h-[calc(100vh-49px)] bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a]">
+      <div className="mx-auto w-full max-w-[1120px] overflow-x-clip px-4 py-8 pb-20">
+        <button
+          type="button"
+          onClick={onBack}
+          className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#6b6560] hover:text-[#1a1a1a]"
+        >
+          ← {t("profile.back")}
+        </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] gap-5 items-start min-w-0">
           <aside className="min-w-0 text-center">
-            <div className="relative mx-auto mb-2 overflow-hidden px-2 pt-3 isolate">
+            <div className="relative mx-auto mb-2 isolate px-2 pt-3">
               <div
                 className="pointer-events-none absolute left-1/2 top-[8%] z-0 h-[78%] w-full -translate-x-1/2 rounded-[46%_54%_42%_58%/48%_44%_56%_52%]"
                 style={{
@@ -107,43 +57,32 @@ export default function ProfileResult({ data, onBack }) {
               {vibe.archetype.title}
             </h1>
             <p className="m-0 text-sm font-semibold text-[#6b6560]">{hook}</p>
-
-            <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-              {hashtags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full px-2.5 py-1 text-[12px] font-bold"
-                  style={{
-                    background: `color-mix(in srgb, ${accent} 14%, #fffcf7)`,
-                    color: `color-mix(in srgb, ${accent} 72%, #222)`,
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-black/5 bg-[#fffcf7] px-3 py-1.5 text-xs font-bold">
+              <img src={vibe.badge} alt="" width={18} height={18} className="rounded" />
+              <span>{vibe.archetype.code}</span>
             </div>
           </aside>
 
-          <section className="space-y-4">
+          <section className="min-w-0 space-y-4">
             <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <div className="flex flex-wrap items-end justify-between gap-3">
-                <div>
-                  <div className="font-[JetBrains_Mono,ui-monospace,monospace] text-[42px] font-bold leading-none tracking-tight">
+                <div className="min-w-0">
+                  <div className="whitespace-nowrap font-[JetBrains_Mono,ui-monospace,monospace] text-[42px] font-bold leading-none tracking-tight">
                     {Number(vibe.total).toFixed(1)}
                     <span className="ml-1 text-base font-semibold text-[#6b6560]">/ 100</span>
                   </div>
-                  <div className="mt-2 text-sm font-bold" style={{ color: vibe.tier.color }}>
+                  <div className="mt-2 whitespace-nowrap text-sm font-bold" style={{ color: vibe.tier.color }}>
                     {vibe.tier.emoji} {vibe.tier.id}
                   </div>
                   <p className="mt-1 mb-0 text-sm text-[#6b6560]">{tierBlurb}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   {vibe.signals.map((signal) => (
-                    <div key={signal.label} className="min-w-[88px] rounded-xl bg-[#f3f1ec] px-2.5 py-2">
+                    <div key={signal.label} className="min-w-0 rounded-xl bg-[#f3f1ec] px-2.5 py-2">
                       <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6b6560]">
                         {zh ? signal.labelZh : signal.label}
                       </div>
-                      <div className="mt-1 text-sm font-bold tabular-nums">{signal.value}</div>
+                      <div className="mt-1 break-words text-sm font-bold tabular-nums">{signal.value}</div>
                     </div>
                   ))}
                 </div>
@@ -166,10 +105,10 @@ export default function ProfileResult({ data, onBack }) {
                 <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.axes")}</h2>
                 <div className="space-y-2.5">
                   {vibe.dimensions.map((dim) => (
-                    <div key={dim.key} className="flex items-start justify-between gap-3 min-w-0">
+                    <div key={dim.key} className="flex min-w-0 items-start justify-between gap-3">
                       <div className="min-w-0">
                         <div className="text-sm font-bold">{zh ? dim.labelZh : dim.label}</div>
-                        <div className="text-[11px] text-[#8b8680] break-words">{dim.hint}</div>
+                        <div className="break-words text-[11px] text-[#8b8680]">{dim.hint}</div>
                       </div>
                       <div className="shrink-0 whitespace-nowrap font-[JetBrains_Mono,ui-monospace,monospace] text-sm font-bold tabular-nums" style={{ color: accent }}>
                         {Number(dim.value).toFixed(1)}
@@ -187,45 +126,6 @@ export default function ProfileResult({ data, onBack }) {
               <p className="mt-4 mb-0 rounded-xl bg-[#fff0e8] px-3 py-2 text-sm">
                 <b>TL;DR</b> · {tldr}
               </p>
-            </div>
-
-            {words.length > 0 && (
-              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
-                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded-xl bg-[#f7f4ef]">
-                  <WordCloud
-                    words={words.slice(0, 60)}
-                    width={720}
-                    height={240}
-                    gridSize={5}
-                    weightDivisor={3.4}
-                    rotateRatio={0.06}
-                    minRotation={-0.12}
-                    maxRotation={0.12}
-                    ellipticity={0.7}
-                    minSize={10}
-                    colors={ROAST_CLOUD_COLORS}
-                    fontFamily="Outfit, system-ui, sans-serif"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-              <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
-              <h2 className="m-0 mb-1 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-4 text-xs text-[#8b8680]">{t("profile.activityHint")}</p>
-              <div className="h-[280px] min-h-[240px]">
-                <ActivityHeatmap3DPanel
-                  prompts={data?.prompts || []}
-                  activity={data?.activity}
-                  weeks={26}
-                  forceLight
-                  defaultPalette="amber"
-                  roastStyle
-                />
-              </div>
             </div>
           </section>
         </div>
