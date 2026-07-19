@@ -1,27 +1,28 @@
-# Visual audit — v5 SBTI pack
+# Visual audit — v6 MBTI flat figures
 
-**Date:** 2026-06-11  
-**PR:** [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3) (owner revision)
+**Date:** 2026-07-20  
+**PR:** [#3](https://github.com/PinkR1ver/vibe-wrapper/pull/3)
 
-## Owner feedback addressed
+## Style pivot complete
 
-- [x] Expand to **8 profiles** with vibe-coding meme hooks (not mechanical 16 fill)
-- [x] **Badges** — v6 symbolic icons per archetype (`vibe-badges-v6-board.png`), 64×64 SVG
-- [x] **Banners** — composed from **8 mascot slices only** (`compose-banners.py`), exact 1200×400 / 1200×280, no crop
-- [x] Style pivot to **`sbti-style-reference-board.png`** (v5 boards A/B)
-- [x] Raster PNG slice embed pipeline retained
+- [x] **8/8** freestanding `*-figure.png` locked to classic 16personalities geometric faceted flat vector (refs: `notes/mbti-ref-*.jpg`)
+- [x] No black outlines · ~5.5–6 heads · dot/oval eyes · large hair masses · muted 6–10 color palettes · 1–3 props
+- [x] Cream BG chroma-keyed → transparent PNGs, unframed on soft stage blob
+- [x] Old SBTI diamond cards archived as `*.sbti-archive.svg`
+- [x] `*-card.svg` / `*-character.svg` thin wrappers → figure (not framed cards)
+- [x] Badges remain v6 symbolic icons (64×64 SVG)
 
-## Checks
+## Product surfaces
 
-```bash
-cd assests
-node scripts/qa-faces.mjs   # 8×3 character assets + 3 banners
-```
+- [x] `result.html` — figure on soft stage blob, **no bordered card frame**; score/tier in frosted `meta-panel`
+- [x] `preview.html` — 8-figure gallery, freestanding
+- [x] `review.html` — QA gallery of live figures + badges + legacy boards
 
-- [x] 8 character + 8 card + 8 badge SVGs with embedded PNG
-- [x] 3 banner SVGs (1200×400 / 1200×280 viewBox)
-- [x] No external image href in deliverables
+## Result-page checklist
 
-## Preview
-
-`review.html` — full v5 gallery
+- [x] Overall tier + total score `/100`
+- [x] Six-axis radar with per-axis max labels
+- [x] Full roast (ZH/EN) + TL;DR
+- [x] Unframed figure + badge chip
+- [x] Picker switches all 8 archetypes
+- [x] Agent-native scoring dimensions (see `taxonomy-draft.md`)

@@ -1,13 +1,13 @@
-# Vibe Profile Character Taxonomy (v2)
+# Vibe Profile Character Taxonomy (v3 · MBTI flat)
 
-Assignee: ShinjukuZhu · Branch: `codex/profile-visual-assets` · Status: **8/16** + badges + banners
+Assignee: ShinjukuZhu · Branch: `codex/profile-visual-assets` · Status: **8/8 figures** + badges + result page
 
 ## Style anchor
 
-Primary reference: `source/references/sbti-style-reference-board.png`  
-Production boards: `vibe-profiles-v5-board-a.png` (01–04), `vibe-profiles-v5-board-b.png` (05–08)
+**v6:** modern flat vector editorial (MBTI / 16Personalities language)  
+Spec: no black outlines · 5.5–6 heads · muted 6–10 color palette · freestanding full-body · abstract stage only
 
-SBTI card frame · circuit glow · diamond border accents · chibi or mascot · thick outlines · dark dashboard friendly.
+Archive: previous SBTI diamond cards live as `*.sbti-archive.svg`
 
 ## 2026 vibe-coding meme hooks (Apr–Jun)
 
@@ -34,7 +34,7 @@ SBTI card frame · circuit glow · diamond border accents · chibi or mascot · 
 | 07 | Context Maxxer | METER | Cyan | Gauge at 99% | Context/credits almost full |
 | 08 | YOLO Shipper | YOLO | Red | Big red button | Agent `--yolo`, skip review merge |
 
-## Planned (not in v5 pack)
+## Planned (not in v6 pack)
 
 | # | Archetype | Code | Hook |
 |---|-----------|------|------|
@@ -50,11 +50,31 @@ SBTI card frame · circuit glow · diamond border accents · chibi or mascot · 
 ## Asset map
 
 ```
-characters/XX-name/  *-mascot.png  *-character.svg  *-card.svg
-badges/XX-name/      *-badge.png    *-badge.svg   ← symbolic icon (v6 board)
-banners/             home-hero.*  share-strip.*  result-header.*
+characters/XX-name/  *-figure.png  *-character.svg  *-card.svg(=figure)
+                     *.sbti-archive.svg  ← old framed SBTI rasters
+badges/XX-name/      *-badge.png    *-badge.svg
+banners/             home-hero.*  share-strip.*  result-header.*  (legacy compose)
 source/references/   vibe-profiles-v5-board-a/b.png  vibe-badges-v6-board.png
 ```
+
+Product surface: `result.html` / `preview.html` — figures float on abstract stage, **no card frame**.
+
+## Scoring axes (result page · agent evaluation)
+
+Aligned with product DNA (`build / debug / plan / design / quality / workflow`) but deepened for **coding-agent usage** (not GitHub stars). Weighted to 100 like ghfind:
+
+| Axis | Max | Maps from | Why it exists |
+|------|-----|-----------|---------------|
+| Agent orchestration | 20 | workflow + skills/MCP/plugins | Can you conduct agents, not just chat? |
+| Prompt craft | 18 | useful ratio + explanation/planning | Intent quality vs paste dumps |
+| Build throughput | 18 | implementation + packaging | Did anything actually ship? |
+| Debug resilience | 14 | debugging | Root-cause stamina |
+| Context discipline | 16 | inverse reference flood + hygiene | Window / credit self-control |
+| Ship courage | 14 | packaging + anti-paralysis | Merge energy vs endless ADRs |
+
+Tiers (ghfind-shaped): `GOD ≥88` · `ELITE ≥72` · `SOLID ≥55` · `NPC ≥35` · `TRASH <35`.
+
+Demo UI: `assests/result.html` · engine: `assests/scripts/score-engine.js`.
 
 ## Badge symbols (v6 — not mascot crops)
 

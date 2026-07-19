@@ -1,62 +1,71 @@
 {
+  "style": "mbti-flat-vector-editorial",
+  "display": "freestanding-figure-no-card-frame",
   "boards": [
     {
-      "file": "source/references/vibe-profiles-v5-board-a.png",
+      "note": "Legacy SBTI boards archived; primary art is *-figure.png",
       "cols": 4,
       "profiles": [
         {
           "folder": "01-builder",
           "name": "builder",
           "code": "SHIP",
-          "label": "Builder SHIP — deploy first"
+          "label": "Builder SHIP — deploy first",
+          "figure": "builder-figure.png"
         },
         {
           "folder": "02-debugger",
           "name": "debugger",
           "code": "HUNT",
-          "label": "Debugger HUNT — duck at midnight"
+          "label": "Debugger HUNT — duck at midnight",
+          "figure": "debugger-figure.png"
         },
         {
           "folder": "03-architect",
           "name": "architect",
           "code": "DRAW",
-          "label": "Architect DRAW — boxes before bytes"
+          "label": "Architect DRAW — boxes before bytes",
+          "figure": "architect-figure.png"
         },
         {
           "folder": "04-codex-believer",
           "name": "codex-believer",
           "code": "FAITH",
-          "label": "Codex Believer FAITH — agent disciple"
+          "label": "Codex Believer FAITH — agent disciple",
+          "figure": "codex-believer-figure.png"
         }
       ]
     },
     {
-      "file": "source/references/vibe-profiles-v5-board-b.png",
       "cols": 4,
       "profiles": [
         {
           "folder": "05-prompt-priest",
           "name": "prompt-priest",
           "code": "SPELL",
-          "label": "Prompt Priest SPELL — scroll of rules"
+          "label": "Prompt Priest SPELL — scroll of rules",
+          "figure": "prompt-priest-figure.png"
         },
         {
           "folder": "06-tab-hoarder",
           "name": "tab-hoarder",
           "code": "TABS",
-          "label": "Tab Hoarder TABS — forty-seven localhost tabs"
+          "label": "Tab Hoarder TABS — forty-seven localhost tabs",
+          "figure": "tab-hoarder-figure.png"
         },
         {
           "folder": "07-context-maxxer",
           "name": "context-maxxer",
           "code": "METER",
-          "label": "Context Maxxer METER — gauge at ninety-nine"
+          "label": "Context Maxxer METER — gauge at ninety-nine",
+          "figure": "context-maxxer-figure.png"
         },
         {
           "folder": "08-yolo-shipper",
           "name": "yolo-shipper",
           "code": "YOLO",
-          "label": "YOLO Shipper YOLO — skip review hit merge"
+          "label": "YOLO Shipper YOLO — skip review hit merge",
+          "figure": "yolo-shipper-figure.png"
         }
       ]
     }
@@ -72,21 +81,24 @@
       "out": "banners/home-hero.svg",
       "width": 1200,
       "height": 400,
-      "label": "Vibe Profile home hero banner"
+      "label": "Vibe Profile home hero banner",
+      "status": "legacy-sbti-compose"
     },
     {
       "file": "banners/share-strip.png",
       "out": "banners/share-strip.svg",
       "width": 1200,
       "height": 400,
-      "label": "Vibe Profile share strip banner"
+      "label": "Vibe Profile share strip banner",
+      "status": "legacy-sbti-compose"
     },
     {
       "file": "banners/result-header.png",
       "out": "banners/result-header.svg",
       "width": 1200,
       "height": 280,
-      "label": "Vibe Profile result header banner"
+      "label": "Vibe Profile result header banner",
+      "status": "legacy-sbti-compose"
     }
   ]
 }

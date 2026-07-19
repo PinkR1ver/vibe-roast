@@ -1,17 +1,18 @@
-# Builder — SHIP
+# Builder — SHIP (MBTI flat)
 
-## v1 (final first deliverable)
+## Art direction
 
-- Unified layout: head / body / laptop zones per design-system.md
-- Prop: green deploy circle + play triangle (ship-it, universally readable)
-- Expression: nested face group — brows, dual eyes with highlight, grin
-- Removed: floating sparks, ambiguous icons
+Modern flat vector editorial · no black outlines · 5.5–6 heads · freestanding (no card frame)
 
-## References
+## Props
 
-- IDE deploy button trope
-- `.doodle/index.html` seed proportions (not final art)
+- Slim laptop with soft green rocket badge
+- Layered mint hoodie over cream tee
+
+## Pose
+
+Slight forward lean, celebratory fist + laptop — deploy-first energy.
 
 ## Prompt seed
 
-Flat chibi mint hoodie developer at laptop. Green deploy button on dark IDE screen. Confident grin, eyes on screen. Collectible card character, bold outlines, dark-dashboard friendly.
+Full-body MBTI-style flat vector developer, muted mint palette, large stylized hair, oval eyes, holding laptop with rocket badge, natural narrative pose, abstract soft background, no outlines, no card frame.

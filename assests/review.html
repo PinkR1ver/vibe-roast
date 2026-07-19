@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Vibe Visual QA · v5 SBTI pack</title>
+    <title>Vibe Visual QA · MBTI flat figures</title>
     <style>
       :root { color-scheme: dark; --ink: #f7f8fb; --muted: #9aa3ad; --pass: #23d6a5; --line: #202832; }
       * { box-sizing: border-box; }
@@ -12,45 +12,55 @@
       h2 { font-size: 20px; margin: 32px 0 12px; }
       p, li { color: var(--muted); line-height: 1.65; }
       code { color: var(--pass); font-size: 13px; }
+      a { color: var(--pass); }
       .boards { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 960px; }
       .boards img { width: 100%; border-radius: 10px; border: 1px solid var(--line); }
       .boards span { display: block; font-size: 12px; margin-top: 6px; color: var(--muted); }
-      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-      .panel { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #111821; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+      .panel { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: #111821; text-align: center; }
       .panel h3 { margin: 0 0 4px; font-size: 16px; }
       .code { color: var(--pass); font-size: 12px; margin-bottom: 10px; }
-      .row { display: grid; grid-template-columns: 1fr 1fr 64px; gap: 10px; align-items: start; }
+      .figure-box { background: #f3f1ec; border-radius: 8px; padding: 8px; }
+      .figure-box img { width: 100%; max-width: 220px; height: auto; display: block; margin: 0 auto; }
+      .badge-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
       .box { background: #0a0a0f; border-radius: 8px; padding: 8px; text-align: center; }
       .box span { display: block; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
-      .badge-box { width: 64px; padding: 0; }
+      .badge-box { width: 80px; padding: 8px; }
       img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
       .banners img { width: 100%; border-radius: 8px; border: 1px solid var(--line); }
       .status { margin: 16px 0; padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(35,214,165,0.35); background: rgba(35,214,165,0.08); font-size: 14px; }
     </style>
   </head>
   <body>
-    <h1>Visual QA · v5 SBTI pack (8 profiles)</h1>
-    <p>风格锚点：<code>sbti-style-reference-board.png</code> · 生产板 <code>vibe-profiles-v5-board-a/b.png</code></p>
-    <p>Banners 仅使用已设计的 8 个 mascot 切片拼接（<code>compose-banners.py</code>），无 AI 额外角色；尺寸 1:1 内嵌，不裁切。</p>
-    <div class="status">QA: <code>python scripts/compose-banners.py</code> → <code>node scripts/sync-banners.mjs</code></div>
+    <h1>Visual QA · MBTI flat figures (8 profiles)</h1>
+    <p>
+      Canonical art: modern flat vector editorial (no black outlines · 5.5–6 heads · muted palette).
+      Primary asset: <code>*-figure.png</code>. Old SBTI diamond rasters archived as <code>*.sbti-archive.svg</code>.
+    </p>
+    <p>
+      Product surfaces: <a href="result.html">result.html</a> · <a href="preview.html">preview.html</a> —
+      freestanding figures on soft stage, <strong style="color:var(--ink)">no card frame</strong>.
+    </p>
+    <p>Legacy reference boards below are historical SBTI comps — not the live product art.</p>
+    <div class="status">QA: open result picker · switch all 8 archetypes · confirm unframed <code>*-figure.png</code></div>
 
-    <h2>Reference boards</h2>
-    <div class="boards">
-      <div><img src="source/references/vibe-profiles-v5-board-a.png" alt="Board A" /><span>Board A · SHIP HUNT DRAW FAITH</span></div>
-      <div><img src="source/references/vibe-profiles-v5-board-b.png" alt="Board B" /><span>Board B · SPELL TABS METER YOLO</span></div>
-    </div>
+    <h2>Live figures (product)</h2>
+    <section class="grid" id="profiles"></section>
 
     <h2>Badge symbols (v6)</h2>
     <p>独立符号徽章，非 mascot 头像裁切。参考板：<code>vibe-badges-v6-board.png</code></p>
     <div class="boards" style="max-width:960px;margin-bottom:24px">
       <img src="source/references/vibe-badges-v6-board.png" alt="Badge board" />
     </div>
-    <div class="badge-row" id="badges" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:32px"></div>
+    <div class="badge-row" id="badges"></div>
 
-    <h2>Profiles · card + badge</h2>
-    <section class="grid" id="profiles"></section>
+    <h2>Legacy SBTI reference boards (archived style)</h2>
+    <div class="boards">
+      <div><img src="source/references/vibe-profiles-v5-board-a.png" alt="Board A" /><span>Board A · SHIP HUNT DRAW FAITH (archived)</span></div>
+      <div><img src="source/references/vibe-profiles-v5-board-b.png" alt="Board B" /><span>Board B · SPELL TABS METER YOLO (archived)</span></div>
+    </div>
 
-    <h2>Banners</h2>
+    <h2>Banners (legacy compose)</h2>
     <section class="banners">
       <p><strong>Home hero</strong> (1200×400)</p>
       <img src="banners/home-hero.svg" alt="Home hero" />
@@ -77,7 +87,6 @@
         const name = folder.replace(/^\d+-/, "");
         const b = document.createElement("div");
         b.className = "box badge-box";
-        b.style.width = "80px";
         b.innerHTML = `<span>${code}</span><img src="badges/${folder}/${name}-badge.svg" width="64" height="64" alt="" />`;
         badgeRow.appendChild(b);
         const art = document.createElement("article");
@@ -85,10 +94,8 @@
         art.innerHTML = `
           <h3>${title}</h3>
           <div class="code">${code}</div>
-          <div class="row">
-            <div class="box"><span>card</span><img src="characters/${folder}/${name}-card.svg" alt="" /></div>
-            <div class="box"><span>character</span><img src="characters/${folder}/${name}-character.svg" alt="" /></div>
-            <div class="box badge-box"><span>badge</span><img src="badges/${folder}/${name}-badge.svg" width="64" height="64" alt="" /></div>
+          <div class="figure-box">
+            <img src="characters/${folder}/${name}-figure.png" width="384" height="512" alt="${title}" />
           </div>`;
         root.appendChild(art);
       }

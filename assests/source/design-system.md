@@ -1,65 +1,51 @@
-# Vibe Profile Visual — Design System (v5 · SBTI board)
+# Vibe Profile Visual — Design System (v6 · MBTI flat)
 
-Primary style reference: `source/references/sbti-style-reference-board.png`
+Primary style: classic 16Personalities geometric faceted flat vector (Piotr Antkowiak / Zeda Labs language).
+
+## Art style (canonical)
+
+- Full-body figures, ~5.5–6 heads tall (slightly oversized head)
+- Geometric faceted color planes, clean silhouettes, **no black outlines / no line art**
+- Simplified faces (dot/oval eyes, minimal nose, simple mouth)
+- Large stylized hair masses as 2–3 shade planes (no strand detail)
+- Muted harmonious palette (~6–10 colors) per archetype accent
+- Faceted shade planes only — no painterly gradients, grunge, or fabric texture
+- Clothing communicates archetype; 1–3 symbolic props
+- Natural narrative poses
+- Minimal / abstract environment only (product page supplies soft stage blob)
+- **No collectible card frame** on product surfaces
+- Reference boards: `notes/mbti-ref-analysts.jpg`, `notes/mbti-ref-sentinels.jpg`
 
 ## Source of truth
 
 | Asset | Role |
 |-------|------|
-| `vibe-profiles-v5-board-a.png` | Profiles 01–04 (4 columns) |
-| `vibe-profiles-v5-board-b.png` | Profiles 05–08 (4 columns) |
-| `characters/*/*-mascot.png` | One column slice per profile |
-| `vibe-badges-v6-board.png` | Symbolic badge icons (8 columns) |
-| `badges/*/*-badge.png` | Per-profile symbol badge (256×256 source) |
-| `banners/*.png` | Wide banner masters |
+| `characters/*/*-figure.png` | Freestanding MBTI-style figure (primary) |
+| `characters/*/*-character.svg` | Thin wrapper pointing at figure |
+| `characters/*/*-card.svg` | Alias of character (compat) — not a framed card |
+| `characters/*/*.sbti-archive.svg` | Previous SBTI diamond-card raster embeds |
+| `badges/*/*-badge.svg` | Symbolic badge icons (v6 board) |
 
-All deliverable SVGs embed PNG via `data:image/png;base64` (self-contained, no external href).
+## Profiles
 
-## Visual language (from SBTI board)
+| Code | Accent | Prop language |
+|------|--------|---------------|
+| SHIP | Mint | Laptop + rocket badge |
+| HUNT | Pink | Rubber duck + error tablet |
+| DRAW | Blue | Flowchart tablet + glasses |
+| FAITH | Purple | Halo terminal |
+| SPELL | Gold | Rules scroll |
+| TABS | Orange | Floating browser tabs |
+| METER | Cyan | Context gauge ~99% |
+| YOLO | Red | Big merge / YOLO button |
 
-- Vertical card frame, diamond gem top/bottom center
-- Dark fill + circuit trace glow (accent per profile)
-- Thick black outlines, chibi or mascot (not required to be human)
-- Cross-legged / prop-forward poses
-- No long baked text in character art (issue rule)
+## Product display
 
-## Profiles (v5 pack)
+- `result.html` places the figure **on a soft abstract stage blob** — not inside a bordered card.
+- Figure PNGs use `mix-blend-mode: multiply` so light scene canvases dissolve into the page (no rectangular card chrome).
+- Score / tier / signals sit in a separate frosted `meta-panel` below the figure.
+- `preview.html` / `review.html` show the same freestanding figures (review also keeps legacy SBTI boards for archive).
 
-| Code | Form | Signature |
-|------|------|-----------|
-| SHIP | Chibi builder | Rocket laptop, fist pump |
-| HUNT | Chibi debugger | Hood, error screen, duck |
-| DRAW | Chibi architect | Glasses, flowchart tablet |
-| FAITH | Robot disciple | Terminal halo worship |
-| SPELL | Chibi priest | Giant prompt scroll |
-| TABS | Chibi hoarder | Tab swarm, localhost ports |
-| METER | Chibi maxxer | Context gauge at 99% |
-| YOLO | Chibi shipper | Red YOLO button, chaos |
+## Preview
 
-## Canvas
-
-| Asset | Size |
-|-------|------|
-| Board slice | 384×1024 (from 1536×1024 ÷ 4) |
-| Card SVG | 310×420 |
-| Badge SVG | 64×64 (symbol icon, not mascot crop) |
-| Home / share banner | 1200×400 (viewBox; source PNG scaled) |
-| Result header banner | 1200×280 |
-
-## Regenerate
-
-```bash
-cd assests
-python scripts/split-reference.py
-python scripts/split-badges.py
-node scripts/sync-raster.mjs
-python scripts/compose-banners.py
-node scripts/sync-banners.mjs
-node scripts/qa-faces.mjs
-```
-
-Manifest: `scripts/profiles.json`
-
-## QA
-
-Open `review.html` — compare board columns vs cards, badges, banners.
+Open `preview.html` and `result.html` (picker cycles all 8). Server: `cd assests && python3 -m http.server 8765`.
