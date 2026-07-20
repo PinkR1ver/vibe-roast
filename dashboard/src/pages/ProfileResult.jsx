@@ -209,17 +209,17 @@ export default function ProfileResult({ data, onBack }) {
               <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
                 <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
                 <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="flex min-h-[220px] items-center justify-center overflow-hidden rounded-xl bg-[#f7f4ef]">
+                <div className="h-[240px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
                   <WordCloud
                     words={words.slice(0, 60)}
                     width={720}
                     height={240}
-                    gridSize={5}
-                    weightDivisor={3.4}
-                    rotateRatio={0.06}
-                    minRotation={-0.12}
-                    maxRotation={0.12}
-                    ellipticity={0.7}
+                    gridSize={6}
+                    weightDivisor={4.2}
+                    rotateRatio={0.12}
+                    minRotation={-0.28}
+                    maxRotation={0.28}
+                    ellipticity={0.68}
                     minSize={10}
                     colors={ROAST_CLOUD_COLORS}
                     fontFamily="Outfit, system-ui, sans-serif"

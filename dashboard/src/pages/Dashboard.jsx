@@ -100,17 +100,17 @@ export default function Dashboard({ onOpenProfile }) {
                 {t("dashboard.cloud.kicker")}
               </p>
               <h2 className="text-h4 text-white mb-2">{t("dashboard.cloud.title")}</h2>
-              <div className="h-[270px] lg:h-[280px] flex items-center justify-center overflow-hidden">
+              <div className="h-[270px] w-full overflow-hidden lg:h-[280px]">
                 <WordCloud
                   words={word_frequencies}
                   width={760}
                   height={270}
-                  gridSize={4}
-                  weightDivisor={3.2}
-                  rotateRatio={0.08}
-                  minRotation={-0.14}
-                  maxRotation={0.14}
-                  ellipticity={0.62}
+                  gridSize={6}
+                  weightDivisor={4}
+                  rotateRatio={0.12}
+                  minRotation={-0.28}
+                  maxRotation={0.28}
+                  ellipticity={0.65}
                   minSize={10}
                 />
               </div>
