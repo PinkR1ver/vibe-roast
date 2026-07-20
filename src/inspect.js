@@ -3,20 +3,10 @@ const { wordFrequencies } = require("./extract/phrase-stats");
 const { analyzePrompts } = require("./extract/prompt-analysis");
 const { inspectEnvironment } = require("./extract/environment");
 const { buildVibeProfile } = require("./lib/agent-score");
-const { inspectCodex } = require("./sources/codex");
-const { inspectClaude } = require("./sources/claude");
-const { inspectCursor } = require("./sources/cursor");
-const { inspectVibeTracker } = require("./sources/vibe-tracker");
 const { inspectTokenTracker } = require("./sources/token-tracker");
+const { SOURCE_INSPECTORS, normalizeSources } = require("./sources");
 
-const SOURCE_INSPECTORS = {
-  codex: inspectCodex,
-  claude: inspectClaude,
-  cursor: inspectCursor,
-  "vibe-tracker": inspectVibeTracker,
-};
-
-async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"], roots = {} } = {}) {
+async function inspectSources({ from, to, sources, roots = {} } = {}) {
   const range = dayBounds(from, to);
   const selected = normalizeSources(sources);
   const sourceReports = {};
@@ -33,9 +23,10 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
       root: roots[source],
       dbPath: roots.cursorDb || roots.cursor,
       range,
+      home: roots.home,
     });
     sourceReports[source] = stripPrompts(report);
-    prompts.push(...report.prompts);
+    prompts.push(...(report.prompts || []));
   }
 
   prompts.sort((a, b) => String(a.timestamp || "").localeCompare(String(b.timestamp || "")));
@@ -149,13 +140,6 @@ function parseOptionalCost(value) {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function normalizeSources(sources) {
-  if (typeof sources === "string") {
-    return sources.split(",").map((s) => s.trim()).filter(Boolean);
-  }
-  return Array.isArray(sources) && sources.length > 0 ? sources : ["codex", "claude", "cursor"];
-}
-
 function stripPrompts(report) {
   const { prompts: _prompts, ...rest } = report;
   return rest;
@@ -199,4 +183,4 @@ function addTotals(target, delta) {
   }
 }
 
-module.exports = { inspectSources };
+module.exports = { inspectSources, SOURCE_INSPECTORS, normalizeSources };

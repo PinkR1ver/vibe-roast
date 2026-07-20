@@ -1,0 +1,7 @@
+{
+  "createdAt": "2026-06-07T12:00:00.000Z",
+  "messages": [
+    {"role": "user", "text": "Windsurf cascade: tighten the CSS grid", "timestamp": "2026-06-07T12:00:00.000Z"},
+    {"role": "assistant", "text": "Updated the grid tracks.", "timestamp": "2026-06-07T12:01:00.000Z"}
+  ]
+}

@@ -206,21 +206,21 @@ export default function ProfileResult({ data, onBack }) {
             </div>
 
             {words.length > 0 && (
-              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
-                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="h-[240px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
+              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-4 py-3 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+                <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
+                <h2 className="m-0 mb-2 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
+                <div className="h-[168px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
                   <WordCloud
-                    words={words.slice(0, 60)}
+                    words={words.slice(0, 72)}
                     width={720}
-                    height={240}
-                    gridSize={6}
-                    weightDivisor={4.2}
-                    rotateRatio={0.12}
-                    minRotation={-0.28}
-                    maxRotation={0.28}
-                    ellipticity={0.68}
-                    minSize={10}
+                    height={168}
+                    gridSize={4}
+                    weightDivisor={5.4}
+                    rotateRatio={0.1}
+                    minRotation={-0.22}
+                    maxRotation={0.22}
+                    ellipticity={0.82}
+                    minSize={8}
                     colors={ROAST_CLOUD_COLORS}
                     fontFamily="Outfit, system-ui, sans-serif"
                   />
@@ -228,14 +228,14 @@ export default function ProfileResult({ data, onBack }) {
               </div>
             )}
 
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-              <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
+            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-4 py-3 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+              <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
               <h2 className="m-0 mb-1 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-4 text-xs text-[#8b8680]">
+              <p className="mt-0 mb-3 text-xs text-[#8b8680]">
                 {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
               </p>
 
-              <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <RoastStat
                   label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
                   value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
@@ -258,7 +258,7 @@ export default function ProfileResult({ data, onBack }) {
               </div>
 
               {modelBreakdown.sources.length > 0 && (
-                <div className="mb-4 flex flex-wrap gap-2">
+                <div className="mb-3 flex flex-wrap gap-2">
                   {modelBreakdown.sources.slice(0, 4).map((source) => (
                     <div
                       key={source.key}
@@ -275,7 +275,7 @@ export default function ProfileResult({ data, onBack }) {
                 </div>
               )}
 
-              <div className="h-[220px] max-h-[240px]">
+              <div className="h-[260px] max-h-[280px]">
                 <ActivityHeatmap3DPanel
                   prompts={data?.prompts || []}
                   activity={activity}

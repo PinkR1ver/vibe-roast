@@ -11,21 +11,22 @@ export default function ActivityHeatmap({
   weeks = 26,
   dark = false,
   compact = false,
+  dense = false,
 }) {
   const heatmap = useMemo(
     () => buildActivityHeatmap({ prompts, dailyRows, weeks }),
     [prompts, dailyRows, weeks],
   );
-  const cell = compact ? 9 : 12;
-  const gap = compact ? 2 : 3;
-  const labelW = compact ? 22 : 28;
+  const cell = dense ? 11 : compact ? 9 : 12;
+  const gap = dense ? 2 : compact ? 2 : 3;
+  const labelW = dense ? 18 : compact ? 22 : 28;
   const colors = dark ? COLORS_DARK : COLORS_LIGHT;
   const grid = heatmap.weeks || [];
   const totalWidth = Math.max(grid.length * (cell + gap) + labelW, 120);
 
   return (
     <div className="overflow-x-auto">
-      <svg width={totalWidth} height={7 * (cell + gap) + (compact ? 8 : 16)} className="block">
+      <svg width={totalWidth} height={7 * (cell + gap) + (dense || compact ? 4 : 16)} className="block">
         {DAY_LABELS.map((label, i) => (
           <text
             key={i}

@@ -2,6 +2,7 @@
 const { inspectSources } = require("../src/inspect");
 const { start } = require("../src/server");
 const { install, uninstall } = require("../src/hooks/install");
+const { KNOWN_SOURCES } = require("../src/sources");
 
 async function main(argv) {
   const [command, ...rest] = argv;
@@ -24,7 +25,10 @@ async function main(argv) {
   }
 
   if (command !== "inspect") {
-    process.stderr.write("Usage: vibe-wrapper [serve]|inspect|install|uninstall\n");
+    process.stderr.write(
+      "Usage: vibe-wrapper [serve]|inspect|install|uninstall\n" +
+        `Known sources: ${KNOWN_SOURCES.join(", ")}\n`,
+    );
     process.exitCode = 1;
     return;
   }
@@ -35,9 +39,19 @@ async function main(argv) {
     to: opts.to,
     sources: opts.sources,
     roots: {
+      home: opts.home,
       codex: opts.codexRoot,
       claude: opts.claudeRoot,
       cursor: opts.cursorDb,
+      cursorDb: opts.cursorDb,
+      cline: opts.clineRoot,
+      roo: opts.rooRoot,
+      continue: opts.continueRoot,
+      gemini: opts.geminiRoot,
+      aider: opts.aiderRoot,
+      windsurf: opts.windsurfRoot,
+      copilot: opts.copilotRoot,
+      tokenTrackerQueue: opts.tokenTrackerQueue,
     },
   });
 
@@ -54,9 +68,18 @@ function parseArgs(args) {
     if (key === "from") opts.from = value;
     else if (key === "to") opts.to = value;
     else if (key === "sources") opts.sources = value;
+    else if (key === "home") opts.home = value;
     else if (key === "codex-root") opts.codexRoot = value;
     else if (key === "claude-root") opts.claudeRoot = value;
     else if (key === "cursor-db") opts.cursorDb = value;
+    else if (key === "cline-root") opts.clineRoot = value;
+    else if (key === "roo-root") opts.rooRoot = value;
+    else if (key === "continue-root") opts.continueRoot = value;
+    else if (key === "gemini-root") opts.geminiRoot = value;
+    else if (key === "aider-root") opts.aiderRoot = value;
+    else if (key === "windsurf-root") opts.windsurfRoot = value;
+    else if (key === "copilot-root") opts.copilotRoot = value;
+    else if (key === "token-tracker-queue") opts.tokenTrackerQueue = value;
   }
   return opts;
 }

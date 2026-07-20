@@ -75,7 +75,7 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   if (!canvas || !words?.length) return;
   const parent = canvas.parentElement;
   const width = Math.max(200, Math.floor(parent?.clientWidth || canvas.clientWidth || 640));
-  const height = Math.max(160, Math.floor(parent?.clientHeight || canvas.clientHeight || 220));
+  const height = Math.max(120, Math.floor(parent?.clientHeight || canvas.clientHeight || 168));
   const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
@@ -89,9 +89,9 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   const max = Math.max(1, Number(words[0]?.count) || 1);
   const palette = [accent, "#c45c26", "#f0c14a", "#23d6a5", "#5b8cff", "#6b6560", "#d97706", "#e07a3a"];
   const placed = [];
-  const shuffled = words.slice(0, 48);
-  const pad = 10;
-  const gap = 5;
+  const shuffled = words.slice(0, 56);
+  const pad = 4;
+  const gap = 2;
 
   function collides(x, y, w, h) {
     for (const box of placed) {
@@ -105,20 +105,20 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   for (let i = 0; i < shuffled.length; i++) {
     const { term, count } = shuffled[i];
     const weight = Math.max(0, Number(count) || 0) / max;
-    const size = 12 + Math.pow(weight, 0.7) * Math.min(36, height * 0.22);
-    const rotate = i % 7 === 0 ? (i % 2 === 0 ? -0.22 : 0.22) : 0;
+    const size = 10 + Math.pow(weight, 0.65) * Math.min(28, height * 0.18);
+    const rotate = i % 9 === 0 ? (i % 2 === 0 ? -0.18 : 0.18) : 0;
     ctx.font = `700 ${size}px Outfit, system-ui, sans-serif`;
     const tw = ctx.measureText(term).width;
     const th = size;
     let placedOk = false;
-    for (let attempt = 0; attempt < 120; attempt++) {
-      const angle = attempt * 0.48;
-      const radius = 2 + attempt * 2.6;
-      const cx = width / 2 + Math.cos(angle) * radius * (width / Math.max(height, 1)) * 0.55;
-      const cy = height / 2 + Math.sin(angle) * radius * 0.72;
+    for (let attempt = 0; attempt < 160; attempt++) {
+      const angle = attempt * 0.42;
+      const radius = 1 + attempt * 1.85;
+      const cx = width / 2 + Math.cos(angle) * radius * (width / Math.max(height, 1)) * 0.62;
+      const cy = height / 2 + Math.sin(angle) * radius * 0.78;
       const x = cx - tw / 2;
       const y = cy + th * 0.32;
-      if (x < pad || y < th + pad * 0.4 || x + tw > width - pad || y > height - pad) continue;
+      if (x < pad || y < th + pad * 0.25 || x + tw > width - pad || y > height - pad) continue;
       if (collides(x, y - th, tw, th)) continue;
       ctx.save();
       ctx.translate(cx, cy);
@@ -133,13 +133,13 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
       placedOk = true;
       break;
     }
-    if (!placedOk && i < 12) {
+    if (!placedOk && i < 14) {
       // Soft fallback near center rather than dumping into a corner grid.
       ctx.fillStyle = palette[i % palette.length];
       ctx.globalAlpha = 0.45;
       ctx.textAlign = "left";
       ctx.textBaseline = "alphabetic";
-      ctx.fillText(term, pad + (i % 4) * (width / 4.2), height / 2 + (Math.floor(i / 4) - 1) * 22);
+      ctx.fillText(term, pad + (i % 5) * (width / 5.2), height / 2 + (Math.floor(i / 5) - 1) * 16);
     }
   }
   ctx.globalAlpha = 1;
@@ -243,10 +243,10 @@ export function renderActivityIso(container, activity, weeks = 52, { svgHeight =
   const weeksData = buildWeeksFromDaily(dailyRows, weeks);
   const yaw = -0.2;
   const pitch = 0.88;
-  const UNIT = 9;
-  const GAP = 1.4;
+  const UNIT = 11;
+  const GAP = 1.2;
   const SIZE = UNIT - GAP;
-  const HEIGHT_MAX = 22;
+  const HEIGHT_MAX = 28;
   const isTokens = activity?.metric === "tokens" && Number(activity?.total_tokens || 0) > 0;
 
   const cells = [];
@@ -318,7 +318,7 @@ export function renderActivityIso(container, activity, weeks = 52, { svgHeight =
       minY = Math.min(minY, p.center.y - UNIT * 2);
       maxY = Math.max(maxY, p.center.y + UNIT * 2);
     }
-    const pad = 12;
+    const pad = 6;
     const vb = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
     return { projected, vb };
   };
@@ -355,9 +355,6 @@ export function renderActivity2D(container, activity, weeks = 52) {
   const dailyRows = activity?.daily_rows || [];
   const weeksData = buildWeeksFromDaily(dailyRows, weeks);
   const isTokens = activity?.metric === "tokens" && Number(activity?.total_tokens || 0) > 0;
-  const cell = 9;
-  const gap = 2;
-  const labelW = 22;
   const dayLabels = ["", "Mon", "", "Wed", "", "Fri", ""];
 
   if (!weeksData.some((w) => (w || []).some(Boolean))) {
@@ -365,22 +362,25 @@ export function renderActivity2D(container, activity, weeks = 52) {
     return;
   }
 
-  const totalWidth = Math.max(weeksData.length * (cell + gap) + labelW, 120);
-  const height = 7 * (cell + gap) + 8;
+  const cellSize = 11;
+  const cellGap = 2;
+  const labelWidth = 20;
+  const totalWidth = Math.max(weeksData.length * (cellSize + cellGap) + labelWidth, 120);
+  const height = 7 * (cellSize + cellGap) + 4;
   const rects = [];
   weeksData.forEach((week, wi) => {
     (week || []).forEach((c, di) => {
       if (!c) return;
       const fill = EMERALD[Math.min(4, c.level || 0)];
       rects.push(
-        `<rect x="${labelW + wi * (cell + gap)}" y="${di * (cell + gap)}" width="${cell}" height="${cell}" rx="2" fill="${fill}"><title>${c.day}: ${Number(c.value || 0).toLocaleString()}</title></rect>`,
+        `<rect x="${labelWidth + wi * (cellSize + cellGap)}" y="${di * (cellSize + cellGap)}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}"><title>${c.day}: ${Number(c.value || 0).toLocaleString()}</title></rect>`,
       );
     });
   });
   const labels = dayLabels
     .map((label, i) =>
       label
-        ? `<text x="0" y="${i * (cell + gap) + cell}" font-size="9" fill="#8b8680">${label}</text>`
+        ? `<text x="0" y="${i * (cellSize + cellGap) + cellSize}" font-size="9" fill="#8b8680">${label}</text>`
         : "",
     )
     .join("");
@@ -404,7 +404,7 @@ export function renderActivityMap(container, activity, weeks = 52, { defaultMode
   const paintBody = (body) => {
     body.classList.remove("is-exit");
     body.classList.add("is-enter");
-    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 160, animate: true });
+    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 196, animate: true });
     else renderActivity2D(body, activity, weeks);
   };
 

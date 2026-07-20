@@ -1,0 +1,11 @@
+{
+  "sessions": [
+    {
+      "creationDate": "2026-06-07T09:00:00.000Z",
+      "requests": [
+        {"message": "Copilot write a unit test for parseArgs", "timestamp": "2026-06-07T09:00:00.000Z"},
+        {"role": "assistant", "message": "Here is a test sketch.", "timestamp": "2026-06-07T09:01:00.000Z"}
+      ]
+    }
+  ]
+}

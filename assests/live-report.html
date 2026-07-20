@@ -332,7 +332,7 @@
       }
 
       .cloud-stage {
-        height: 240px;
+        height: 168px;
         display: block;
         position: relative;
       }
@@ -345,15 +345,15 @@
 
       .activity-stage {
         min-height: 0;
-        max-height: 280px;
-        padding: 6px;
+        max-height: 320px;
+        padding: 2px;
         position: relative;
       }
 
       .activity-view-toggle {
         position: absolute;
-        top: 10px;
-        right: 10px;
+        top: 6px;
+        right: 6px;
         z-index: 2;
         display: inline-flex;
         gap: 2px;
@@ -381,7 +381,7 @@
       }
 
       .activity-view-body {
-        padding-top: 2px;
+        padding-top: 0;
         transform-origin: 50% 85%;
       }
 
@@ -419,22 +419,22 @@
         overflow-x: auto;
         display: flex;
         justify-content: center;
-        padding: 4px 2px 2px;
+        padding: 0;
       }
 
       .activity-kpi {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 6px;
-        margin-bottom: 8px;
-        padding-right: 72px;
+        gap: 4px;
+        margin-bottom: 4px;
+        padding-right: 68px;
       }
 
       .activity-kpi > div {
         border-radius: 10px;
         background: #fffcf7;
         border: 1px solid rgba(0, 0, 0, 0.04);
-        padding: 6px 8px;
+        padding: 4px 6px;
       }
 
       .activity-kpi span {
@@ -525,6 +525,10 @@
         padding: 22px 22px 20px;
       }
 
+      .panel.panel-compact {
+        padding: 16px 16px 12px;
+      }
+
       .panel h2 {
         margin: 0 0 4px;
         font-size: 20px;
@@ -535,6 +539,10 @@
         margin: 0 0 16px;
         color: var(--muted);
         font-size: 13px;
+      }
+
+      .panel.panel-compact .sub {
+        margin: 0 0 8px;
       }
 
       .radar-wrap {
@@ -883,13 +891,13 @@
             <div class="roast" id="roast"></div>
           </article>
 
-          <article class="card panel">
+          <article class="card panel panel-compact">
             <h2>Word cloud</h2>
             <p class="sub">From inspect word_frequencies</p>
             <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
           </article>
 
-          <article class="card panel">
+          <article class="card panel panel-compact">
             <h2>Activity</h2>
             <p class="sub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
             <div class="activity-stage" id="activityMap"></div>
