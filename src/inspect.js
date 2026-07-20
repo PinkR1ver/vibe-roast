@@ -45,11 +45,13 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
     codexHome: roots.codexHome,
   });
   const summary = buildSummary(sourceReports, prompts);
+  const activity = enrichActivity(buildActivity(tokenTrackerActivity, prompts));
   const vibe_profile = buildVibeProfile({
     categories: promptAnalysis.categories || {},
     env: environment?.codex || {},
     summary,
     promptAnalysis,
+    activity,
   });
 
   return {
@@ -57,7 +59,7 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
     range: { from: from || null, to: to || null },
     summary,
     sources: sourceReports,
-    activity: buildActivity(tokenTrackerActivity, prompts),
+    activity,
     word_frequencies: wordFrequencies(promptAnalysis.useful_prompts),
     profile_signals: {
       prompt_analysis: promptAnalysis,
@@ -79,6 +81,7 @@ function buildActivity(tokenTrackerActivity, prompts = []) {
       bucket_count: tokenTrackerActivity.bucket_count || 0,
       daily_row_count: tokenTrackerActivity.daily_rows.length,
       root: tokenTrackerActivity.root,
+      estimated_cost_usd: parseOptionalCost(tokenTrackerActivity.estimated_cost_usd),
     };
   }
 
@@ -117,7 +120,33 @@ function buildActivity(tokenTrackerActivity, prompts = []) {
     bucket_count: 0,
     daily_row_count: daily_rows.length,
     root: null,
+    estimated_cost_usd: null,
   };
+}
+
+function enrichActivity(activity) {
+  const { summarizeActivity } = require("./lib/activity-metrics");
+  const stats = summarizeActivity(activity);
+  return {
+    ...activity,
+    total_tokens: activity.metric === "tokens"
+      ? (activity.total_tokens || stats.totalValue)
+      : activity.total_tokens || 0,
+    active_day_count: stats.activeDays || activity.active_day_count || 0,
+    longest_streak: stats.maxStreak,
+    peak_day: stats.peakDay.day
+      ? { day: stats.peakDay.day, value: stats.peakDay.value }
+      : null,
+    top_provider: stats.topProvider,
+    active_rate: stats.activeRate,
+    estimated_cost_usd: parseOptionalCost(activity.estimated_cost_usd),
+  };
+}
+
+function parseOptionalCost(value) {
+  if (value == null || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 function normalizeSources(sources) {

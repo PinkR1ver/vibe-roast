@@ -348,6 +348,44 @@
         padding: 8px;
       }
 
+      .activity-kpi {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+
+      .activity-kpi > div {
+        border-radius: 12px;
+        background: #fffcf7;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        padding: 8px 10px;
+      }
+
+      .activity-kpi span {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #8b8680;
+      }
+
+      .activity-kpi strong {
+        display: block;
+        margin-top: 4px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 16px;
+        font-weight: 800;
+        color: #059669;
+      }
+
+      @media (max-width: 720px) {
+        .activity-kpi {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
       .poster-bar {
         display: flex;
         flex-wrap: wrap;
@@ -777,7 +815,7 @@
 
           <article class="card panel">
             <h2>3D Activity</h2>
-            <p class="sub">Isometric heatmap · cream card style</p>
+            <p class="sub">Emerald isometric columns · TokenTracker when available</p>
             <div class="activity-stage" id="activityMap"></div>
           </article>
         </div>
@@ -931,7 +969,7 @@
         roast.innerHTML = `${escapeHtml(body)}<p class="tldr"><b>TL;DR</b> · ${escapeHtml(tldr)}</p>`;
 
         renderWordCloud(wordCloud, payload.WORDS, arch.accent);
-        renderActivityIso(activityMap, payload.ACTIVITY, 20);
+        renderActivityIso(activityMap, payload.ACTIVITY, 52);
 
         stage.classList.remove("is-animating");
         void stage.offsetWidth;

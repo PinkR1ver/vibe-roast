@@ -65,6 +65,14 @@ test("buildVibeProfile returns figure paths and roast", () => {
     env: { skills: { count: 2 }, mcp_servers: { count: 0 }, plugins: { count: 0 } },
     summary: { source_count: 2, prompt_count: 44 },
     promptAnalysis: { useful_prompt_count: 42 },
+    activity: {
+      metric: "tokens",
+      total_tokens: 12500,
+      daily_rows: [
+        { day: "2026-06-01", value: 5000, sources: { cursor: 5000 } },
+        { day: "2026-06-02", value: 7500, sources: { cursor: 7500 } },
+      ],
+    },
   });
 
   assert.ok(profile.total >= 0);
@@ -74,6 +82,8 @@ test("buildVibeProfile returns figure paths and roast", () => {
   assert.equal(profile.dimensions.length, 6);
   assert.ok(profile.roast.includes("🔥"));
   assert.ok(profile.roastZh.length > 10);
+  assert.equal(profile.signals[0].label, "Total tokens");
+  assert.ok(!profile.signals.some((s) => s.label === "Useful prompts"));
 });
 
 test("scoreFromCategories treats zero counts as zero not NaN", () => {

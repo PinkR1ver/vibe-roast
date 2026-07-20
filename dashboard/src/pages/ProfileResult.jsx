@@ -3,6 +3,7 @@ import { useLocale } from "../contexts/LocaleContext.jsx";
 import WordCloud from "../components/WordCloud.jsx";
 import ActivityHeatmap3DPanel from "../components/ActivityHeatmap3DPanel.jsx";
 import { buildHashtags } from "../lib/hashtags.js";
+import { buildModelBreakdown } from "../lib/profile-viz.js";
 import { downloadCanvasPng, renderSharePoster } from "../lib/share-poster.js";
 
 const ROAST_CLOUD_COLORS = [
@@ -10,11 +11,21 @@ const ROAST_CLOUD_COLORS = [
   "#23d6a5", "#5b8cff", "#6b6560", "#d97706", "#b45309",
 ];
 
+function compactNumber(value) {
+  const n = Number(value) || 0;
+  if (n < 1000) return n.toLocaleString();
+  if (n < 1000000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K`;
+  if (n < 10000000) return `${(n / 1000000).toFixed(2)}M`;
+  if (n < 1000000000) return `${(n / 1000000).toFixed(1)}M`;
+  return `${(n / 1000000000).toFixed(n >= 10000000000 ? 0 : 2)}B`;
+}
+
 export default function ProfileResult({ data, onBack }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
   const vibe = data?.vibe_profile;
   const summary = data?.summary || {};
+  const activity = data?.activity || null;
   const [posterBusy, setPosterBusy] = useState(false);
   const [posterError, setPosterError] = useState("");
 
@@ -22,6 +33,11 @@ export default function ProfileResult({ data, onBack }) {
   const hashtags = useMemo(() => buildHashtags(vibe, categories), [vibe, categories]);
   const words = data?.word_frequencies || [];
   const accent = vibe?.archetype?.accent || "#ff5a1f";
+  const modelBreakdown = useMemo(() => buildModelBreakdown(activity || {}), [activity]);
+  const isTokenMetric = activity?.metric === "tokens" && Number(activity?.total_tokens || 0) > 0;
+  const peak = activity?.peak_day;
+  const hasCost = activity?.estimated_cost_usd != null && Number(activity.estimated_cost_usd) > 0;
+  const estCost = hasCost ? Number(activity.estimated_cost_usd) : null;
 
   if (!vibe) {
     return (
@@ -215,20 +231,81 @@ export default function ProfileResult({ data, onBack }) {
             <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
               <h2 className="m-0 mb-1 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-4 text-xs text-[#8b8680]">{t("profile.activityHint")}</p>
-              <div className="h-[280px] min-h-[240px]">
+              <p className="mt-0 mb-4 text-xs text-[#8b8680]">
+                {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
+              </p>
+
+              <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                <RoastStat
+                  label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
+                  value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
+                  accent="#059669"
+                />
+                <RoastStat
+                  label={hasCost ? t("profile.stat.estCost") : t("profile.stat.activeDays")}
+                  value={hasCost ? `$${estCost.toFixed(estCost >= 100 ? 0 : 2)}` : String(activity?.active_day_count || 0)}
+                  accent={hasCost ? "#059669" : undefined}
+                />
+                <RoastStat
+                  label={t("profile.stat.streak")}
+                  value={`${activity?.longest_streak || 0}${zh ? " 天" : "d"}`}
+                />
+                <RoastStat
+                  label={t("profile.stat.peakDay")}
+                  value={peak?.value ? compactNumber(peak.value) : "—"}
+                  suffix={peak?.day || undefined}
+                />
+              </div>
+
+              {modelBreakdown.sources.length > 0 && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {modelBreakdown.sources.slice(0, 4).map((source) => (
+                    <div
+                      key={source.key}
+                      className="min-w-[108px] flex-1 rounded-xl border border-black/[0.04] bg-[#f7f4ef] px-3 py-2"
+                    >
+                      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{source.key}</div>
+                      <div className="mt-0.5 text-lg font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</div>
+                      <div className="text-[10px] text-[#8b8680]">
+                        {t("profile.stat.modelCount", { count: source.modelCount })}
+                        {isTokenMetric ? ` · ${compactNumber(source.tokens)}` : ""}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="h-[300px] min-h-[260px]">
                 <ActivityHeatmap3DPanel
                   prompts={data?.prompts || []}
-                  activity={data?.activity}
-                  weeks={26}
+                  activity={activity}
+                  weeks={52}
                   forceLight
-                  defaultPalette="amber"
+                  defaultPalette="emerald"
                   roastStyle
+                  showViewToggle
                 />
               </div>
             </div>
           </section>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function RoastStat({ label, value, suffix, accent }) {
+  return (
+    <div className="rounded-xl bg-[#f7f4ef] px-3 py-2.5">
+      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{label}</div>
+      <div className="mt-1 flex items-baseline gap-1.5">
+        <span
+          className="font-[JetBrains_Mono,ui-monospace,monospace] text-xl font-extrabold tabular-nums tracking-tight"
+          style={accent ? { color: accent } : undefined}
+        >
+          {value}
+        </span>
+        {suffix && <span className="text-[10px] font-semibold text-[#8b8680]">{suffix}</span>}
       </div>
     </div>
   );

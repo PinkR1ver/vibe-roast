@@ -192,19 +192,15 @@ function buildRoast(archetypeId, scores) {
   };
 }
 
-function buildVibeProfile({ categories = {}, env = {}, summary = {}, promptAnalysis = {} } = {}) {
+const { buildActivitySignals } = require("./activity-metrics");
+
+function buildVibeProfile({ categories = {}, env = {}, summary = {}, promptAnalysis = {}, activity = {} } = {}) {
   const scores = scoreFromCategories(categories, env);
   const total = totalScore(scores);
   const tier = tierFor(total);
   const archetypeId = dominantArchetype(scores);
   const archetype = ARCHETYPES[archetypeId];
   const roast = buildRoast(archetypeId, scores);
-  const useful = Number(promptAnalysis.useful_prompt_count || summary.prompt_count || 0);
-  const topCategory = Object.entries(categories)
-    .filter(([key]) => key !== "reference")
-    .map(([key, row]) => [key, categoryCount(categories, key)])
-    .filter(([, count]) => count > 0)
-    .sort((a, b) => b[1] - a[1])[0];
 
   return {
     scores,
@@ -225,15 +221,7 @@ function buildVibeProfile({ categories = {}, env = {}, summary = {}, promptAnaly
       value: scores[dim.key],
       score: Math.round((scores[dim.key] / dim.max) * 100) / 100,
     })),
-    signals: [
-      { label: "Useful prompts", labelZh: "有效提示", value: String(useful) },
-      { label: "Sources", labelZh: "数据源", value: String(summary.source_count ?? 0) },
-      {
-        label: "Top category",
-        labelZh: "主类别",
-        value: topCategory ? String(topCategory[0]) : "—",
-      },
-    ],
+    signals: buildActivitySignals({ activity, summary, categories }),
     ...roast,
   };
 }

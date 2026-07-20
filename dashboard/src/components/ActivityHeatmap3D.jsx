@@ -145,7 +145,7 @@ export default function ActivityHeatmap3D({
   const rafRef = useRef(null);
 
   // Growth wave
-  const [growthWave, setGrowthWave] = useState(0);
+  const [growthWave, setGrowthWave] = useState(interactive ? 0 : 1);
   const growthRafRef = useRef(null);
   const mountedRef = useRef(true);
   useEffect(() => { mountedRef.current = true; return () => { mountedRef.current = false; }; }, []);
@@ -161,7 +161,14 @@ export default function ActivityHeatmap3D({
     };
     growthRafRef.current = requestAnimationFrame(anim);
   };
-  useEffect(() => { triggerGrowthWave(); return () => { if (growthRafRef.current) cancelAnimationFrame(growthRafRef.current); }; }, [interactive]);
+  useEffect(() => {
+    if (!interactive) {
+      setGrowthWave(1);
+      return undefined;
+    }
+    triggerGrowthWave();
+    return () => { if (growthRafRef.current) cancelAnimationFrame(growthRafRef.current); };
+  }, [interactive]);
 
   // Auto-rotate
   useEffect(() => {
@@ -328,7 +335,7 @@ export default function ActivityHeatmap3D({
   return (
     <div
       ref={containerRef}
-      className={`relative select-none outline-none ${interactive ? "cursor-grab active:cursor-grabbing w-full h-full flex items-center justify-center" : "w-full overflow-hidden flex justify-center"}`}
+      className={`relative select-none outline-none ${interactive ? "cursor-grab active:cursor-grabbing w-full h-full flex items-center justify-center" : "w-full h-full min-h-[220px] overflow-hidden flex items-center justify-center"}`}
       onMouseDown={(e) => {
         if (!interactive) return;
         handleStart(e.clientX, e.clientY);
@@ -344,11 +351,12 @@ export default function ActivityHeatmap3D({
       <svg
         ref={svgRef}
         viewBox={viewBox}
-        width={interactive ? "95%" : "100%"}
-        height={interactive ? "95%" : "auto"}
+        width="100%"
+        height="100%"
+        preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="3D interactive activity heatmap"
-        style={{ display: "block", width: "100%", height: "auto", maxWidth: interactive ? "none" : `${width}px`, maxHeight: interactive ? "78vh" : "none" }}
+        style={{ display: "block", width: "100%", height: "100%", maxHeight: interactive ? "78vh" : "100%" }}
         className="transition-transform duration-300 ease-out"
       >
         {interactive && floorGridLines.map((line) => (

@@ -204,9 +204,18 @@ function buildWeeksFromDaily(dailyRows = [], weeks = 20) {
   return cells.length > weeks ? cells.slice(cells.length - weeks) : cells;
 }
 
-const AMBER = ["#fffbeb", "#fde68a", "#f59e0b", "#d97706", "#b45309"];
+const EMERALD = ["#ebedf0", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981"];
 
-export function renderActivityIso(container, activity, weeks = 20) {
+function compactNumber(value) {
+  const n = Number(value) || 0;
+  if (n < 1000) return String(Math.round(n));
+  if (n < 1000000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K`;
+  if (n < 10000000) return `${(n / 1000000).toFixed(2)}M`;
+  if (n < 1000000000) return `${(n / 1000000).toFixed(1)}M`;
+  return `${(n / 1000000000).toFixed(2)}B`;
+}
+
+export function renderActivityIso(container, activity, weeks = 52) {
   if (!container) return;
   const dailyRows = activity?.daily_rows || [];
   const weeksData = buildWeeksFromDaily(dailyRows, weeks);
@@ -216,6 +225,7 @@ export function renderActivityIso(container, activity, weeks = 20) {
   const GAP = 1.6;
   const SIZE = UNIT - GAP;
   const HEIGHT_MAX = 30;
+  const isTokens = activity?.metric === "tokens" && Number(activity?.total_tokens || 0) > 0;
 
   const cells = [];
   weeksData.forEach((week, wi) => {
@@ -247,7 +257,7 @@ export function renderActivityIso(container, activity, weeks = 20) {
       { x: xc - half, y: yc + half, z: h },
     ].map((p) => rotatePoint(p.x, p.y, p.z, yaw, pitch));
     const center = rotatePoint(xc, yc, h / 2, yaw, pitch);
-    const base = AMBER[Math.min(4, c.level)];
+    const base = EMERALD[Math.min(4, c.level)];
     const faces = [
       { indices: [4, 5, 6, 7], scale: 1 },
       { indices: [1, 2, 6, 5], scale: 0.75 },
@@ -256,7 +266,7 @@ export function renderActivityIso(container, activity, weeks = 20) {
     ];
     const paths = faces.map((f) => {
       const [a, b, c2, d] = f.indices.map((i) => pts[i]);
-      return `<path d="M${a.x},${a.y} L${b.x},${b.y} L${c2.x},${c2.y} L${d.x},${d.y} Z" fill="${shadeColor(base, f.scale)}" stroke="rgba(40,28,12,0.06)" stroke-width="0.4" />`;
+      return `<path d="M${a.x},${a.y} L${b.x},${b.y} L${c2.x},${c2.y} L${d.x},${d.y} Z" fill="${shadeColor(base, f.scale)}" stroke="rgba(16,185,129,0.08)" stroke-width="0.4" />`;
     });
     return { center, paths: paths.join(""), z: center.z };
   });
@@ -274,7 +284,15 @@ export function renderActivityIso(container, activity, weeks = 20) {
   }
   const pad = 16;
   const vb = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
-  container.innerHTML = `<svg viewBox="${vb}" role="img" aria-label="3D activity" style="width:100%;height:260px">${projected.map((p) => p.paths).join("")}</svg>`;
+  const peak = activity?.peak_day;
+  const kpi = `
+    <div class="activity-kpi">
+      <div><span>${isTokens ? "Total tokens" : "Active days"}</span><strong>${isTokens ? compactNumber(activity.total_tokens) : (activity.active_day_count || dailyRows.length)}</strong></div>
+      <div><span>Streak</span><strong>${activity.longest_streak || 0}d</strong></div>
+      <div><span>Peak</span><strong>${peak?.value ? compactNumber(peak.value) : "—"}</strong></div>
+      <div><span>Provider</span><strong>${(activity.top_provider || "—").toString().toUpperCase()}</strong></div>
+    </div>`;
+  container.innerHTML = `${kpi}<svg viewBox="${vb}" role="img" aria-label="3D activity" style="width:100%;height:260px">${projected.map((p) => p.paths).join("")}</svg>`;
 }
 
 function loadImage(src) {

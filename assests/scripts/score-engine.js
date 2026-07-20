@@ -159,7 +159,7 @@ export const DEMO_PROFILES = [
     tags: ["#DeployFirst", "#RocketLaptop", "#ProdIsQA"],
     scores: { orchestration: 11.2, promptCraft: 12.4, build: 16.8, debug: 6.1, context: 10.5, ship: 12.6 },
     signals: [
-      { label: "Useful prompts", value: "842" },
+      { label: "Total tokens", value: "842" },
       { label: "Sources", value: "Codex · Cursor" },
       { label: "Top category", value: "Implementation" },
     ],
@@ -182,7 +182,7 @@ export const DEMO_PROFILES = [
     tags: ["#BreakpointMonk", "#DuckCounsel", "#StackTracePoet"],
     scores: { orchestration: 8.4, promptCraft: 13.1, build: 7.2, debug: 13.6, context: 12.8, ship: 5.4 },
     signals: [
-      { label: "Useful prompts", value: "611" },
+      { label: "Total tokens", value: "611" },
       { label: "Sources", value: "Claude · Cursor" },
       { label: "Top category", value: "Debugging" },
     ],
@@ -205,7 +205,7 @@ export const DEMO_PROFILES = [
     tags: ["#BoxesFirst", "#ADRForever", "#NoCodeUntilDrawn"],
     scores: { orchestration: 14.6, promptCraft: 15.2, build: 8.1, debug: 6.4, context: 13.9, ship: 7.0 },
     signals: [
-      { label: "Useful prompts", value: "390" },
+      { label: "Total tokens", value: "390" },
       { label: "Sources", value: "Codex" },
       { label: "Top category", value: "Planning" },
     ],
@@ -228,7 +228,7 @@ export const DEMO_PROFILES = [
     tags: ["#AgentDisciple", "#HaloTerminal", "#AmenToDiff"],
     scores: { orchestration: 18.4, promptCraft: 11.0, build: 12.5, debug: 5.2, context: 9.1, ship: 11.8 },
     signals: [
-      { label: "Useful prompts", value: "1.2k" },
+      { label: "Total tokens", value: "1.2k" },
       { label: "Sources", value: "Codex · TokenTracker" },
       { label: "Top category", value: "Workflow" },
     ],
@@ -251,7 +251,7 @@ export const DEMO_PROFILES = [
     tags: ["#CursorRules", "#HolyScroll", "#SystemPromptCanon"],
     scores: { orchestration: 12.8, promptCraft: 17.1, build: 6.4, debug: 7.0, context: 14.2, ship: 4.8 },
     signals: [
-      { label: "Useful prompts", value: "455" },
+      { label: "Total tokens", value: "455" },
       { label: "Sources", value: "Cursor" },
       { label: "Top category", value: "Explanation" },
     ],
@@ -274,7 +274,7 @@ export const DEMO_PROFILES = [
     tags: ["#PortZoo", "#47Tabs", "#WhichLocalhost"],
     scores: { orchestration: 9.5, promptCraft: 8.2, build: 11.4, debug: 8.8, context: 4.2, ship: 9.1 },
     signals: [
-      { label: "Useful prompts", value: "703" },
+      { label: "Total tokens", value: "703" },
       { label: "Sources", value: "Cursor · Claude" },
       { label: "Top category", value: "Implementation" },
     ],
@@ -297,7 +297,7 @@ export const DEMO_PROFILES = [
     tags: ["#99Percent", "#CreditAnxiety", "#OneMoreFile"],
     scores: { orchestration: 13.2, promptCraft: 14.8, build: 9.6, debug: 7.5, context: 15.4, ship: 6.2 },
     signals: [
-      { label: "Useful prompts", value: "528" },
+      { label: "Total tokens", value: "528" },
       { label: "Sources", value: "Codex · Claude" },
       { label: "Top category", value: "Research" },
     ],
@@ -320,7 +320,7 @@ export const DEMO_PROFILES = [
     tags: ["#YoloFlag", "#SkipReview", "#FridayDeploy"],
     scores: { orchestration: 10.1, promptCraft: 7.4, build: 13.9, debug: 3.2, context: 6.8, ship: 13.5 },
     signals: [
-      { label: "Useful prompts", value: "966" },
+      { label: "Total tokens", value: "966" },
       { label: "Sources", value: "Cursor --yolo" },
       { label: "Top category", value: "Packaging" },
     ],

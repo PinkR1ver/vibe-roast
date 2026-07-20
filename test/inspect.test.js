@@ -71,6 +71,7 @@ test("inspectSources builds vibe_profile from multi-source prompts", async () =>
       cursor: path.join(fixtures, "cursor", "state.vscdb"),
       home,
       codexHome: path.join(home, ".codex"),
+      tokenTrackerQueue: path.join(fixtures, "missing-token-tracker.jsonl"),
     },
   });
 
@@ -82,6 +83,7 @@ test("inspectSources builds vibe_profile from multi-source prompts", async () =>
   assert.match(vibe.figure, /^\/assests\/characters\/.+-figure\.png$/);
   assert.match(vibe.badge, /^\/assests\/badges\/.+-badge\.svg$/);
   assert.equal(vibe.dimensions.length, 6);
+  assert.ok(!vibe.signals.some((signal) => signal.label === "Useful prompts"));
   assert.equal(
     vibe.signals.find((signal) => signal.label === "Sources")?.value,
     "3",
@@ -195,6 +197,10 @@ test("inspectSources exposes TokenTracker activity without adding synthetic prom
   assert.equal(report.activity.total_tokens, 5800);
   assert.equal(report.summary.prompt_count, 2);
   assert.equal(report.sources["token-tracker"], undefined);
+  assert.equal(report.vibe_profile.signals[0].label, "Total tokens");
+  assert.ok(!report.vibe_profile.signals.some((s) => s.label === "Useful prompts"));
+  assert.ok(report.activity.peak_day?.day);
+  assert.ok(report.activity.longest_streak >= 1);
 });
 
 test("inspectSources filters TokenTracker activity by date range", async () => {
