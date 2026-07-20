@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T18:29:00.774Z",
+  "generated_at": "2026-07-20T18:55:17.556Z",
   "range": {
     "from": null,
     "to": null
@@ -7,9 +7,9 @@
   "summary": {
     "source_count": 3,
     "files_scanned": 1,
-    "prompt_count": 369,
+    "prompt_count": 337,
     "first_prompt_at": "2026-04-18T01:05:16.348Z",
-    "last_prompt_at": "2026-07-20T18:23:06.269Z",
+    "last_prompt_at": "2026-07-20T18:49:07.245Z",
     "token_totals": {
       "input_tokens": 0,
       "cached_input_tokens": 0,
@@ -52,7 +52,7 @@
       "source": "cursor",
       "root": "/Users/zhuyanhao/Library/Application Support/Cursor/User/globalStorage/state.vscdb",
       "files_scanned": 1,
-      "prompt_count": 369,
+      "prompt_count": 337,
       "token_totals": {
         "input_tokens": 0,
         "cached_input_tokens": 0,
@@ -2228,192 +2228,1067 @@
   },
   "word_frequencies": [
     {
-      "term": "adv",
-      "count": 106
-    },
-    {
-      "term": "xs",
-      "count": 100
-    },
-    {
-      "term": "adv_xs",
-      "count": 98
-    },
-    {
       "term": "model",
-      "count": 65
+      "count": 56
     },
     {
-      "term": "grad",
-      "count": 63
+      "term": "代码",
+      "count": 56
     },
     {
-      "term": "self",
-      "count": 60
+      "term": "讲解",
+      "count": 52
     },
     {
-      "term": "label",
-      "count": 51
+      "term": "什么",
+      "count": 50
     },
     {
-      "term": "imgs",
-      "count": 49
+      "term": "内容",
+      "count": 47
     },
     {
-      "term": "labels",
-      "count": 48
+      "term": "result",
+      "count": 45
     },
     {
-      "term": "key",
+      "term": "实现",
+      "count": 45
+    },
+    {
+      "term": "详细",
       "count": 41
     },
     {
-      "term": "todo",
-      "count": 40
+      "term": "pdf",
+      "count": 38
     },
     {
-      "term": "def",
+      "term": "grad",
       "count": 36
     },
     {
-      "term": "torch",
+      "term": "user",
       "count": 36
-    },
-    {
-      "term": "loss",
-      "count": 35
-    },
-    {
-      "term": "true",
-      "count": 35
-    },
-    {
-      "term": "detach",
-      "count": 34
     },
     {
       "term": "ax",
       "count": 32
     },
     {
-      "term": "pred",
+      "term": "roast",
       "count": 32
     },
     {
-      "term": "client",
-      "count": 31
-    },
-    {
-      "term": "set",
-      "count": 28
-    },
-    {
-      "term": "data",
-      "count": 27
-    },
-    {
-      "term": "epsilon",
-      "count": 27
-    },
-    {
-      "term": "nn",
-      "count": 26
-    },
-    {
-      "term": "plt",
-      "count": 26
-    },
-    {
-      "term": "代码",
-      "count": 26
-    },
-    {
-      "term": "size",
-      "count": 25
-    },
-    {
-      "term": "import",
-      "count": 23
-    },
-    {
-      "term": "ngrok",
-      "count": 23
+      "term": "html",
+      "count": 30
     },
     {
       "term": "修改",
+      "count": 29
+    },
+    {
+      "term": "label",
+      "count": 28
+    },
+    {
+      "term": "完整",
+      "count": 28
+    },
+    {
+      "term": "是什",
+      "count": 28
+    },
+    {
+      "term": "imgs",
+      "count": 27
+    },
+    {
+      "term": "mbti",
+      "count": 27
+    },
+    {
+      "term": "现在",
+      "count": 27
+    },
+    {
+      "term": "character",
+      "count": 26
+    },
+    {
+      "term": "page",
+      "count": 26
+    },
+    {
+      "term": "style",
+      "count": 26
+    },
+    {
+      "term": "要求",
+      "count": 26
+    },
+    {
+      "term": "commit",
+      "count": 25
+    },
+    {
+      "term": "figure",
+      "count": 24
+    },
+    {
+      "term": "data",
       "count": 23
     },
     {
-      "term": "train",
-      "count": 22
+      "term": "怎么",
+      "count": 23
+    },
+    {
+      "term": "解释",
+      "count": 23
     }
   ],
   "profile_signals": {
     "prompt_analysis": {
-      "total_prompts": 369,
-      "useful_prompt_count": 367,
-      "reference_prompt_count": 2,
-      "useful_ratio": 0.9946,
+      "total_prompts": 337,
+      "useful_prompt_count": 333,
+      "reference_prompt_count": 4,
+      "useful_ratio": 0.9881,
       "categories": {
         "planning": {
-          "count": 13,
-          "examples": []
+          "count": 11,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-07T08:44:25.234Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-16T11:16:53.297Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-06-08T02:38:38.281Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "debugging": {
-          "count": 29,
-          "examples": []
+          "count": 10,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-23T04:20:56.969Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-20T02:56:33.174Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-22T06:51:06.950Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "implementation": {
-          "count": 223,
-          "examples": []
+          "count": 216,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-18T01:05:16.348Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T07:55:54.086Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T07:55:54.086Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "refactor": {
-          "count": 4,
-          "examples": []
+          "count": 3,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-06-16T07:42:25.232Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-06-22T09:14:10.422Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-06-26T03:42:32.879Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "testing": {
-          "count": 33,
-          "examples": []
+          "count": 29,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T07:55:54.086Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.616Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.616Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "packaging": {
           "count": 2,
-          "examples": []
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-07-19T11:40:59.049Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-07-19T12:03:01.917Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "explanation": {
           "count": 36,
-          "examples": []
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.617Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-16T11:34:28.522Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-16T11:36:07.109Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "research": {
           "count": 7,
-          "examples": []
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T07:55:54.086Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.616Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.616Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "ui_design": {
-          "count": 11,
-          "examples": []
+          "count": 12,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:01:07.616Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-07-19T10:16:08.398Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-07-19T11:25:14.909Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "workflow": {
-          "count": 9,
-          "examples": []
+          "count": 7,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": "2026-04-19T08:17:28.012Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-21T08:30:37.647Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-06-16T04:06:28.322Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         },
         "reference": {
-          "count": 2,
-          "examples": []
+          "count": 4,
+          "examples": [
+            {
+              "source": "cursor",
+              "timestamp": null,
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-05-20T13:01:35.321Z",
+              "text": "",
+              "_redacted": true
+            },
+            {
+              "source": "cursor",
+              "timestamp": "2026-07-16T06:51:25.872Z",
+              "text": "",
+              "_redacted": true
+            }
+          ]
         }
       },
+      "useful_prompts": [
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-18T01:05:16.348Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "research",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T07:55:54.086Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:00:28.257Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "research",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "research",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.616Z",
+          "text": "",
+          "category": "ui_design",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "explanation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:01:07.617Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:08:06.241Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:08:28.788Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:15:13.211Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:17:28.012Z",
+          "text": "",
+          "category": "workflow",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:31:01.728Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:40:42.042Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-19T08:41:40.502Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T04:54:11.586Z",
+          "text": "",
+          "category": "testing",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T04:57:14.282Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T05:20:50.969Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T05:21:06.754Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T05:25:14.667Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T05:51:07.281Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T08:10:22.132Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-21T08:45:03.262Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-23T03:28:57.678Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-23T03:37:11.750Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-23T04:20:56.969Z",
+          "text": "",
+          "category": "debugging",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-04-23T07:03:56.587Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "research",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        },
+        {
+          "source": "cursor",
+          "timestamp": "2026-05-07T08:44:25.232Z",
+          "text": "",
+          "category": "implementation",
+          "usefulness": "high",
+          "reasons": [
+            "contains_user_intent"
+          ],
+          "_redacted": true
+        }
+      ],
       "reference_summary": {
-        "count": 2,
-        "code_or_log_count": 2,
+        "count": 4,
+        "code_or_log_count": 4,
         "signals": {
           "languages": {
-            "python": 1
+            "python": 2,
+            "shell": 2
           },
           "file_extensions": {
-            ".py": 2
+            ".py": 4
           },
           "error_types": {
+            "Exception": 1,
             "Traceback": 1
           },
           "files": [
+            {
+              "path": "server.py",
+              "extension": ".py"
+            },
+            {
+              "path": "client.py",
+              "extension": ".py"
+            },
             {
               "path": "/tmp/ipykernel_2420/1904327038.py",
               "extension": ".py"
@@ -2427,13 +3302,27 @@
         "examples": [
           {
             "source": "cursor",
+            "timestamp": null,
+            "text": "",
+            "_redacted": true
+          },
+          {
+            "source": "cursor",
             "timestamp": "2026-05-20T13:01:35.321Z",
-            "text": "--------------------------------------------------------------------------- RuntimeError Traceback (most recent call last) /tmp/ipykernel_2420/1904327038.py in <cell line: 0>() 2 f"
+            "text": "",
+            "_redacted": true
           },
           {
             "source": "cursor",
             "timestamp": "2026-07-16T06:51:25.872Z",
-            "text": "#include <iostream> using namespace std; int main(){ int t; cin >> t; long long a, b; for(int i = 0; i < t; i++){ cin >> a >> b; if (a < b) cout << \"<\" << endl; if (a > b) cout << "
+            "text": "",
+            "_redacted": true
+          },
+          {
+            "source": "cursor",
+            "timestamp": "2026-07-19T10:37:46.485Z",
+            "text": "",
+            "_redacted": true
           }
         ]
       }
@@ -2485,13 +3374,13 @@
   "vibe_profile": {
     "scores": {
       "orchestration": 0.3,
-      "promptCraft": 17.9,
-      "build": 11,
-      "debug": 1.1,
-      "context": 15.9,
+      "promptCraft": 17.8,
+      "build": 11.8,
+      "debug": 0.4,
+      "context": 15.8,
       "ship": 4.3
     },
-    "total": 50.5,
+    "total": 50.4,
     "tier": {
       "id": "NPC",
       "min": 35,
@@ -2528,7 +3417,7 @@
         "labelZh": "提示词手艺",
         "hint": "Useful intent vs paste dumps",
         "max": 18,
-        "value": 17.9,
+        "value": 17.8,
         "score": 0.99
       },
       {
@@ -2537,8 +3426,8 @@
         "labelZh": "构建吞吐",
         "hint": "Implementation & packaging density",
         "max": 18,
-        "value": 11,
-        "score": 0.61
+        "value": 11.8,
+        "score": 0.66
       },
       {
         "key": "debug",
@@ -2546,8 +3435,8 @@
         "labelZh": "调试韧性",
         "hint": "Breakpoint stamina & root-cause chase",
         "max": 14,
-        "value": 1.1,
-        "score": 0.08
+        "value": 0.4,
+        "score": 0.03
       },
       {
         "key": "context",
@@ -2555,7 +3444,7 @@
         "labelZh": "上下文纪律",
         "hint": "Window hygiene · no log farming",
         "max": 16,
-        "value": 15.9,
+        "value": 15.8,
         "score": 0.99
       },
       {
@@ -2585,14 +3474,14 @@
         "value": "CURSOR"
       }
     ],
-    "roast": "🔥 Your system prompt has chapters. Prompt craft 17.9/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.",
-    "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.9/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。",
+    "roast": "🔥 Your system prompt has chapters. Prompt craft 17.8/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.",
+    "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.8/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。",
     "tldr": "Prompt Priest: liturgy excellence, deployment fasting.",
     "tldrZh": "Prompt Priest：礼仪满分，部署斋戒。"
   },
   "prompts": {
     "_redacted": true,
-    "count": 369
+    "count": 337
   },
   "_redaction_note": "Prompt bodies, category examples, useful_prompts text stripped. Aggregates + activity daily_rows + word_frequencies kept."
 }

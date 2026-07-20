@@ -237,7 +237,7 @@ function compactNumber(value) {
   return `${(n / 1000000000).toFixed(2)}B`;
 }
 
-export function renderActivityIso(container, activity, weeks = 52, { svgHeight = 180 } = {}) {
+export function renderActivityIso(container, activity, weeks = 52, { svgHeight = 180, animate = true } = {}) {
   if (!container) return;
   const dailyRows = activity?.daily_rows || [];
   const weeksData = buildWeeksFromDaily(dailyRows, weeks);
@@ -263,49 +263,6 @@ export function renderActivityIso(container, activity, weeks = 52, { svgHeight =
   }
 
   const W = weeksData.length;
-  const projected = cells.map((c) => {
-    const h = Math.max(1.8, (c.level / 4) * HEIGHT_MAX);
-    const xc = (c.col - W / 2) * UNIT;
-    const yc = (c.row - 3.5) * UNIT;
-    const half = SIZE / 2;
-    const pts = [
-      { x: xc - half, y: yc - half, z: 0 },
-      { x: xc + half, y: yc - half, z: 0 },
-      { x: xc + half, y: yc + half, z: 0 },
-      { x: xc - half, y: yc + half, z: 0 },
-      { x: xc - half, y: yc - half, z: h },
-      { x: xc + half, y: yc - half, z: h },
-      { x: xc + half, y: yc + half, z: h },
-      { x: xc - half, y: yc + half, z: h },
-    ].map((p) => rotatePoint(p.x, p.y, p.z, yaw, pitch));
-    const center = rotatePoint(xc, yc, h / 2, yaw, pitch);
-    const base = EMERALD[Math.min(4, c.level)];
-    const faces = [
-      { indices: [4, 5, 6, 7], scale: 1 },
-      { indices: [1, 2, 6, 5], scale: 0.75 },
-      { indices: [0, 1, 5, 4], scale: 0.85 },
-      { indices: [3, 0, 4, 7], scale: 0.55 },
-    ];
-    const paths = faces.map((f) => {
-      const [a, b, c2, d] = f.indices.map((i) => pts[i]);
-      return `<path d="M${a.x},${a.y} L${b.x},${b.y} L${c2.x},${c2.y} L${d.x},${d.y} Z" fill="${shadeColor(base, f.scale)}" stroke="rgba(16,185,129,0.08)" stroke-width="0.4" />`;
-    });
-    return { center, paths: paths.join(""), z: center.z };
-  });
-
-  projected.sort((a, b) => a.z - b.z);
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const p of projected) {
-    minX = Math.min(minX, p.center.x - UNIT * 2);
-    maxX = Math.max(maxX, p.center.x + UNIT * 2);
-    minY = Math.min(minY, p.center.y - UNIT * 2);
-    maxY = Math.max(maxY, p.center.y + UNIT * 2);
-  }
-  const pad = 12;
-  const vb = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
   const peak = activity?.peak_day;
   const kpi = `
     <div class="activity-kpi">
@@ -314,7 +271,83 @@ export function renderActivityIso(container, activity, weeks = 52, { svgHeight =
       <div><span>Peak</span><strong>${peak?.value ? compactNumber(peak.value) : "—"}</strong></div>
       <div><span>Provider</span><strong>${(activity.top_provider || "—").toString().toUpperCase()}</strong></div>
     </div>`;
-  container.innerHTML = `${kpi}<svg viewBox="${vb}" role="img" aria-label="3D activity" style="width:100%;height:${svgHeight}px">${projected.map((p) => p.paths).join("")}</svg>`;
+
+  const projectAt = (growth) => {
+    const projected = cells.map((c) => {
+      const targetH = Math.max(1.8, (c.level / 4) * HEIGHT_MAX);
+      const dist = Math.sqrt(Math.pow(c.col - W / 2, 2) + Math.pow(c.row - 3.5, 2));
+      const maxDist = Math.sqrt(Math.pow(W / 2, 2) + Math.pow(3.5, 2)) || 1;
+      const delay = (dist / maxDist) * 0.4;
+      const progress = Math.min(1, Math.max(0, (growth - delay) * (1 / 0.6)));
+      const h = targetH * progress;
+      const xc = (c.col - W / 2) * UNIT;
+      const yc = (c.row - 3.5) * UNIT;
+      const half = SIZE / 2;
+      const pts = [
+        { x: xc - half, y: yc - half, z: 0 },
+        { x: xc + half, y: yc - half, z: 0 },
+        { x: xc + half, y: yc + half, z: 0 },
+        { x: xc - half, y: yc + half, z: 0 },
+        { x: xc - half, y: yc - half, z: h },
+        { x: xc + half, y: yc - half, z: h },
+        { x: xc + half, y: yc + half, z: h },
+        { x: xc - half, y: yc + half, z: h },
+      ].map((p) => rotatePoint(p.x, p.y, p.z, yaw, pitch));
+      const center = rotatePoint(xc, yc, h / 2, yaw, pitch);
+      const base = EMERALD[Math.min(4, c.level)];
+      const faces = [
+        { indices: [4, 5, 6, 7], scale: 1 },
+        { indices: [1, 2, 6, 5], scale: 0.75 },
+        { indices: [0, 1, 5, 4], scale: 0.85 },
+        { indices: [3, 0, 4, 7], scale: 0.55 },
+      ];
+      const paths = faces.map((f) => {
+        const [a, b, c2, d] = f.indices.map((i) => pts[i]);
+        return `<path d="M${a.x},${a.y} L${b.x},${b.y} L${c2.x},${c2.y} L${d.x},${d.y} Z" fill="${shadeColor(base, f.scale)}" stroke="rgba(16,185,129,0.08)" stroke-width="0.4" />`;
+      });
+      return { center, paths: paths.join(""), z: center.z };
+    });
+    projected.sort((a, b) => a.z - b.z);
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const p of projected) {
+      minX = Math.min(minX, p.center.x - UNIT * 2);
+      maxX = Math.max(maxX, p.center.x + UNIT * 2);
+      minY = Math.min(minY, p.center.y - UNIT * 2);
+      maxY = Math.max(maxY, p.center.y + UNIT * 2);
+    }
+    const pad = 12;
+    const vb = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
+    return { projected, vb };
+  };
+
+  const paint = (growth) => {
+    const { projected, vb } = projectAt(growth);
+    const svg = container.querySelector("[data-iso-svg]");
+    if (svg) {
+      svg.setAttribute("viewBox", vb);
+      svg.innerHTML = projected.map((p) => p.paths).join("");
+      return;
+    }
+    container.innerHTML = `${kpi}<svg data-iso-svg viewBox="${vb}" role="img" aria-label="3D activity" style="width:100%;height:${svgHeight}px">${projected.map((p) => p.paths).join("")}</svg>`;
+  };
+
+  if (!animate || (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)) {
+    paint(1);
+    return;
+  }
+
+  paint(0);
+  const start = performance.now();
+  const tick = (now) => {
+    const p = Math.min(1, (now - start) / 1200);
+    const eased = 1 - Math.pow(1 - p, 3);
+    paint(eased);
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
 export function renderActivity2D(container, activity, weeks = 52) {
@@ -366,6 +399,14 @@ export function renderActivity2D(container, activity, weeks = 52) {
 export function renderActivityMap(container, activity, weeks = 52, { defaultMode = "2d" } = {}) {
   if (!container) return;
   let mode = defaultMode === "3d" ? "3d" : "2d";
+  let busy = false;
+
+  const paintBody = (body) => {
+    body.classList.remove("is-exit");
+    body.classList.add("is-enter");
+    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 160, animate: true });
+    else renderActivity2D(body, activity, weeks);
+  };
 
   const paint = () => {
     container.innerHTML = `
@@ -373,16 +414,30 @@ export function renderActivityMap(container, activity, weeks = 52, { defaultMode
         <button type="button" data-mode="2d" class="${mode === "2d" ? "is-active" : ""}">2d</button>
         <button type="button" data-mode="3d" class="${mode === "3d" ? "is-active" : ""}">3d</button>
       </div>
-      <div class="activity-view-body"></div>`;
+      <div class="activity-view-body is-enter"></div>`;
     const body = container.querySelector(".activity-view-body");
-    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 160 });
-    else renderActivity2D(body, activity, weeks);
+    paintBody(body);
     container.querySelectorAll("[data-mode]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const next = btn.getAttribute("data-mode");
-        if (next === mode) return;
-        mode = next;
-        paint();
+        if (next === mode || busy) return;
+        busy = true;
+        const current = container.querySelector(".activity-view-body");
+        if (current) {
+          current.classList.remove("is-enter");
+          current.classList.add("is-exit");
+        }
+        window.setTimeout(() => {
+          mode = next;
+          container.querySelectorAll("[data-mode]").forEach((b) => {
+            b.classList.toggle("is-active", b.getAttribute("data-mode") === mode);
+          });
+          const nextBody = document.createElement("div");
+          nextBody.className = "activity-view-body";
+          current?.replaceWith(nextBody);
+          paintBody(nextBody);
+          busy = false;
+        }, 160);
       });
     });
   };

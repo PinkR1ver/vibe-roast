@@ -77,11 +77,13 @@ function extractCursorEntriesFromRows(rows) {
   const entries = [];
   for (const row of rows || []) {
     if (!isCursorPromptKey(row.key)) continue;
+    if (isCursorAssistantKey(row.key)) continue;
     const value = parseMaybeJson(row.value);
     const candidates = collectCursorPromptCandidates(value);
     for (const candidate of candidates) {
       const text = normalizeWhitespace(textFromContent(candidate.text));
       if (!looksLikePrompt(text)) continue;
+      if (isNonUserNoise(text)) continue;
       entries.push({
         source: "cursor",
         timestamp: candidate.timestamp || value?.timestamp || value?.createdAt || null,
@@ -98,15 +100,17 @@ function isCursorPromptKey(key) {
   return /(bubble|composer|chat|conversation|message)/i.test(String(key || ""));
 }
 
+function isCursorAssistantKey(key) {
+  return /(assistant|ai[-_]?message|bot[-_]?reply)/i.test(String(key || ""));
+}
+
 function collectCursorPromptCandidates(value) {
   const out = [];
   visit(value, (node) => {
     if (!node || typeof node !== "object") return;
-    const role = String(node.role || node.type || node.kind || "").toLowerCase();
+    if (!isCursorUserNode(node)) return;
     const text = node.text ?? node.content ?? node.message ?? node.prompt;
-    if (!text) return;
-    if (node.type === 2 || role === "assistant") return;
-    if (role && !/(^1$|user|human|prompt|request|bubble)/.test(role)) return;
+    if (!text || typeof text === "object") return;
     out.push({
       text,
       timestamp: node.timestamp || node.createdAt || node.time || null,
@@ -114,6 +118,46 @@ function collectCursorPromptCandidates(value) {
     });
   });
   return out;
+}
+
+/** Require an explicit user signal when role/type is present; reject assistant/system/tool. */
+function isCursorUserNode(node) {
+  const type = node.type;
+  const role = String(node.role || node.kind || "").toLowerCase();
+  const typeStr = String(type ?? "").toLowerCase();
+
+  if (type === 2 || typeStr === "2") return false;
+  if (/(assistant|system|tool|function|model)/i.test(role)) return false;
+  if (/(assistant|system|tool|ai)/i.test(String(node.bubbleType || node.capabilityType || ""))) {
+    return false;
+  }
+  if (/(assistant|system|tool)/i.test(typeStr) && typeStr !== "1") return false;
+
+  if (type === 1 || typeStr === "1") return true;
+  if (/^(user|human|prompt|request)$/.test(role)) return true;
+  if (typeStr === "user") return true;
+
+  // Containers that nest many messages — don't treat the shell as a prompt.
+  if (Array.isArray(node.messages) || Array.isArray(node.bubbles) || Array.isArray(node.fullConversationHeadersOnly)) {
+    return false;
+  }
+
+  // Legacy ItemTable bubbles: plain { text } with no role/type.
+  if (role || (typeStr && typeStr !== "undefined" && typeStr !== "null")) {
+    // Unknown non-user role/type — skip.
+    if (!/^(1|user|human|prompt|request|bubble)$/.test(role || typeStr)) return false;
+  }
+
+  return node.text != null || node.prompt != null;
+}
+
+function isNonUserNoise(text) {
+  const raw = String(text || "");
+  if (/<system_notification>/i.test(raw)) return true;
+  if (/^\s*<(?:system|tool_result|tool_call|agent_transcript)[\s>]/i.test(raw)) return true;
+  if (/\bThe following task has finished\b/i.test(raw)) return true;
+  if (/^\s*\[?(system|assistant|tool)\]?\s*:/i.test(raw)) return true;
+  return false;
 }
 
 function visit(value, fn, seen = new Set()) {

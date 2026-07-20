@@ -17,6 +17,7 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
     CATEGORY_ORDER.map((name) => [name, { count: 0, examples: [] }]),
   );
   const usefulPrompts = [];
+  const usefulForStats = [];
   const referencePrompts = [];
   let usefulCount = 0;
 
@@ -42,6 +43,7 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
 
     if (classification.useful) {
       usefulCount += 1;
+      usefulForStats.push({ text: entry.text, source: entry.source, timestamp: entry.timestamp });
       if (usefulPrompts.length < usefulLimit) usefulPrompts.push(entry);
     } else {
       referencePrompts.push(entry);
@@ -56,6 +58,7 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
       prompts && prompts.length > 0 ? Number((usefulCount / prompts.length).toFixed(4)) : 0,
     categories,
     useful_prompts: usefulPrompts,
+    useful_for_stats: usefulForStats,
     reference_summary: summarizeReferences(referencePrompts),
   };
 }
@@ -64,6 +67,15 @@ function classifyPrompt(text) {
   const normalized = text.toLowerCase();
   const codeScore = codeLikeScore(text);
   const logScore = logLikeScore(text);
+
+  if (isSystemOrToolNoise(text)) {
+    return {
+      useful: false,
+      usefulness: "reference",
+      category: "reference",
+      reasons: ["system_or_tool_noise"],
+    };
+  }
 
   if (logScore >= 3) {
     return {
@@ -74,7 +86,18 @@ function classifyPrompt(text) {
     };
   }
 
-  if (codeScore >= 3 && !hasIntentVerb(normalized)) {
+  // Heavy pasted files / dumps — never treat as useful intent prompts.
+  if (codeScore >= 4) {
+    return {
+      useful: false,
+      usefulness: "reference",
+      category: "reference",
+      reasons: ["looks_like_pasted_code"],
+    };
+  }
+
+  // Milder code blocks without enough natural-language intent.
+  if (codeScore >= 3 && !hasSubstantialUserIntent(text)) {
     return {
       useful: false,
       usefulness: "reference",
@@ -90,6 +113,27 @@ function classifyPrompt(text) {
     category,
     reasons: ["contains_user_intent"],
   };
+}
+
+function isSystemOrToolNoise(text) {
+  const raw = String(text || "");
+  if (/<system_notification>/i.test(raw)) return true;
+  if (/^\s*<(?:system|tool_result|tool_call|agent_transcript)[\s>]/i.test(raw)) return true;
+  if (/\bThe following task has finished\b/i.test(raw)) return true;
+  if (/^\s*\[?(system|tool)\]?\s*:/i.test(raw)) return true;
+  return false;
+}
+
+/** Intent outside fenced/code lines — avoids counting "IMPLEMENT" inside dumps. */
+function hasSubstantialUserIntent(text) {
+  const stripped = String(text || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/^\s*(import|from|const|let|var|def|class|function|export|package|#include)\b.*$/gim, " ")
+    .replace(/[{};=<>]{2,}/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (stripped.length < 12) return false;
+  return hasIntentVerb(stripped.toLowerCase()) || /[\p{Script=Han}]{2,}/u.test(stripped);
 }
 
 function inferCategory(text) {
@@ -119,12 +163,21 @@ function hasIntentVerb(text) {
 
 function codeLikeScore(text) {
   let score = 0;
-  if (/```/.test(text)) score += 2;
-  if (/\b(const|let|var|function|class|return|import|export|async|await)\b/.test(text)) score += 1;
-  if (/[{};]{2,}/.test(text)) score += 1;
-  if (/=>|<\/?[a-z][\s\S]*>/i.test(text)) score += 1;
-  if (text.split(/\r?\n/).length >= 8) score += 1;
-  if (/[A-Za-z0-9_$]+\([^)]*\)/.test(text)) score += 1;
+  const raw = String(text || "");
+  if (/```/.test(raw)) score += 2;
+  if (/\b(const|let|var|function|class|return|import|export|async|await|def|self\.|torch\.|nn\.)\b/.test(raw)) {
+    score += 1;
+  }
+  if (/[{};]{2,}/.test(raw)) score += 1;
+  if (/=>|<\/?[a-z][\s\S]*>/i.test(raw)) score += 1;
+  const lines = raw.split(/\r?\n/);
+  if (lines.length >= 8) score += 1;
+  // Collapsed single-line dumps still look like code by density.
+  if (lines.length < 8 && raw.length > 400) {
+    const codeTokens = (raw.match(/\b(def|class|import|return|const|self|torch|nn|plt)\b/gi) || []).length;
+    if (codeTokens >= 6) score += 2;
+  }
+  if (/[A-Za-z0-9_$]+\([^)]*\)/.test(raw)) score += 1;
   return score;
 }
 

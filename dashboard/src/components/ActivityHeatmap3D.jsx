@@ -162,10 +162,7 @@ export default function ActivityHeatmap3D({
     growthRafRef.current = requestAnimationFrame(anim);
   };
   useEffect(() => {
-    if (!interactive) {
-      setGrowthWave(1);
-      return undefined;
-    }
+    // Always play column rise-in (compact preview + interactive modal).
     triggerGrowthWave();
     return () => { if (growthRafRef.current) cancelAnimationFrame(growthRafRef.current); };
   }, [interactive]);

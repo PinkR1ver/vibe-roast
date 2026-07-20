@@ -382,6 +382,37 @@
 
       .activity-view-body {
         padding-top: 2px;
+        transform-origin: 50% 85%;
+      }
+
+      .activity-view-body.is-enter {
+        animation: heatmapViewIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+
+      .activity-view-body.is-exit {
+        animation: heatmapViewOut 0.16s ease-in both;
+      }
+
+      @keyframes heatmapViewIn {
+        from {
+          opacity: 0;
+          transform: perspective(900px) rotateX(10deg) translateY(14px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
+        }
+      }
+
+      @keyframes heatmapViewOut {
+        from {
+          opacity: 1;
+          transform: perspective(900px) rotateX(0deg) translateY(0) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: perspective(900px) rotateX(6deg) translateY(8px) scale(0.98);
+        }
       }
 
       .activity-2d-wrap {

@@ -118,7 +118,10 @@ export default function ActivityHeatmap3DPanel({
   const [viewMode, setViewMode] = useState(
     defaultViewMode ?? (showViewToggle || roastStyle ? "2d" : "3d"),
   );
+  const [viewAnimKey, setViewAnimKey] = useState(0);
+  const [viewTransition, setViewTransition] = useState("in"); // out | in
   const resetViewRef = useRef(null);
+  const transitionTimerRef = useRef(null);
   const compactShell = roastStyle || showViewToggle;
   const shellMin = compactShell ? "min-h-[140px]" : "min-h-[240px]";
   const shellMax = compactShell ? "max-h-[240px]" : "";
@@ -127,6 +130,21 @@ export default function ActivityHeatmap3DPanel({
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
 
   const closeModal = () => setIsClosing(true);
+
+  const switchViewMode = (mode) => {
+    if (mode === viewMode) return;
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    setViewTransition("out");
+    transitionTimerRef.current = setTimeout(() => {
+      setViewMode(mode);
+      setViewAnimKey((k) => k + 1);
+      setViewTransition("in");
+    }, 160);
+  };
+
+  useEffect(() => () => {
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen || isClosing) return;
@@ -341,7 +359,7 @@ export default function ActivityHeatmap3DPanel({
               <button
                 key={mode}
                 type="button"
-                onClick={() => setViewMode(mode)}
+                onClick={() => switchViewMode(mode)}
                 className={`rounded-full px-2.5 py-1 uppercase tracking-wide transition-colors ${
                   viewMode === mode
                     ? roastStyle
@@ -356,6 +374,12 @@ export default function ActivityHeatmap3DPanel({
           </div>
         )}
 
+        <div
+          key={`${viewMode}-${viewAnimKey}`}
+          className={`h-full w-full ${shellMin} ${shellMax} ${
+            viewTransition === "out" ? "heatmap-view-exit" : "heatmap-view-enter"
+          }`}
+        >
         {viewMode === "2d" ? (
           <div
             className={`flex h-full ${shellMin} ${shellMax} items-center justify-center overflow-x-auto rounded-lg border ${
@@ -412,6 +436,7 @@ export default function ActivityHeatmap3DPanel({
             </div>
           </button>
         )}
+        </div>
       </div>
       {modal}
     </>

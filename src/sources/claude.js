@@ -43,6 +43,8 @@ async function inspectClaude({ root, range } = {}) {
 
 function extractClaudePrompt(obj) {
   if (obj?.type !== "user" && obj?.message?.role !== "user") return "";
+  // Skip synthetic user rows that only wrap tool results / meta.
+  if (obj?.isMeta || obj?.isCompactSummary) return "";
   const content = obj?.message?.content ?? obj?.content;
   return normalizeWhitespace(textFromContent(content));
 }

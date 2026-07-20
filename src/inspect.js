@@ -60,7 +60,7 @@ async function inspectSources({ from, to, sources = ["codex", "claude", "cursor"
     summary,
     sources: sourceReports,
     activity,
-    word_frequencies: wordFrequencies(promptAnalysis.useful_prompts),
+    word_frequencies: wordFrequencies(promptAnalysis.useful_for_stats || promptAnalysis.useful_prompts),
     profile_signals: {
       prompt_analysis: promptAnalysis,
       environment,

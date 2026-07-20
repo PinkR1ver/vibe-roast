@@ -23,6 +23,18 @@ test("extractCodexPrompt reads payload.message and nested msg.message", () => {
     "优化移动端",
   );
   assert.equal(extractCodexPrompt({ payload: { type: "assistant" } }), "");
+  assert.equal(
+    extractCodexPrompt({
+      payload: { type: "agent_message", message: "我会先检查 xerophyte 布局" },
+    }),
+    "",
+  );
+  assert.equal(
+    extractCodexPrompt({
+      payload: { type: "assistant", message: "xerophyte done" },
+    }),
+    "",
+  );
 });
 
 test("extractCodexTokens normalizes total_token_usage", () => {
@@ -67,6 +79,16 @@ test("extractClaudePrompt only keeps user messages", () => {
     extractClaudePrompt({
       type: "assistant",
       message: { role: "assistant", content: "我会先分析。" },
+    }),
+    "",
+  );
+  assert.equal(
+    extractClaudePrompt({
+      type: "user",
+      message: {
+        role: "user",
+        content: [{ type: "tool_result", content: "xerophyte tool dump" }],
+      },
     }),
     "",
   );

@@ -254,6 +254,57 @@ test("inspectSources computes useful high-frequency terms", async () => {
   assert.ok(terms.includes("测试"));
 });
 
+test("word cloud input excludes assistant and tool content", async () => {
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-07",
+    sources: ["codex", "claude"],
+    roots: {
+      codex: path.join(fixtures, "codex", "sessions"),
+      claude: path.join(fixtures, "claude", "projects"),
+    },
+  });
+
+  const blob = report.prompts.map((p) => p.text).join("\n");
+  assert.ok(!/xerophyte/i.test(blob), "assistant/tool xerophyte must not enter prompts");
+  const terms = report.word_frequencies.map((row) => row.term);
+  assert.ok(!terms.includes("xerophyte"));
+  assert.ok(!terms.includes("xerophyte-followup"));
+  assert.ok(report.prompts.every((p) => p.source === "codex" || p.source === "claude"));
+  assert.ok(report.prompts.some((p) => /登录页面/.test(p.text)));
+  assert.ok(report.prompts.some((p) => /根因/.test(p.text)));
+});
+
+test("Cursor row parser drops system notifications and assistant bubbles", () => {
+  const entries = extractCursorEntriesFromRows([
+    {
+      key: "bubbleId:composer:prompt",
+      value: JSON.stringify({
+        type: 1,
+        text: "帮我补一个 CLI 入口",
+      }),
+    },
+    {
+      key: "bubbleId:composer:assistant",
+      value: JSON.stringify({
+        type: 2,
+        text: "我会先检查 xerophyte 结构。",
+      }),
+    },
+    {
+      key: "bubbleId:system",
+      value: JSON.stringify({
+        type: 1,
+        text: "<system_notification> The following task has finished. xerophyte done",
+      }),
+    },
+  ]);
+
+  assert.equal(entries.length, 1);
+  assert.match(entries[0].text, /CLI/);
+  assert.ok(!entries.some((e) => /xerophyte/i.test(e.text)));
+});
+
 test("tokenize extracts session from Claude Code style identifiers", () => {
   const terms = tokenize("Claude Code SessionEnd hook 里的 session_id 没抓住");
 
