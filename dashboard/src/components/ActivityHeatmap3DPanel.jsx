@@ -93,6 +93,7 @@ export default function ActivityHeatmap3DPanel({
   defaultPalette = "emerald",
   roastStyle = false,
   showViewToggle = false,
+  defaultViewMode,
 }) {
   const { theme } = useTheme();
   const { t } = useLocale();
@@ -114,8 +115,13 @@ export default function ActivityHeatmap3DPanel({
   const [isClosing, setIsClosing] = useState(false);
   const [activePalette, setActivePalette] = useState(defaultPalette);
   const [modalAutoRotate, setModalAutoRotate] = useState(false);
-  const [viewMode, setViewMode] = useState("3d");
+  const [viewMode, setViewMode] = useState(
+    defaultViewMode ?? (showViewToggle || roastStyle ? "2d" : "3d"),
+  );
   const resetViewRef = useRef(null);
+  const compactShell = roastStyle || showViewToggle;
+  const shellMin = compactShell ? "min-h-[140px]" : "min-h-[240px]";
+  const shellMax = compactShell ? "max-h-[240px]" : "";
 
   const accent = PALETTE_ACCENTS[activePalette] || PALETTE_ACCENTS.emerald;
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
@@ -322,10 +328,10 @@ export default function ActivityHeatmap3DPanel({
 
   return (
     <>
-      <div className={`relative w-full h-full min-h-[240px] ${className}`}>
+      <div className={`relative w-full h-full ${shellMin} ${shellMax} ${className}`}>
         {showViewToggle && (
           <div
-            className={`absolute top-2 right-2 z-20 flex items-center gap-0.5 rounded-full p-0.5 text-[10px] font-bold ${
+            className={`absolute top-1.5 right-1.5 z-20 flex items-center gap-0.5 rounded-full p-0.5 text-[10px] font-bold ${
               roastStyle
                 ? "border border-black/5 bg-[#fffcf7]/95 text-[#6b6560]"
                 : "border border-oai-gray-200/70 bg-white/90 text-oai-gray-500 dark:border-oai-gray-800 dark:bg-oai-gray-900/90 dark:text-oai-gray-400"
@@ -352,15 +358,16 @@ export default function ActivityHeatmap3DPanel({
 
         {viewMode === "2d" ? (
           <div
-            className={`flex h-full min-h-[240px] items-center justify-center overflow-x-auto rounded-lg border px-3 py-4 ${
-              roastStyle ? "border-black/[0.04] bg-[#f7f4ef]" : "border-transparent"
-            }`}
+            className={`flex h-full ${shellMin} ${shellMax} items-center justify-center overflow-x-auto rounded-lg border ${
+              compactShell ? "px-2 py-2" : "px-3 py-4"
+            } ${roastStyle ? "border-black/[0.04] bg-[#f7f4ef]" : "border-transparent"}`}
           >
             <ActivityHeatmap
               prompts={prompts}
               dailyRows={dailyRows}
               weeks={heatmapWeeks}
               dark={isDark}
+              compact={compactShell}
             />
           </div>
         ) : (
@@ -370,7 +377,7 @@ export default function ActivityHeatmap3DPanel({
               setIsClosing(false);
               setIsModalOpen(true);
             }}
-            className={`group relative w-full h-full min-h-[240px] overflow-hidden rounded-lg border transition-all cursor-pointer ${
+            className={`group relative w-full h-full ${shellMin} ${shellMax} overflow-hidden rounded-lg border transition-all cursor-pointer ${
               roastStyle
                 ? "border-black/[0.04] bg-[#f7f4ef] hover:border-[color-mix(in_srgb,var(--roast-accent,#ff5a1f)_35%,#e4dfd6)]"
                 : "border-transparent hover:border-oai-gray-700"

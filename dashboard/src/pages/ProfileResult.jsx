@@ -275,7 +275,7 @@ export default function ProfileResult({ data, onBack }) {
                 </div>
               )}
 
-              <div className="h-[300px] min-h-[260px]">
+              <div className="h-[220px] max-h-[240px]">
                 <ActivityHeatmap3DPanel
                   prompts={data?.prompts || []}
                   activity={activity}
@@ -284,6 +284,7 @@ export default function ProfileResult({ data, onBack }) {
                   defaultPalette="emerald"
                   roastStyle
                   showViewToggle
+                  defaultViewMode="2d"
                 />
               </div>
             </div>

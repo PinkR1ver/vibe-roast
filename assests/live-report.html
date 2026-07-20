@@ -332,39 +332,83 @@
       }
 
       .cloud-stage {
-        min-height: 220px;
-        display: grid;
-        place-items: center;
+        height: 240px;
+        display: block;
+        position: relative;
       }
 
       .cloud-stage canvas {
         width: 100%;
-        height: 220px;
+        height: 100%;
         display: block;
       }
 
       .activity-stage {
-        min-height: 260px;
-        padding: 8px;
+        min-height: 0;
+        max-height: 280px;
+        padding: 6px;
+        position: relative;
+      }
+
+      .activity-view-toggle {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 2;
+        display: inline-flex;
+        gap: 2px;
+        padding: 2px;
+        border-radius: 999px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        background: color-mix(in srgb, #fffcf7 92%, transparent);
+      }
+
+      .activity-view-toggle button {
+        border: 0;
+        background: transparent;
+        color: #6b6560;
+        font: 700 10px/1 "JetBrains Mono", ui-monospace, monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-radius: 999px;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .activity-view-toggle button.is-active {
+        background: #10b981;
+        color: #fff;
+      }
+
+      .activity-view-body {
+        padding-top: 2px;
+      }
+
+      .activity-2d-wrap {
+        overflow-x: auto;
+        display: flex;
+        justify-content: center;
+        padding: 4px 2px 2px;
       }
 
       .activity-kpi {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 8px;
-        margin-bottom: 10px;
+        gap: 6px;
+        margin-bottom: 8px;
+        padding-right: 72px;
       }
 
       .activity-kpi > div {
-        border-radius: 12px;
+        border-radius: 10px;
         background: #fffcf7;
         border: 1px solid rgba(0, 0, 0, 0.04);
-        padding: 8px 10px;
+        padding: 6px 8px;
       }
 
       .activity-kpi span {
         display: block;
-        font-size: 10px;
+        font-size: 9px;
         font-weight: 700;
         letter-spacing: 0.12em;
         text-transform: uppercase;
@@ -373,9 +417,9 @@
 
       .activity-kpi strong {
         display: block;
-        margin-top: 4px;
+        margin-top: 2px;
         font-family: "JetBrains Mono", ui-monospace, monospace;
-        font-size: 16px;
+        font-size: 14px;
         font-weight: 800;
         color: #059669;
       }
@@ -383,6 +427,7 @@
       @media (max-width: 720px) {
         .activity-kpi {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+          padding-right: 0;
         }
       }
 
@@ -810,12 +855,12 @@
           <article class="card panel">
             <h2>Word cloud</h2>
             <p class="sub">From inspect word_frequencies</p>
-            <div class="cloud-stage"><canvas id="wordCloud" width="640" height="220"></canvas></div>
+            <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
           </article>
 
           <article class="card panel">
-            <h2>3D Activity</h2>
-            <p class="sub">Emerald isometric columns · TokenTracker when available</p>
+            <h2>Activity</h2>
+            <p class="sub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
             <div class="activity-stage" id="activityMap"></div>
           </article>
         </div>
@@ -831,7 +876,7 @@
       import {
         buildHashtags,
         renderWordCloud,
-        renderActivityIso,
+        renderActivityMap,
         downloadSharePoster,
       } from "./scripts/roast-extras.js";
       import { EMBED } from "./scripts/live-report-boot.js";
@@ -969,7 +1014,7 @@
         roast.innerHTML = `${escapeHtml(body)}<p class="tldr"><b>TL;DR</b> · ${escapeHtml(tldr)}</p>`;
 
         renderWordCloud(wordCloud, payload.WORDS, arch.accent);
-        renderActivityIso(activityMap, payload.ACTIVITY, 52);
+        renderActivityMap(activityMap, payload.ACTIVITY, 52, { defaultMode: "2d" });
 
         stage.classList.remove("is-animating");
         void stage.offsetWidth;
@@ -1038,8 +1083,20 @@
 
       payload = await loadPayload();
       render();
+
+      let cloudResizeTimer = 0;
+      const redrawCloud = () => {
+        renderWordCloud(wordCloud, payload.WORDS, payload.LIVE?.archetype?.accent);
+      };
+      if (typeof ResizeObserver !== "undefined" && wordCloud?.parentElement) {
+        new ResizeObserver(() => {
+          clearTimeout(cloudResizeTimer);
+          cloudResizeTimer = setTimeout(redrawCloud, 80);
+        }).observe(wordCloud.parentElement);
+      }
       window.addEventListener("resize", () => {
-        renderWordCloud(wordCloud, payload.WORDS, payload.LIVE.archetype.accent);
+        clearTimeout(cloudResizeTimer);
+        cloudResizeTimer = setTimeout(redrawCloud, 80);
       });
     </script>
 
