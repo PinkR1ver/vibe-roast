@@ -2,7 +2,8 @@
 
 ## Art direction
 
-Modern flat vector editorial · no black outlines · 5.5–6 heads · freestanding (no card frame)
+Classic 16personalities geometric flat vector (Piotr Antkowiak language):
+smooth silhouette · large shade planes (not dense low-poly) · no outlines · 5.5 heads · freestanding
 
 ## Props
 
@@ -15,4 +16,4 @@ Slight forward lean, celebratory fist + laptop — deploy-first energy.
 
 ## Prompt seed
 
-Full-body MBTI-style flat vector developer, muted mint palette, large stylized hair, oval eyes, holding laptop with rocket badge, natural narrative pose, abstract soft background, no outlines, no card frame.
+Full-body original MBTI-style flat vector developer, muted mint palette, large hair mass, tiny oval/dot eyes, laptop with rocket badge, narrative pose, cream bg, no outlines, no card frame.
