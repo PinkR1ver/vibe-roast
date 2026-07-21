@@ -323,7 +323,9 @@
       }
 
       .cloud-stage {
-        height: 140px;
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        max-height: 380px;
         display: block;
         position: relative;
       }
@@ -335,10 +337,25 @@
       }
 
       .activity-stage {
-        min-height: 280px;
-        max-height: 360px;
+        aspect-ratio: 1 / 1;
+        width: 100%;
+        max-height: 380px;
+        min-height: 0;
         padding: 0;
         position: relative;
+      }
+
+      .viz-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      @media (min-width: 768px) {
+        .viz-row {
+          grid-template-columns: 1fr 1fr;
+        }
       }
 
       .activity-view-toggle {
@@ -1007,17 +1024,19 @@
             <div class="roast" id="roast"></div>
           </article>
 
-          <article class="card panel panel-compact">
-            <h2 id="cloudTitle">Word cloud</h2>
-            <p class="sub" id="cloudSub">From inspect word_frequencies</p>
-            <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
-          </article>
+          <div class="viz-row">
+            <article class="card panel panel-compact">
+              <h2 id="cloudTitle">Word cloud</h2>
+              <p class="sub" id="cloudSub">From inspect word_frequencies</p>
+              <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
+            </article>
 
-          <article class="card panel panel-compact">
-            <h2 id="activityTitle">Activity</h2>
-            <p class="sub" id="activitySub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
-            <div class="activity-stage" id="activityMap"></div>
-          </article>
+            <article class="card panel panel-compact">
+              <h2 id="activityTitle">Activity</h2>
+              <p class="sub" id="activitySub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
+              <div class="activity-stage" id="activityMap"></div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -1203,7 +1222,7 @@
         posterModalDownload.disabled = true;
         openPosterModal();
         try {
-          const hashtags = buildHashtags(payload.LIVE, payload.CATEGORIES);
+          const hashtags = buildHashtags(payload.LIVE, payload.CATEGORIES, { locale: lang });
           posterCanvas = await renderSharePoster({ vibe: payload.LIVE, hashtags, lang });
           posterPreviewImg.src = posterCanvas.toDataURL("image/png");
           posterPreviewImg.hidden = false;
@@ -1264,7 +1283,7 @@
         const hook = lang === "zh" ? arch.hookZh : arch.hook;
         const blurb = lang === "zh" ? tier.blurbZh : tier.blurb;
         const percentile = Math.min(99.5, Math.round((score / 100) * 97 + 2));
-        const hashtags = buildHashtags(vibe, payload.CATEGORIES);
+        const hashtags = buildHashtags(vibe, payload.CATEGORIES, { locale: lang });
 
         profileCard.innerHTML = `
           <div class="profile-stage">

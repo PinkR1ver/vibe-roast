@@ -3474,8 +3474,8 @@
         "value": "CURSOR"
       }
     ],
-    "roast": "🔥 Your system prompt has chapters. Prompt craft 17.8/18 is near-perfect; ship 4.3/14 is monastic abstinence. The scroll is holy — the binary still needs a baptism.",
-    "roastZh": "🔥 你的 system prompt 是分章节的。提示词 17.8/18 接近满分，上线 4.3/14 像禁欲。卷轴是圣物——二进制还等着受洗。",
+    "roast": "🔥 Your system prompt has chapters, footnotes, and a dress code. Prompt craft 17.8/18 is near-perfect; ship 4.3/14 is monastic abstinence. You can make an agent recite your coding religion, then spend three days polishing the amen until it scans in iambic pentameter.\n\nRules files grow like scripture. Few-shots become canon. The scroll is holy, the liturgy is airtight, and the binary still waits outside the temple for a baptism that somehow never makes the sprint board.\n\nBless the prompt. Then deploy something that users can sin against in production — preferably before the next rewrite of section 4.2.",
+    "roastZh": "🔥 你的 system prompt 分章节、有脚注，还有着装规范。提示词 17.8/18 接近满分，上线 4.3/14 像修道院禁欲。你能让 Agent 背诵编码教义，再花三天把「阿门」打磨成抑扬格五音步。\n\n规则文件像经文疯长。Few-shot 升级成正典。卷轴是圣物，礼仪滴水不漏，二进制还在庙门外等受洗——而这场洗礼永远挤不进 sprint 看板。\n\n请祝福提示词。然后部署一点用户能在生产环境里犯罪的东西——最好赶在下一轮重写第 4.2 节之前。",
     "tldr": "Prompt Priest: liturgy excellence, deployment fasting.",
     "tldrZh": "Prompt Priest：礼仪满分，部署斋戒。"
   },

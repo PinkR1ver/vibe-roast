@@ -82,6 +82,9 @@ test("buildVibeProfile returns figure paths and roast", () => {
   assert.equal(profile.dimensions.length, 6);
   assert.ok(profile.roast.includes("🔥"));
   assert.ok(profile.roastZh.length > 10);
+  assert.ok(profile.roast.length > 200, "roast should be a richer multi-paragraph blurb");
+  assert.ok(profile.roastZh.length > 80, "zh roast should be substantially longer");
+  assert.ok(profile.roast.includes("\n\n") || profile.roast.split(".").length >= 4);
   assert.equal(profile.signals[0].label, "Total tokens");
   assert.ok(!profile.signals.some((s) => s.label === "Useful prompts"));
 });

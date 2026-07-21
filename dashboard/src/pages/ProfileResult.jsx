@@ -185,7 +185,10 @@ export default function ProfileResult({ data }) {
   const [posterCanvas, setPosterCanvas] = useState(null);
 
   const categories = data?.profile_signals?.prompt_analysis?.categories || {};
-  const hashtags = useMemo(() => buildHashtags(vibe, categories), [vibe, categories]);
+  const hashtags = useMemo(
+    () => buildHashtags(vibe, categories, { locale: zh ? "zh" : "en" }),
+    [vibe, categories, zh],
+  );
   const words = data?.word_frequencies || [];
   const accent = vibe?.archetype?.accent || "#ff5a1f";
   const modelBreakdown = useMemo(() => buildModelBreakdown(activity || {}), [activity]);
@@ -356,88 +359,151 @@ export default function ProfileResult({ data }) {
               </p>
             </div>
 
-            {words.length > 0 && (
+            {words.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-w-0 items-stretch">
+                <div className="min-w-0 flex flex-col rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+                  <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
+                  <h2 className="m-0 mb-1.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
+                  <div className="relative w-full aspect-square max-h-[380px] overflow-hidden rounded-xl bg-[#f7f4ef]">
+                    <WordCloud
+                      words={words.slice(0, 80)}
+                      width={360}
+                      height={360}
+                      gridSize={3}
+                      weightDivisor={4.2}
+                      rotateRatio={0.08}
+                      minRotation={-0.18}
+                      maxRotation={0.18}
+                      ellipticity={1}
+                      shape="circle"
+                      minSize={7}
+                      colors={ROAST_CLOUD_COLORS}
+                      fontFamily="Outfit, system-ui, sans-serif"
+                    />
+                  </div>
+                </div>
+
+                <div className="min-w-0 flex flex-col rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+                  <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
+                  <h2 className="m-0 mb-0.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
+                  <p className="mt-0 mb-2 text-xs text-[#8b8680]">
+                    {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
+                  </p>
+
+                  <div className="mb-2 grid grid-cols-2 gap-1.5">
+                    <RoastStat
+                      label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
+                      value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
+                      accent="#059669"
+                    />
+                    <RoastStat
+                      label={hasCost ? t("profile.stat.estCost") : t("profile.stat.activeDays")}
+                      value={hasCost ? `$${estCost.toFixed(estCost >= 100 ? 0 : 2)}` : String(activity?.active_day_count || 0)}
+                      accent={hasCost ? "#059669" : undefined}
+                    />
+                    <RoastStat
+                      label={t("profile.stat.streak")}
+                      value={`${activity?.longest_streak || 0}${zh ? " 天" : "d"}`}
+                    />
+                    <RoastStat
+                      label={t("profile.stat.peakDay")}
+                      value={peak?.value ? compactNumber(peak.value) : "—"}
+                      suffix={peak?.day || undefined}
+                    />
+                  </div>
+
+                  {modelBreakdown.sources.length > 0 && (
+                    <div className="mb-1.5 flex flex-wrap gap-1">
+                      {modelBreakdown.sources.slice(0, 4).map((source) => (
+                        <div
+                          key={source.key}
+                          className="inline-flex items-baseline gap-1.5 rounded-md border border-black/[0.04] bg-[#f7f4ef] px-2 py-1"
+                        >
+                          <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8b8680]">{source.key}</span>
+                          <span className="text-sm font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</span>
+                          {isTokenMetric && (
+                            <span className="text-[9px] text-[#8b8680]">{compactNumber(source.tokens)}</span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="relative w-full aspect-square max-h-[380px] min-h-0 flex-1">
+                    <ActivityHeatmap3DPanel
+                      prompts={data?.prompts || []}
+                      activity={activity}
+                      weeks={52}
+                      forceLight
+                      defaultPalette="emerald"
+                      roastStyle
+                      showViewToggle
+                      defaultViewMode="2d"
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
               <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
-                <h2 className="m-0 mb-1.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="h-[140px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
-                  <WordCloud
-                    words={words.slice(0, 80)}
-                    width={720}
-                    height={140}
-                    gridSize={3}
-                    weightDivisor={4.2}
-                    rotateRatio={0.08}
-                    minRotation={-0.18}
-                    maxRotation={0.18}
-                    ellipticity={0.9}
-                    minSize={7}
-                    colors={ROAST_CLOUD_COLORS}
-                    fontFamily="Outfit, system-ui, sans-serif"
+                <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
+                <h2 className="m-0 mb-0.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
+                <p className="mt-0 mb-2 text-xs text-[#8b8680]">
+                  {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
+                </p>
+
+                <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                  <RoastStat
+                    label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
+                    value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
+                    accent="#059669"
+                  />
+                  <RoastStat
+                    label={hasCost ? t("profile.stat.estCost") : t("profile.stat.activeDays")}
+                    value={hasCost ? `$${estCost.toFixed(estCost >= 100 ? 0 : 2)}` : String(activity?.active_day_count || 0)}
+                    accent={hasCost ? "#059669" : undefined}
+                  />
+                  <RoastStat
+                    label={t("profile.stat.streak")}
+                    value={`${activity?.longest_streak || 0}${zh ? " 天" : "d"}`}
+                  />
+                  <RoastStat
+                    label={t("profile.stat.peakDay")}
+                    value={peak?.value ? compactNumber(peak.value) : "—"}
+                    suffix={peak?.day || undefined}
+                  />
+                </div>
+
+                {modelBreakdown.sources.length > 0 && (
+                  <div className="mb-1.5 flex flex-wrap gap-1">
+                    {modelBreakdown.sources.slice(0, 4).map((source) => (
+                      <div
+                        key={source.key}
+                        className="inline-flex items-baseline gap-1.5 rounded-md border border-black/[0.04] bg-[#f7f4ef] px-2 py-1"
+                      >
+                        <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8b8680]">{source.key}</span>
+                        <span className="text-sm font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</span>
+                        {isTokenMetric && (
+                          <span className="text-[9px] text-[#8b8680]">{compactNumber(source.tokens)}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="h-[320px] max-h-[340px]">
+                  <ActivityHeatmap3DPanel
+                    prompts={data?.prompts || []}
+                    activity={activity}
+                    weeks={52}
+                    forceLight
+                    defaultPalette="emerald"
+                    roastStyle
+                    showViewToggle
+                    defaultViewMode="2d"
                   />
                 </div>
               </div>
             )}
-
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-              <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
-              <h2 className="m-0 mb-0.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-2 text-xs text-[#8b8680]">
-                {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
-              </p>
-
-              <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                <RoastStat
-                  label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
-                  value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
-                  accent="#059669"
-                />
-                <RoastStat
-                  label={hasCost ? t("profile.stat.estCost") : t("profile.stat.activeDays")}
-                  value={hasCost ? `$${estCost.toFixed(estCost >= 100 ? 0 : 2)}` : String(activity?.active_day_count || 0)}
-                  accent={hasCost ? "#059669" : undefined}
-                />
-                <RoastStat
-                  label={t("profile.stat.streak")}
-                  value={`${activity?.longest_streak || 0}${zh ? " 天" : "d"}`}
-                />
-                <RoastStat
-                  label={t("profile.stat.peakDay")}
-                  value={peak?.value ? compactNumber(peak.value) : "—"}
-                  suffix={peak?.day || undefined}
-                />
-              </div>
-
-              {modelBreakdown.sources.length > 0 && (
-                <div className="mb-1.5 flex flex-wrap gap-1">
-                  {modelBreakdown.sources.slice(0, 4).map((source) => (
-                    <div
-                      key={source.key}
-                      className="inline-flex items-baseline gap-1.5 rounded-md border border-black/[0.04] bg-[#f7f4ef] px-2 py-1"
-                    >
-                      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8b8680]">{source.key}</span>
-                      <span className="text-sm font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</span>
-                      {isTokenMetric && (
-                        <span className="text-[9px] text-[#8b8680]">{compactNumber(source.tokens)}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="h-[320px] max-h-[340px]">
-                <ActivityHeatmap3DPanel
-                  prompts={data?.prompts || []}
-                  activity={activity}
-                  weeks={52}
-                  forceLight
-                  defaultPalette="emerald"
-                  roastStyle
-                  showViewToggle
-                  defaultViewMode="2d"
-                />
-              </div>
-            </div>
           </section>
         </div>
       </div>

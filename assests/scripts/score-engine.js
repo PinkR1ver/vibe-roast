@@ -163,6 +163,7 @@ export const DEMO_PROFILES = [
     name: "Ship Fast",
     archetype: "01-builder",
     tags: ["#DeployFirst", "#RocketLaptop", "#ProdIsQA"],
+    tagsZh: ["#先部署", "#火箭本", "#生产即测试"],
     scores: { orchestration: 11.2, promptCraft: 12.4, build: 16.8, debug: 6.1, context: 10.5, ship: 12.6 },
     signals: [
       { label: "Total tokens", value: "842" },
@@ -174,9 +175,9 @@ export const DEMO_PROFILES = [
       { title: "infra/preview-deploys", meta: "Packaging heavy · 0 open PRs left" },
     ],
     roast:
-      "🔥 You don't write code — you launch it. The rocket on your laptop isn't a sticker, it's a warning label for your teammates' review queue. Implementation density is elite; debug axis is where the unpaid intern lives. You thank the agent for the code and merge before the thank-you finishes rendering. Keep shipping — just maybe let HUNT borrow the keyboard once a sprint.",
+      "🔥 You don't write code — you launch it. The rocket on your laptop isn't a sticker, it's a warning label for your teammates' review queue. Implementation density is elite; debug axis is where the unpaid intern lives.\n\nYou thank the agent for the code and merge before the thank-you finishes rendering. Preview URLs become production folklore, and the postmortem calendar remains a mythical scroll nobody opens mid-sprint.\n\nKeep shipping — just maybe let HUNT borrow the keyboard once a sprint, and pretend one failing test deserves a reading before the next launch.",
     roastZh:
-      "🔥 你不是在写代码，你是在发射代码。笔记本上的火箭不是贴纸，是给队友 review 队列的警告标签。构建轴拉满，调试轴像欠费的实习生。你跟 Agent 道完谢，merge 按钮已经自己按完了。继续发——但请每个 sprint 至少借给 HUNT 一次键盘。",
+      "🔥 你不是在写代码，你是在发射代码。笔记本上的火箭不是贴纸，是给队友 review 队列的警告标签。构建轴拉满，调试轴像欠费的实习生。\n\n你跟 Agent 道完谢，merge 按钮已经自己按完了。Preview URL 变成生产传说，复盘日历仍是没人在 sprint 中打开的神话卷轴。\n\n继续发——但请每个 sprint 至少借给 HUNT 一次键盘，并假装一条失败测试值得在下次发射前读完。",
     tldr: "Deploy-first Builder with god-tier throughput and a soft spot for skipping the autopsy.",
     tldrZh: "Deploy-first 的 Builder：吞吐封神，验尸偏软。",
   },
@@ -186,6 +187,7 @@ export const DEMO_PROFILES = [
     name: "Rubber Duck",
     archetype: "02-debugger",
     tags: ["#BreakpointMonk", "#DuckCounsel", "#StackTracePoet"],
+    tagsZh: ["#断点僧", "#小黄鸭顾问", "#堆栈诗人"],
     scores: { orchestration: 8.4, promptCraft: 13.1, build: 7.2, debug: 13.6, context: 12.8, ship: 5.4 },
     signals: [
       { label: "Total tokens", value: "611" },
@@ -197,9 +199,9 @@ export const DEMO_PROFILES = [
       { title: "incident/null-on-friday", meta: "Duck approved · humans survived" },
     ],
     roast:
-      "🔥 Your rubber duck has seniority. Debug resilience is maxed; ship courage is on PTO. You can recite stack frames like poetry and still refuse to merge a green CI because 'what if the flake is sentient.' The agent is your detective partner, not your deployer. Respect — now close the ticket.",
+      "🔥 Your rubber duck has seniority. Debug resilience is maxed; ship courage is on PTO. You can recite stack frames like poetry and still refuse to merge a green CI because 'what if the flake is sentient.'\n\nThe agent is your detective partner, not your deployer. Every quick look becomes an archaeological dig through logs, bisects, and three theories that somehow all implicate timezones.\n\nRespect — now close the ticket, merge the green, and let production enjoy one boring Tuesday without a midnight duck sermon.",
     roastZh:
-      "🔥 你的小黄鸭工龄比你长。调试韧性拉满，上线勇气在休假。你能把堆栈背成诗，却因为『万一 flake 有自我意识』而不敢点 merge。Agent 是你的侦探搭档，不是发布官。致敬——然后把 ticket 关了。",
+      "🔥 你的小黄鸭工龄比你长。调试韧性拉满，上线勇气在休假。你能把堆栈背成诗，却因为『万一 flake 有自我意识』而不敢点 merge。\n\nAgent 是你的侦探搭档，不是发布官。每次『看一眼』都会变成日志考古、bisect 巡礼，外加三种全都怪时区的平行宇宙理论。\n\n致敬——然后把 ticket 关了，绿了就 merge，让生产体验一个没有午夜小黄鸭布道的无聊周二。",
     tldr: "Night-shift Debugger: finds truth, fears the merge button.",
     tldrZh: "夜班 Debugger：真相猎手，merge 恐惧症。",
   },
@@ -209,6 +211,7 @@ export const DEMO_PROFILES = [
     name: "Diagram First",
     archetype: "03-architect",
     tags: ["#BoxesFirst", "#ADRForever", "#NoCodeUntilDrawn"],
+    tagsZh: ["#先画框", "#ADR万岁", "#画完再写"],
     scores: { orchestration: 14.6, promptCraft: 15.2, build: 8.1, debug: 6.4, context: 13.9, ship: 7.0 },
     signals: [
       { label: "Total tokens", value: "390" },
@@ -220,9 +223,9 @@ export const DEMO_PROFILES = [
       { title: "rfc/agent-topology", meta: "MCP graph looks like a constellation" },
     ],
     roast:
-      "🔥 You draw galaxies before you type hello-world. Prompt craft and orchestration are gorgeous; build throughput is still waiting for the ink to dry on the whiteboard. The agent gets exquisite specs and occasionally some code. Beautiful mind — now ship a rectangle that runs.",
+      "🔥 You draw galaxies before you type hello-world. Prompt craft and orchestration are gorgeous; build throughput is still waiting for the ink to dry on the whiteboard.\n\nThe agent gets exquisite specs, ADRs with footnotes, and occasionally some code. Stakeholders clap for the topology while CI waits for a commit that isn't named wip-boxes-final-v9.\n\nBeautiful mind — now ship a rectangle that runs, then draw the next galaxy on top of something users can click.",
     roastZh:
-      "🔥 你在敲 hello-world 之前先画星系。提示词与编排很美，构建吞吐还在等白板墨水干。Agent 收到的是精美规格书，偶尔才是代码。脑子漂亮——现在请交付一个能跑的矩形。",
+      "🔥 你在敲 hello-world 之前先画星系。提示词与编排很美，构建吞吐还在等白板墨水干。\n\nAgent 收到的是精美规格书和带脚注的 ADR，偶尔才是代码。干系人给拓扑鼓掌，CI 还在等一个不叫 wip-boxes-final-v9 的提交。\n\n脑子漂亮——现在请交付一个能跑的矩形，然后再在用户点得动的东西上面画下一座星系。",
     tldr: "Architect who weaponizes diagrams; bytes arrive fashionably late.",
     tldrZh: "用框图当武器的 Architect；字节总是迟到。",
   },
@@ -232,6 +235,7 @@ export const DEMO_PROFILES = [
     name: "Disciple",
     archetype: "04-codex-believer",
     tags: ["#AgentDisciple", "#HaloTerminal", "#AmenToDiff"],
+    tagsZh: ["#Agent门徒", "#光环终端", "#阿门Diff"],
     scores: { orchestration: 18.4, promptCraft: 11.0, build: 12.5, debug: 5.2, context: 9.1, ship: 11.8 },
     signals: [
       { label: "Total tokens", value: "1.2k" },
@@ -243,9 +247,9 @@ export const DEMO_PROFILES = [
       { title: "agents/release-priest", meta: "Prays in JSONL" },
     ],
     roast:
-      "🔥 You don't use the agent — you worship it. Orchestration is cathedral-tier: skills, MCP, plugins arranged like stained glass. Review is a soft amen after the diff lands. When Codex sneezes, your repo catches a cold. Faith is powerful; skepticism is still a virtue.",
+      "🔥 You don't use the agent — you worship it. Orchestration is cathedral-tier: skills, MCP, plugins arranged like stained glass. Review is a soft amen after the diff lands.\n\nWhen Codex sneezes, your repo catches a cold, and the liturgy is a JSONL that never sleeps. Skepticism exists as a sticker, not as a blocking check.\n\nFaith is powerful; skepticism is still a virtue — install one heretic ritual and read the diff like a non-believer before you chant merge.",
     roastZh:
-      "🔥 你不是在用 Agent，你是在供奉它。编排轴已是大教堂级别：skills、MCP、插件像彩窗一样排好。Review 只是 diff 落地后的轻声阿门。Codex 一打喷嚏，仓库就感冒。信仰强大——怀疑仍是美德。",
+      "🔥 你不是在用 Agent，你是在供奉它。编排轴已是大教堂级别：skills、MCP、插件像彩窗一样排好。Review 只是 diff 落地后的轻声阿门。\n\nCodex 一打喷嚏，仓库就感冒；礼拜仪式是永不休眠的 JSONL。怀疑精神贴在贴纸上，从不出现在 blocking check 里。\n\n信仰强大——怀疑仍是美德。请安装一条异端仪式：chant merge 之前，先用无信仰者的眼睛把 diff 读完。",
     tldr: "Codex Believer with a halo terminal and a thin review conscience.",
     tldrZh: "戴光环的 Codex Believer，review 良知偏薄。",
   },
@@ -255,6 +259,7 @@ export const DEMO_PROFILES = [
     name: "Prompt Priest",
     archetype: "05-prompt-priest",
     tags: ["#CursorRules", "#HolyScroll", "#SystemPromptCanon"],
+    tagsZh: ["#Cursor戒律", "#神圣卷轴", "#系统提示正典"],
     scores: { orchestration: 12.8, promptCraft: 17.1, build: 6.4, debug: 7.0, context: 14.2, ship: 4.8 },
     signals: [
       { label: "Total tokens", value: "455" },
@@ -266,9 +271,9 @@ export const DEMO_PROFILES = [
       { title: "prompts/release-liturgy", meta: "Few-shot as scripture" },
     ],
     roast:
-      "🔥 Your system prompt has chapters. Prompt craft is near-perfect; ship courage is monastic abstinence. You can make an agent recite your coding religion, then spend three days refining the amen. The scroll is holy — the binary still needs a baptism.",
+      "🔥 Your system prompt has chapters, footnotes, and a dress code. Prompt craft is near-perfect; ship courage is monastic abstinence. You can make an agent recite your coding religion, then spend three days refining the amen until it scans in iambic pentameter.\n\nRules files grow like scripture. Few-shots become canon. The scroll is holy, the liturgy is airtight, and the binary still waits outside the temple for a baptism that somehow never makes the sprint board.\n\nBless the prompt — then deploy something users can sin against in production before the next rewrite of section 4.2.",
     roastZh:
-      "🔥 你的 system prompt 是分章节的。提示词手艺接近满分，上线勇气像修道院禁欲。你能让 Agent 背诵你的编码教义，再花三天打磨那个『阿门』。卷轴是圣物——二进制还等着受洗。",
+      "🔥 你的 system prompt 分章节、有脚注，还有着装规范。提示词手艺接近满分，上线勇气像修道院禁欲。你能让 Agent 背诵你的编码教义，再花三天把『阿门』打磨成抑扬格五音步。\n\n规则文件像经文疯长。Few-shot 升级成正典。卷轴是圣物，礼仪滴水不漏，二进制还在庙门外等受洗——而这场洗礼永远挤不进 sprint 看板。\n\n请祝福提示词——然后在下一轮重写第 4.2 节之前，部署一点用户能在生产环境里犯罪的东西。",
     tldr: "Prompt Priest: liturgy excellence, deployment fasting.",
     tldrZh: "Prompt Priest：礼仪满分，部署斋戒。",
   },
@@ -278,6 +283,7 @@ export const DEMO_PROFILES = [
     name: "Tab Storm",
     archetype: "06-tab-hoarder",
     tags: ["#PortZoo", "#47Tabs", "#WhichLocalhost"],
+    tagsZh: ["#端口动物园", "#四十七标签", "#哪个Localhost"],
     scores: { orchestration: 9.5, promptCraft: 8.2, build: 11.4, debug: 8.8, context: 4.2, ship: 9.1 },
     signals: [
       { label: "Total tokens", value: "703" },
@@ -289,9 +295,9 @@ export const DEMO_PROFILES = [
       { title: "tabs/untitled-38", meta: "Context window crying" },
     ],
     roast:
-      "🔥 Context discipline collapsed into a port zoo. You run four localhosts and ask the agent which one is real. Build still happens — somehow — between tab switches. Your browser memory is the real senior engineer. Close twenty tabs; keep the one that compiles.",
+      "🔥 Context discipline collapsed into a port zoo with opinions. You run four localhosts and ask the agent which one is real, while untitled tabs multiply like rabbits with sourcemaps.\n\nBuild still happens — somehow — between tab switches. Your browser memory is the real senior engineer; the dock is a crime scene the agent has seen before.\n\nClose twenty tabs; keep the one that compiles. Name it something other than final-final-v3.",
     roastZh:
-      "🔥 上下文纪律塌成了端口动物园。你同时开四个 localhost，还问 Agent 哪个是真的。构建仍在发生——奇迹般地——夹在切 tab 之间。浏览器内存才是真正的高级工程师。关掉二十个标签；留下能编译的那个。",
+      "🔥 上下文纪律塌成了很有主见的端口动物园。你同时开四个 localhost，还问 Agent 哪个是真的；未命名标签像带 sourcemap 的兔子一样繁殖。\n\n构建仍在发生——奇迹般地——夹在切 tab 之间。浏览器内存才是真正的高级工程师；程序坞是 Agent 看过的案发现场。\n\n关掉二十个标签；留下能编译的那个。别再叫它 final-final-v3。",
     tldr: "Tab Hoarder: ships while the dock overflows.",
     tldrZh: "Tab Hoarder：码头溢出来也能交付。",
   },
@@ -301,6 +307,7 @@ export const DEMO_PROFILES = [
     name: "Gauge Panic",
     archetype: "07-context-maxxer",
     tags: ["#99Percent", "#CreditAnxiety", "#OneMoreFile"],
+    tagsZh: ["#百分之九十九", "#余额焦虑", "#再塞一个"],
     scores: { orchestration: 13.2, promptCraft: 14.8, build: 9.6, debug: 7.5, context: 15.4, ship: 6.2 },
     signals: [
       { label: "Total tokens", value: "528" },
@@ -312,9 +319,9 @@ export const DEMO_PROFILES = [
       { title: "budget/tokens-left-12", meta: "Anxiety as a workflow" },
     ],
     roast:
-      "🔥 You treat the context window like a final exam booklet — fill every margin. Discipline score is ironically high because you know exactly how close you are to blowing the meter. The agent gets exquisite compression; you get credit anxiety. Maxxing is a sport; leave 1% for oxygen.",
+      "🔥 You treat the context window like a final exam booklet — fill every margin. Discipline score is ironically high because you know exactly how close you are to blowing the meter, down to the last courtesy token.\n\nThe agent gets exquisite compression; you get credit anxiety and the spiritual high of one more file. Maxxing is a sport; oxygen is still undefeated.\n\nLeave 1% for breath. The model will survive. Your pulse might too.",
     roastZh:
-      "🔥 你把上下文窗口当成期末试卷——边缘全写满。纪律分反而很高，因为你精确知道离爆表还有多远。Agent 得到极致压缩，你得到余额焦虑。Maxxing 是运动——请给氧气留 1%。",
+      "🔥 你把上下文窗口当成期末试卷——边缘全写满。纪律分反而很高，因为你精确知道离爆表还有多远，精确到最后一个礼貌 token。\n\nAgent 得到极致压缩，你得到余额焦虑，外加『再塞一个文件』的精神高潮。Maxxing 是运动；氧气至今保持不败。\n\n请给呼吸留 1%。模型会活下来。你的脉搏或许也会。",
     tldr: "Context Maxxer living at 99% with a calm spreadsheet heart.",
     tldrZh: "Context Maxxer：仪表盘 99%，内心是表格。",
   },
@@ -324,6 +331,7 @@ export const DEMO_PROFILES = [
     name: "Red Button",
     archetype: "08-yolo-shipper",
     tags: ["#YoloFlag", "#SkipReview", "#FridayDeploy"],
+    tagsZh: ["#YOLO旗", "#跳过Review", "#周五上线"],
     scores: { orchestration: 10.1, promptCraft: 7.4, build: 13.9, debug: 3.2, context: 6.8, ship: 13.5 },
     signals: [
       { label: "Total tokens", value: "966" },
@@ -335,9 +343,9 @@ export const DEMO_PROFILES = [
       { title: "hotfix/whoops", meta: "Follow-up PR titled 'sorry'" },
     ],
     roast:
-      "🔥 Ship courage ate the rest of the chart. You run the agent with --yolo like it's a personality trait. Debug resilience is a missing person report. Production is your staging environment and Friday is your favorite day. Iconic — terrifying — effective until it isn't.",
+      "🔥 Ship courage ate the rest of the chart. You run the agent with --yolo like it's a personality trait. Debug resilience is a missing person report.\n\nProduction is your staging environment and Friday is your favorite liturgical day. The follow-up PR is titled sorry and somehow still merges faster than the apology lands in Slack.\n\nIconic — terrifying — effective until it isn't. Invent tests before the apology PR, or at least in the same commit as the regret.",
     roastZh:
-      "🔥 上线勇气把其余维度吃干抹净。你开着 --yolo 跑 Agent，像在展示人设。调试韧性已失踪。生产即预发，周五是节日。传奇——可怕——有效，直到某天不再有效。",
+      "🔥 上线勇气把其余维度吃干抹净。你开着 --yolo 跑 Agent，像在展示人设。调试韧性已失踪。\n\n生产即预发，周五是节日。后续 PR 标题叫 sorry，合并速度仍快过道歉出现在 Slack。\n\n传奇——可怕——有效，直到某天不再有效。请在道歉 PR 之前发明测试，或者至少跟悔恨放进同一个 commit。",
     tldr: "YOLO Shipper: merge first, invent tests in the apology PR.",
     tldrZh: "YOLO Shipper：先 merge，在道歉 PR 里补测试。",
   },

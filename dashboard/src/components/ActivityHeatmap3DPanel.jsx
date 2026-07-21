@@ -123,8 +123,8 @@ export default function ActivityHeatmap3DPanel({
   const resetViewRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const compactShell = roastStyle || showViewToggle;
-  const shellMin = compactShell ? "min-h-[220px]" : "min-h-[240px]";
-  const shellMax = compactShell ? "max-h-[320px]" : "";
+  const shellMin = roastStyle ? "min-h-0 h-full" : compactShell ? "min-h-[220px]" : "min-h-[240px]";
+  const shellMax = roastStyle ? "max-h-full" : compactShell ? "max-h-[320px]" : "";
 
   const accent = PALETTE_ACCENTS[activePalette] || PALETTE_ACCENTS.emerald;
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
