@@ -9,5 +9,8 @@ test("roast i18n resolves Chinese and English labels with fallback", async () =>
   assert.equal(mod.t("app.brand", "en"), "Vibe Roaster");
   assert.equal(mod.t("app.brand", "zh"), "Vibe Roaster");
   assert.equal(mod.t("profile.cloud", "zh"), "词云");
+  assert.equal(mod.t("profile.posterShare", "en"), "Share poster");
+  assert.equal(mod.t("profile.posterShare", "zh"), "分享海报");
+  assert.equal(mod.t("profile.posterDownload", "en"), "Download PNG");
   assert.equal(mod.t("missing.key", "zh"), "missing.key");
 });

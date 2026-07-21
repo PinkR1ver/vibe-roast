@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { LocaleProvider } from "./contexts/LocaleContext";
+import { LocaleProvider, useLocale } from "./contexts/LocaleContext";
 import ProfileResult from "./pages/ProfileResult";
 import { useApi } from "./hooks/useApi.jsx";
 import { buildTimeRange } from "./lib/time-range.js";
 
 function AppBody() {
+  const { t } = useLocale();
   const [profileData, setProfileData] = useState(null);
   const range = buildTimeRange("total", { from: "", to: "" });
   const { data, loading, error } = useApi(range);
@@ -19,12 +20,12 @@ function AppBody() {
       <main>
         {loading && !profileData ? (
           <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-6">
-            <p className="roast-brand text-[44px] leading-none text-[#1a1a1a]">Vibe Roaster</p>
-            <p className="text-[#6b6560] text-sm font-medium">Loading roast…</p>
+            <p className="roast-brand text-[44px] leading-none text-[#1a1a1a]">{t("app.brand")}</p>
+            <p className="text-[#6b6560] text-sm font-medium">{t("app.loading")}</p>
           </div>
         ) : error && !profileData ? (
           <div className="min-h-screen flex flex-col items-center justify-center gap-3 px-6 text-center">
-            <p className="roast-brand text-[44px] leading-none text-[#1a1a1a]">Vibe Roaster</p>
+            <p className="roast-brand text-[44px] leading-none text-[#1a1a1a]">{t("app.brand")}</p>
             <p className="text-[#e24b4b] text-sm font-medium max-w-md">{error}</p>
           </div>
         ) : (

@@ -465,7 +465,8 @@ function roundRect(ctx, x, y, w, h, r) {
   ctx.closePath();
 }
 
-export async function downloadSharePoster({ vibe, hashtags = [], lang = "zh" }) {
+export async function renderSharePoster({ vibe, hashtags = [], lang = "zh" } = {}) {
+  const zh = lang === "zh";
   const width = 900;
   const height = 1200;
   const canvas = document.createElement("canvas");
@@ -484,10 +485,10 @@ export async function downloadSharePoster({ vibe, hashtags = [], lang = "zh" }) 
 
   ctx.fillStyle = "#1a1a1a";
   ctx.font = "700 22px Outfit, system-ui, sans-serif";
-  ctx.fillText("vibe-wrapper", pad, pad + 8);
+  ctx.fillText("Vibe Roaster", pad, pad + 8);
   ctx.fillStyle = "#6b6560";
   ctx.font = "600 16px Outfit, system-ui, sans-serif";
-  ctx.fillText(lang === "zh" ? "竖屏分享海报 · 3:4" : "Share poster · 3:4", pad, pad + 32);
+  ctx.fillText(zh ? "分享海报 · 3:4" : "Share poster · 3:4", pad, pad + 32);
 
   let figureY = pad + 56;
   try {
@@ -537,7 +538,7 @@ export async function downloadSharePoster({ vibe, hashtags = [], lang = "zh" }) 
     tagX += tw + 10;
   }
 
-  const tldr = lang === "zh" ? vibe.tldrZh || vibe.tldr : vibe.tldr || vibe.tldrZh;
+  const tldr = zh ? vibe.tldrZh || vibe.tldr : vibe.tldr || vibe.tldrZh;
   roundRect(ctx, pad, height - 220, width - pad * 2, 150, 20);
   ctx.fillStyle = "#fffcf7";
   ctx.fill();
@@ -547,7 +548,7 @@ export async function downloadSharePoster({ vibe, hashtags = [], lang = "zh" }) 
   ctx.fillText("TL;DR", pad + 24, height - 180);
   ctx.fillStyle = "#1a1a1a";
   ctx.font = "600 18px Outfit, system-ui, sans-serif";
-  const max = 46;
+  const max = zh ? 28 : 46;
   let rest = String(tldr || "");
   let ly = height - 150;
   for (let i = 0; i < 3 && rest; i++) {
@@ -559,11 +560,15 @@ export async function downloadSharePoster({ vibe, hashtags = [], lang = "zh" }) 
   ctx.textAlign = "center";
   ctx.fillStyle = "#8b8680";
   ctx.font = "600 13px Outfit, system-ui, sans-serif";
-  ctx.fillText("vibe-wrapper · local roast", width / 2, height - 28);
+  ctx.fillText(zh ? "vibe-wrapper · 本地 roast" : "vibe-wrapper · local roast", width / 2, height - 28);
 
+  return canvas;
+}
+
+export function downloadCanvasPng(canvas, filename = "vibe-roast-poster.png") {
   const url = canvas.toDataURL("image/png");
   const a = document.createElement("a");
   a.href = url;
-  a.download = `vibe-roast-${(vibe.archetype?.code || "vibe").toLowerCase()}-3x4.png`;
+  a.download = filename;
   a.click();
 }

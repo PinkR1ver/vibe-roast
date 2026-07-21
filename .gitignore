@@ -1,6 +1,7 @@
 node_modules/
 dashboard/dist/
 dashboard/node_modules/
+.venv-img/
 .env
 *.log
 .DS_Store

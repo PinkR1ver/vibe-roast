@@ -70,10 +70,12 @@ function drawMiniRadar(ctx, dimensions, accent, cx, cy, radius) {
  * @param {object} opts
  * @param {object} opts.vibe
  * @param {string[]} opts.hashtags
+ * @param {"en"|"zh"} [opts.locale]
  * @param {number} [opts.width]
  * @returns {Promise<HTMLCanvasElement>}
  */
-export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {}) {
+export async function renderSharePoster({ vibe, hashtags = [], locale = "en", width = 900 } = {}) {
+  const zh = locale === "zh";
   const height = Math.round((width * 4) / 3);
   const canvas = document.createElement("canvas");
   canvas.width = width;
@@ -89,22 +91,19 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  // soft accent blobs
   const blob = ctx.createRadialGradient(width * 0.2, height * 0.15, 20, width * 0.2, height * 0.15, width * 0.45);
   blob.addColorStop(0, `${accent}33`);
   blob.addColorStop(1, "transparent");
   ctx.fillStyle = blob;
   ctx.fillRect(0, 0, width, height);
 
-  // brand
   ctx.fillStyle = "#1a1a1a";
   ctx.font = "700 22px Outfit, system-ui, sans-serif";
-  ctx.fillText("vibe-wrapper", pad, pad + 8);
+  ctx.fillText("Vibe Roaster", pad, pad + 8);
   ctx.fillStyle = "#6b6560";
   ctx.font = "600 16px Outfit, system-ui, sans-serif";
-  ctx.fillText("Roast Result · 3:4", pad, pad + 32);
+  ctx.fillText(zh ? "分享海报 · 3:4" : "Share poster · 3:4", pad, pad + 32);
 
-  // figure
   let figureY = pad + 56;
   try {
     const img = await loadImage(vibe.figure);
@@ -120,7 +119,6 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
     figureY += height * 0.28;
   }
 
-  // title + score
   ctx.textAlign = "center";
   ctx.fillStyle = accent;
   ctx.font = "800 42px Outfit, system-ui, sans-serif";
@@ -139,7 +137,6 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
   ctx.font = "800 28px Outfit, system-ui, sans-serif";
   ctx.fillText(`${tier.emoji || ""} ${tier.id || ""}`.trim(), width / 2, figureY + 132);
 
-  // hashtags
   const tags = (hashtags || []).slice(0, 6);
   ctx.font = "700 18px Outfit, system-ui, sans-serif";
   let tagX = pad;
@@ -160,7 +157,6 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
     tagX += tw + tagGap;
   }
 
-  // mini radar card
   const cardW = width - pad * 2;
   const cardH = 200;
   const cardY = height - pad - cardH - 36;
@@ -174,14 +170,14 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
   ctx.textAlign = "left";
   ctx.fillStyle = "#6b6560";
   ctx.font = "800 14px Outfit, system-ui, sans-serif";
-  ctx.fillText("SCORE RADAR", pad + 24, cardY + 28);
+  ctx.fillText(zh ? "分数雷达" : "SCORE RADAR", pad + 24, cardY + 28);
 
   drawMiniRadar(ctx, vibe?.dimensions || [], accent, pad + cardW * 0.28, cardY + cardH / 2 + 8, 62);
 
   ctx.fillStyle = "#1a1a1a";
   ctx.font = "600 15px Outfit, system-ui, sans-serif";
-  const tldr = vibe?.tldrZh || vibe?.tldr || "";
-  const maxChars = 42;
+  const tldr = zh ? (vibe?.tldrZh || vibe?.tldr || "") : (vibe?.tldr || vibe?.tldrZh || "");
+  const maxChars = zh ? 28 : 42;
   const lines = [];
   let rest = tldr;
   while (rest.length && lines.length < 3) {
@@ -197,7 +193,7 @@ export async function renderSharePoster({ vibe, hashtags = [], width = 900 } = {
   ctx.fillStyle = "#8b8680";
   ctx.font = "600 13px Outfit, system-ui, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("vibe-wrapper · local roast", width / 2, height - 22);
+  ctx.fillText(zh ? "vibe-wrapper · 本地 roast" : "vibe-wrapper · local roast", width / 2, height - 22);
 
   return canvas;
 }

@@ -27,7 +27,9 @@ assests/
 ├── badges/01-builder … 08-yolo-shipper/
 ├── banners/  home-hero.*  share-strip.*  result-header.*
 ├── live-report.html          # optional static roast export
+├── notes/live-inspect-summary.json  # redacted snapshot for live-report
 ├── scripts/score-engine.js   # scoring helpers + DEMO_PROFILES
+├── scripts/roast-extras.js   # word cloud / heatmap / share poster helpers
 ├── source/design-system.md
 └── source/references/        # legacy SBTI boards + badge board
 ```

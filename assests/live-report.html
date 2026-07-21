@@ -468,11 +468,135 @@
         font-weight: 600;
       }
 
-      .cta.secondary {
-        width: auto;
-        margin: 0;
-        padding: 10px 16px;
-        white-space: nowrap;
+      .share-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border: 0;
+        border-radius: 14px;
+        color: #fff;
+        background: var(--accent, #ff5a1f);
+        box-shadow: 0 10px 20px color-mix(in srgb, var(--accent, #ff5a1f) 28%, transparent);
+        cursor: pointer;
+      }
+
+      .share-icon-btn:disabled {
+        opacity: 0.6;
+        cursor: wait;
+      }
+
+      .poster-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(2px);
+        padding: 0;
+      }
+
+      .poster-modal.is-open {
+        display: flex;
+      }
+
+      .poster-sheet {
+        width: min(100%, 440px);
+        max-height: 96vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        background: #fffcf7;
+        border-radius: 22px 22px 0 0;
+        box-shadow: 0 -12px 40px rgba(40, 28, 12, 0.18);
+      }
+
+      .poster-sheet-head,
+      .poster-sheet-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 14px 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      }
+
+      .poster-sheet-foot {
+        border-bottom: 0;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+      }
+
+      .poster-sheet-body {
+        overflow: auto;
+        padding: 16px;
+      }
+
+      .poster-preview {
+        aspect-ratio: 3 / 4;
+        width: min(100%, 320px);
+        margin: 0 auto;
+        overflow: hidden;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        background: #f3f1ec;
+        box-shadow: 0 10px 28px rgba(40, 28, 12, 0.1);
+      }
+
+      .poster-preview img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .poster-sheet-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+
+      .poster-sheet-sub {
+        margin-top: 2px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .poster-sheet button {
+        min-height: 48px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        background: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .poster-sheet .download {
+        border: 0;
+        color: #fff;
+        background: var(--accent, #ff5a1f);
+      }
+
+      .poster-sheet .download:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      @media (min-width: 640px) {
+        .poster-modal {
+          align-items: center;
+          padding: 16px;
+        }
+        .poster-sheet {
+          border-radius: 22px;
+          max-height: 92vh;
+          box-shadow: 0 24px 60px rgba(40, 28, 12, 0.22);
+        }
       }
 
       .signal-grid {
@@ -845,25 +969,29 @@
       <header class="topnav">
         <h1 class="brand">Vibe Roaster</h1>
         <nav class="nav-links">
-          <a href="/">Home</a>
-          <a href="live-report.html">Live export</a>
-          <a href="notes/live-flow-report.md">Flow notes</a>
+          <a href="/" id="navHome">Home</a>
+          <a href="live-report.html" id="navLive">Live export</a>
         </nav>
       </header>
 
       <div class="live-banner" id="banner"></div>
 
       <div class="poster-bar">
-        <div class="hint" id="posterHint">Roast Result · 竖屏海报比例 3:4</div>
-        <button class="cta secondary" type="button" id="posterBtn">生成竖屏分享海报 (3:4)</button>
+        <div class="hint" id="posterHint">Share poster · 3:4</div>
+        <button class="share-icon-btn" type="button" id="posterBtn" aria-label="Share poster" title="Share poster">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 8a3 3 0 1 0-2.83-4H12a3 3 0 0 0 3 4Zm-6 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8.6 11.4 15 8.6M8.6 12.6 15.4 15.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
 
       <section class="layout is-animating" id="stage">
         <aside class="profile-card" id="profileCard"></aside>
         <div class="stack">
           <article class="card panel">
-            <h2>Score breakdown</h2>
-            <p class="sub">Six agent-native axes · live inspect</p>
+            <h2 id="scoreTitle">Score breakdown</h2>
+            <p class="sub" id="scoreSub">Six agent-native axes · live inspect</p>
             <div class="radar-wrap">
               <div class="radar-stage" id="radar"></div>
               <div class="axis-list" id="axisList"></div>
@@ -871,7 +999,7 @@
           </article>
 
           <article class="card panel">
-            <h2>🔥 Full roast</h2>
+            <h2 id="roastTitle">🔥 Full roast</h2>
             <div class="lang-toggle" role="group" aria-label="Roast language">
               <button type="button" id="langZh" class="is-active">中文</button>
               <button type="button" id="langEn">EN</button>
@@ -880,33 +1008,100 @@
           </article>
 
           <article class="card panel panel-compact">
-            <h2>Word cloud</h2>
-            <p class="sub">From inspect word_frequencies</p>
+            <h2 id="cloudTitle">Word cloud</h2>
+            <p class="sub" id="cloudSub">From inspect word_frequencies</p>
             <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
           </article>
 
           <article class="card panel panel-compact">
-            <h2>Activity</h2>
-            <p class="sub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
+            <h2 id="activityTitle">Activity</h2>
+            <p class="sub" id="activitySub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
             <div class="activity-stage" id="activityMap"></div>
           </article>
         </div>
       </section>
 
-      <footer class="page-foot">
+      <footer class="page-foot" id="pageFoot">
         Static snapshot from redacted live inspect · no prompt bodies ·
         <a href="notes/live-inspect-summary.json">JSON</a>
       </footer>
     </main>
+
+    <div class="poster-modal" id="posterModal" aria-hidden="true">
+      <div class="poster-sheet" role="dialog" aria-modal="true" aria-labelledby="posterModalTitle">
+        <div class="poster-sheet-head">
+          <div>
+            <div class="poster-sheet-title" id="posterModalTitle">Share poster · 3:4</div>
+            <div class="poster-sheet-sub" id="posterModalHint">Preview first, then download when you’re ready.</div>
+          </div>
+          <button type="button" id="posterModalCloseTop">Close</button>
+        </div>
+        <div class="poster-sheet-body">
+          <div class="poster-preview">
+            <img id="posterPreviewImg" alt="Share poster preview" hidden />
+          </div>
+        </div>
+        <div class="poster-sheet-foot">
+          <button type="button" id="posterModalClose">Close</button>
+          <button type="button" class="download" id="posterModalDownload" disabled>Download PNG</button>
+        </div>
+      </div>
+    </div>
 
     <script type="module">
       import {
         buildHashtags,
         renderWordCloud,
         renderActivityMap,
-        downloadSharePoster,
+        renderSharePoster,
+        downloadCanvasPng,
       } from "./scripts/roast-extras.js";
       import { EMBED } from "./scripts/live-report-boot.js";
+
+      const COPY = {
+        en: {
+          navHome: "Home",
+          navLive: "Live export",
+          posterHint: "Share poster · 3:4",
+          posterShare: "Share poster",
+          posterBusy: "Preparing…",
+          posterTitle: "Share poster · 3:4",
+          posterModalHint: "Preview first, then download when you’re ready.",
+          posterDownload: "Download PNG",
+          posterClose: "Close",
+          scoreTitle: "Score breakdown",
+          scoreSub: "Six agent-native axes · live inspect",
+          roastTitle: "🔥 Full roast",
+          cloudTitle: "Word cloud",
+          cloudSub: "From inspect word_frequencies",
+          activityTitle: "Activity",
+          activitySub: "Emerald heatmap · TokenTracker when available · toggle 3D",
+          foot: "Static snapshot from redacted live inspect · no prompt bodies ·",
+          banner: (meta, srcBits) =>
+            `<b>Live inspect</b> · ${meta.generated_at} · prompts ${meta.prompt_count} · sources ${meta.source_count} (${srcBits}) · redacted aggregates only`,
+        },
+        zh: {
+          navHome: "首页",
+          navLive: "静态导出",
+          posterHint: "分享海报 · 3:4",
+          posterShare: "分享海报",
+          posterBusy: "准备中…",
+          posterTitle: "分享海报 · 3:4",
+          posterModalHint: "先预览，确认后再下载。",
+          posterDownload: "下载 PNG",
+          posterClose: "关闭",
+          scoreTitle: "分数明细",
+          scoreSub: "六维 Agent 轴 · live inspect",
+          roastTitle: "🔥 完整 Roast",
+          cloudTitle: "词云",
+          cloudSub: "来自 inspect word_frequencies",
+          activityTitle: "活动",
+          activitySub: "翠绿热力图 · 可用时用 TokenTracker · 可切换 3D",
+          foot: "来自脱敏 live inspect 的静态快照 · 不含 prompt 正文 ·",
+          banner: (meta, srcBits) =>
+            `<b>Live inspect</b> · ${meta.generated_at} · 提示 ${meta.prompt_count} · 数据源 ${meta.source_count} (${srcBits}) · 仅脱敏聚合`,
+        },
+      };
 
       async function loadPayload() {
         try {
@@ -945,24 +1140,92 @@
       const langEn = document.getElementById("langEn");
       const banner = document.getElementById("banner");
       const posterBtn = document.getElementById("posterBtn");
+      const posterHint = document.getElementById("posterHint");
       const wordCloud = document.getElementById("wordCloud");
       const activityMap = document.getElementById("activityMap");
+      const posterModal = document.getElementById("posterModal");
+      const posterPreviewImg = document.getElementById("posterPreviewImg");
+      const posterModalDownload = document.getElementById("posterModalDownload");
+      const posterModalClose = document.getElementById("posterModalClose");
+      const posterModalCloseTop = document.getElementById("posterModalCloseTop");
 
       let lang = "zh";
       let payload = EMBED;
+      let posterCanvas = null;
+
+      function copy() {
+        return COPY[lang] || COPY.en;
+      }
+
+      function applyChrome() {
+        const c = copy();
+        document.getElementById("navHome").textContent = c.navHome;
+        document.getElementById("navLive").textContent = c.navLive;
+        posterHint.textContent = c.posterHint;
+        posterBtn.setAttribute("aria-label", c.posterShare);
+        posterBtn.title = c.posterShare;
+        document.getElementById("scoreTitle").textContent = c.scoreTitle;
+        document.getElementById("scoreSub").textContent = c.scoreSub;
+        document.getElementById("roastTitle").textContent = c.roastTitle;
+        document.getElementById("cloudTitle").textContent = c.cloudTitle;
+        document.getElementById("cloudSub").textContent = c.cloudSub;
+        document.getElementById("activityTitle").textContent = c.activityTitle;
+        document.getElementById("activitySub").textContent = c.activitySub;
+        document.getElementById("pageFoot").innerHTML = `${c.foot} <a href="notes/live-inspect-summary.json">JSON</a>`;
+        document.getElementById("posterModalTitle").textContent = c.posterTitle;
+        document.getElementById("posterModalHint").textContent = c.posterModalHint;
+        posterModalClose.textContent = c.posterClose;
+        posterModalCloseTop.textContent = c.posterClose;
+        posterModalDownload.textContent = c.posterDownload;
+        posterPreviewImg.alt = c.posterTitle;
+      }
+
+      function closePosterModal() {
+        posterModal.classList.remove("is-open");
+        posterModal.setAttribute("aria-hidden", "true");
+      }
+
+      function openPosterModal() {
+        posterModal.classList.add("is-open");
+        posterModal.setAttribute("aria-hidden", "false");
+      }
 
       langZh.addEventListener("click", () => { lang = "zh"; render(); });
       langEn.addEventListener("click", () => { lang = "en"; render(); });
       posterBtn.addEventListener("click", async () => {
+        const c = copy();
         posterBtn.disabled = true;
-        posterBtn.textContent = lang === "zh" ? "生成中…" : "Generating…";
+        posterBtn.title = c.posterBusy;
+        posterBtn.setAttribute("aria-label", c.posterBusy);
+        posterCanvas = null;
+        posterPreviewImg.hidden = true;
+        posterPreviewImg.removeAttribute("src");
+        posterModalDownload.disabled = true;
+        openPosterModal();
         try {
           const hashtags = buildHashtags(payload.LIVE, payload.CATEGORIES);
-          await downloadSharePoster({ vibe: payload.LIVE, hashtags, lang });
+          posterCanvas = await renderSharePoster({ vibe: payload.LIVE, hashtags, lang });
+          posterPreviewImg.src = posterCanvas.toDataURL("image/png");
+          posterPreviewImg.hidden = false;
+          posterModalDownload.disabled = false;
         } finally {
           posterBtn.disabled = false;
-          posterBtn.textContent = "生成竖屏分享海报 (3:4)";
+          posterBtn.title = c.posterShare;
+          posterBtn.setAttribute("aria-label", c.posterShare);
         }
+      });
+      posterModalDownload.addEventListener("click", () => {
+        if (!posterCanvas) return;
+        const code = (payload.LIVE?.archetype?.code || "vibe").toLowerCase();
+        downloadCanvasPng(posterCanvas, `vibe-roast-${code}-3x4.png`);
+      });
+      posterModalClose.addEventListener("click", closePosterModal);
+      posterModalCloseTop.addEventListener("click", closePosterModal);
+      posterModal.addEventListener("click", (event) => {
+        if (event.target === posterModal) closePosterModal();
+      });
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closePosterModal();
       });
 
       function escapeHtml(value) {
@@ -980,14 +1243,23 @@
         const arch = vibe.archetype;
         const tier = vibe.tier;
         const score = Number(vibe.total);
+        const c = copy();
         document.documentElement.style.setProperty("--accent", arch.accent);
         langZh.classList.toggle("is-active", lang === "zh");
         langEn.classList.toggle("is-active", lang === "en");
+        applyChrome();
 
         const srcBits = Object.entries(META.sources || {})
           .map(([k, v]) => `${k} ${v}`)
           .join(" · ");
-        banner.innerHTML = `<b>Live inspect</b> · ${escapeHtml(META.generated_at)} · prompts ${META.prompt_count} · sources ${META.source_count} (${escapeHtml(srcBits)}) · redacted aggregates only`;
+        banner.innerHTML = c.banner(
+          {
+            generated_at: escapeHtml(META.generated_at),
+            prompt_count: META.prompt_count,
+            source_count: META.source_count,
+          },
+          escapeHtml(srcBits),
+        );
 
         const hook = lang === "zh" ? arch.hookZh : arch.hook;
         const blurb = lang === "zh" ? tier.blurbZh : tier.blurb;
@@ -1029,7 +1301,7 @@
             (dim) => `<div class="axis-row">
             <div class="label">${escapeHtml(lang === "zh" ? dim.labelZh : dim.label)}</div>
             <div class="val">${Number(dim.value).toFixed(1)} / ${dim.max}</div>
-            <div class="hint">${escapeHtml(dim.hint)}</div>
+            <div class="hint">${escapeHtml(lang === "zh" ? (dim.hintZh || dim.hint) : dim.hint)}</div>
           </div>`,
           )
           .join("");

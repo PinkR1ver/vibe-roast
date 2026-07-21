@@ -4,12 +4,12 @@
  */
 
 const DIMENSIONS = [
-  { key: "orchestration", label: "Agent orchestration", labelZh: "Agent 编排", max: 20, hint: "Skills · MCP · multi-agent workflow" },
-  { key: "promptCraft", label: "Prompt craft", labelZh: "提示词手艺", max: 18, hint: "Useful intent vs paste dumps" },
-  { key: "build", label: "Build throughput", labelZh: "构建吞吐", max: 18, hint: "Implementation & packaging density" },
-  { key: "debug", label: "Debug resilience", labelZh: "调试韧性", max: 14, hint: "Breakpoint stamina & root-cause chase" },
-  { key: "context", label: "Context discipline", labelZh: "上下文纪律", max: 16, hint: "Window hygiene · no log farming" },
-  { key: "ship", label: "Ship courage", labelZh: "上线勇气", max: 14, hint: "Merge energy vs review paralysis" },
+  { key: "orchestration", label: "Agent orchestration", labelZh: "Agent 编排", max: 20, hint: "Skills · MCP · multi-agent workflow", hintZh: "Skills · MCP · 多智能体工作流" },
+  { key: "promptCraft", label: "Prompt craft", labelZh: "提示词手艺", max: 18, hint: "Useful intent vs paste dumps", hintZh: "有效意图 vs 粘贴倾倒" },
+  { key: "build", label: "Build throughput", labelZh: "构建吞吐", max: 18, hint: "Implementation & packaging density", hintZh: "实现与打包密度" },
+  { key: "debug", label: "Debug resilience", labelZh: "调试韧性", max: 14, hint: "Breakpoint stamina & root-cause chase", hintZh: "断点耐力与根因追踪" },
+  { key: "context", label: "Context discipline", labelZh: "上下文纪律", max: 16, hint: "Window hygiene · no log farming", hintZh: "窗口卫生 · 不刷日志" },
+  { key: "ship", label: "Ship courage", labelZh: "上线勇气", max: 14, hint: "Merge energy vs review paralysis", hintZh: "合并动能 vs review 瘫痪" },
 ];
 
 const TIERS = [
@@ -217,6 +217,7 @@ function buildVibeProfile({ categories = {}, env = {}, summary = {}, promptAnaly
       label: dim.label,
       labelZh: dim.labelZh,
       hint: dim.hint,
+      hintZh: dim.hintZh,
       max: dim.max,
       value: scores[dim.key],
       score: Math.round((scores[dim.key] / dim.max) * 100) / 100,
