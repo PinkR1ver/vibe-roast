@@ -17,9 +17,10 @@ export default function ActivityHeatmap({
     () => buildActivityHeatmap({ prompts, dailyRows, weeks }),
     [prompts, dailyRows, weeks],
   );
-  const cell = dense ? 11 : compact ? 9 : 12;
   const gap = dense ? 2 : compact ? 2 : 3;
-  const labelW = dense ? 18 : compact ? 22 : 28;
+  // Dense roast panels are tall (~220–300px); size cells to fill vertical budget.
+  const cell = dense ? 18 : compact ? 9 : 12;
+  const labelW = dense ? 16 : compact ? 22 : 28;
   const colors = dark ? COLORS_DARK : COLORS_LIGHT;
   const grid = heatmap.weeks || [];
   const totalWidth = Math.max(grid.length * (cell + gap) + labelW, 120);

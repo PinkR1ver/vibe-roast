@@ -206,21 +206,21 @@ export default function ProfileResult({ data, onBack }) {
             </div>
 
             {words.length > 0 && (
-              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-4 py-3 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
                 <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
-                <h2 className="m-0 mb-2 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="h-[168px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
+                <h2 className="m-0 mb-1.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
+                <div className="h-[140px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
                   <WordCloud
-                    words={words.slice(0, 72)}
+                    words={words.slice(0, 80)}
                     width={720}
-                    height={168}
-                    gridSize={4}
-                    weightDivisor={5.4}
-                    rotateRatio={0.1}
-                    minRotation={-0.22}
-                    maxRotation={0.22}
-                    ellipticity={0.82}
-                    minSize={8}
+                    height={140}
+                    gridSize={3}
+                    weightDivisor={4.2}
+                    rotateRatio={0.08}
+                    minRotation={-0.18}
+                    maxRotation={0.18}
+                    ellipticity={0.9}
+                    minSize={7}
                     colors={ROAST_CLOUD_COLORS}
                     fontFamily="Outfit, system-ui, sans-serif"
                   />
@@ -228,14 +228,14 @@ export default function ProfileResult({ data, onBack }) {
               </div>
             )}
 
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-4 py-3 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
-              <h2 className="m-0 mb-1 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-3 text-xs text-[#8b8680]">
+              <h2 className="m-0 mb-0.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
+              <p className="mt-0 mb-2 text-xs text-[#8b8680]">
                 {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
               </p>
 
-              <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
                 <RoastStat
                   label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
                   value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
@@ -258,24 +258,23 @@ export default function ProfileResult({ data, onBack }) {
               </div>
 
               {modelBreakdown.sources.length > 0 && (
-                <div className="mb-3 flex flex-wrap gap-2">
+                <div className="mb-1.5 flex flex-wrap gap-1">
                   {modelBreakdown.sources.slice(0, 4).map((source) => (
                     <div
                       key={source.key}
-                      className="min-w-[108px] flex-1 rounded-xl border border-black/[0.04] bg-[#f7f4ef] px-3 py-2"
+                      className="inline-flex items-baseline gap-1.5 rounded-md border border-black/[0.04] bg-[#f7f4ef] px-2 py-1"
                     >
-                      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{source.key}</div>
-                      <div className="mt-0.5 text-lg font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</div>
-                      <div className="text-[10px] text-[#8b8680]">
-                        {t("profile.stat.modelCount", { count: source.modelCount })}
-                        {isTokenMetric ? ` · ${compactNumber(source.tokens)}` : ""}
-                      </div>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8b8680]">{source.key}</span>
+                      <span className="text-sm font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</span>
+                      {isTokenMetric && (
+                        <span className="text-[9px] text-[#8b8680]">{compactNumber(source.tokens)}</span>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
 
-              <div className="h-[260px] max-h-[280px]">
+              <div className="h-[320px] max-h-[340px]">
                 <ActivityHeatmap3DPanel
                   prompts={data?.prompts || []}
                   activity={activity}
@@ -297,16 +296,16 @@ export default function ProfileResult({ data, onBack }) {
 
 function RoastStat({ label, value, suffix, accent }) {
   return (
-    <div className="rounded-xl bg-[#f7f4ef] px-3 py-2.5">
-      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{label}</div>
-      <div className="mt-1 flex items-baseline gap-1.5">
+    <div className="rounded-lg bg-[#f7f4ef] px-2.5 py-1.5">
+      <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{label}</div>
+      <div className="mt-0.5 flex items-baseline gap-1">
         <span
-          className="font-[JetBrains_Mono,ui-monospace,monospace] text-xl font-extrabold tabular-nums tracking-tight"
+          className="font-[JetBrains_Mono,ui-monospace,monospace] text-lg font-extrabold tabular-nums tracking-tight"
           style={accent ? { color: accent } : undefined}
         >
           {value}
         </span>
-        {suffix && <span className="text-[10px] font-semibold text-[#8b8680]">{suffix}</span>}
+        {suffix && <span className="text-[9px] font-semibold text-[#8b8680]">{suffix}</span>}
       </div>
     </div>
   );

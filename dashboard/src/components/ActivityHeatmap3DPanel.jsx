@@ -123,8 +123,8 @@ export default function ActivityHeatmap3DPanel({
   const resetViewRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const compactShell = roastStyle || showViewToggle;
-  const shellMin = compactShell ? "min-h-[180px]" : "min-h-[240px]";
-  const shellMax = compactShell ? "max-h-[280px]" : "";
+  const shellMin = compactShell ? "min-h-[220px]" : "min-h-[240px]";
+  const shellMax = compactShell ? "max-h-[320px]" : "";
 
   const accent = PALETTE_ACCENTS[activePalette] || PALETTE_ACCENTS.emerald;
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
@@ -383,7 +383,7 @@ export default function ActivityHeatmap3DPanel({
         {viewMode === "2d" ? (
           <div
             className={`flex h-full ${shellMin} ${shellMax} items-center justify-center overflow-x-auto rounded-lg border ${
-              compactShell ? "px-1 py-1" : "px-3 py-4"
+              compactShell ? "p-0" : "px-3 py-4"
             } ${roastStyle ? "border-black/[0.04] bg-[#f7f4ef]" : "border-transparent"}`}
           >
             <ActivityHeatmap

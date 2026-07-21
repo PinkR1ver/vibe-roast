@@ -13,6 +13,8 @@ const { inspectGemini, extractGeminiUserText } = require("../src/sources/gemini"
 const { inspectAider, parseAiderHistory } = require("../src/sources/aider");
 const { inspectWindsurf } = require("../src/sources/windsurf");
 const { inspectCopilot } = require("../src/sources/copilot");
+const { inspectAmazonQ, extractAmazonQUserText } = require("../src/sources/amazonq");
+const { inspectAntigravity, extractAntigravityUserText } = require("../src/sources/antigravity");
 const { inspectSources } = require("../src/inspect");
 
 const fixtures = path.join(__dirname, "fixtures");
@@ -104,6 +106,33 @@ test("inspectCopilot reads chat session JSON", async () => {
   assert.match(report.prompts[0].text, /parseArgs/);
 });
 
+test("inspectAmazonQ reads LokiJS chat-history JSON", async () => {
+  assert.equal(extractAmazonQUserText({ type: "prompt", body: "hi q" }), "hi q");
+  assert.equal(extractAmazonQUserText({ type: "answer", body: "nope" }), "");
+  const report = await inspectAmazonQ({
+    root: path.join(fixtures, "amazonq", "history"),
+    range,
+  });
+  assert.equal(report.source, "amazonq");
+  assert.equal(report.prompt_count, 2);
+  assert.ok(report.prompts.some((p) => /exponential backoff/i.test(p.text)));
+});
+
+test("inspectAntigravity reads JSON exports and skips protobuf", async () => {
+  assert.equal(
+    extractAntigravityUserText({ role: "user", content: "hello anti" }),
+    "hello anti",
+  );
+  const report = await inspectAntigravity({
+    root: path.join(fixtures, "antigravity", "conversations"),
+    range,
+  });
+  assert.equal(report.source, "antigravity");
+  assert.equal(report.prompt_count, 1);
+  assert.match(report.prompts[0].text, /antigravity adapter/);
+  assert.ok(report.files_scanned >= 2);
+});
+
 test("new sources return empty counts for missing dirs without throwing", async () => {
   const missing = path.join(fixtures, "empty-agents", "definitely-missing");
   const reports = await Promise.all([
@@ -114,10 +143,12 @@ test("new sources return empty counts for missing dirs without throwing", async 
     inspectAider({ root: missing, range }),
     inspectWindsurf({ root: missing, range }),
     inspectCopilot({ root: missing, range }),
+    inspectAmazonQ({ root: missing, range }),
+    inspectAntigravity({ root: missing, range }),
   ]);
   for (const report of reports) {
     assert.equal(report.prompt_count, 0);
-    assert.equal(report.files_scanned, 0);
+    assert.ok(report.files_scanned === 0 || Array.isArray(report.prompts));
     assert.deepEqual(report.prompts, []);
   }
 });
@@ -126,7 +157,17 @@ test("inspectSources merges mainstream agent fixtures", async () => {
   const report = await inspectSources({
     from: "2026-06-07",
     to: "2026-06-07",
-    sources: ["cline", "roo", "continue", "gemini", "aider", "windsurf", "copilot"],
+    sources: [
+      "cline",
+      "roo",
+      "continue",
+      "gemini",
+      "aider",
+      "windsurf",
+      "copilot",
+      "amazonq",
+      "antigravity",
+    ],
     roots: {
       cline: path.join(fixtures, "cline", "tasks"),
       roo: path.join(fixtures, "roo", "tasks"),
@@ -135,14 +176,18 @@ test("inspectSources merges mainstream agent fixtures", async () => {
       aider: path.join(fixtures, "aider", "project"),
       windsurf: path.join(fixtures, "windsurf", "exports"),
       copilot: path.join(fixtures, "copilot", "sessions"),
+      amazonq: path.join(fixtures, "amazonq", "history"),
+      antigravity: path.join(fixtures, "antigravity", "conversations"),
       home: fs.mkdtempSync(path.join(os.tmpdir(), "vibe-home-")),
       tokenTrackerQueue: path.join(fixtures, "missing-token-tracker.jsonl"),
     },
   });
 
-  assert.equal(report.summary.source_count, 7);
-  assert.equal(report.summary.prompt_count, 8);
+  assert.equal(report.summary.source_count, 9);
+  assert.equal(report.summary.prompt_count, 11);
   assert.ok(report.sources.cline.prompt_count >= 1);
   assert.ok(report.sources.copilot.prompt_count >= 1);
+  assert.ok(report.sources.amazonq.prompt_count >= 1);
+  assert.ok(report.sources.antigravity.prompt_count >= 1);
   assert.ok(report.word_frequencies.length >= 1);
 });

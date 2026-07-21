@@ -97,10 +97,14 @@ NODE
 | Aider | `aider` | `.aider.chat.history.md` under cwd / `~/projects`… | Markdown history |
 | Windsurf | `windsurf` | `~/.codeium/windsurf` | Plaintext JSON/JSONL only; Cascade `.pb` is encrypted |
 | Copilot Chat | `copilot` | VS Code/Cursor `globalStorage/github.copilot-chat` | Best-effort session JSON |
+| Amazon Q | `amazonq` | `~/.aws/amazonq/history` | LokiJS `chat-history-*.json` (`type: prompt`) |
+| Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` | Plaintext JSON exports only; conversation `.pb` is binary |
 | TokenTracker | _(activity)_ | `~/.tokentracker/tracker/queue.jsonl` | Heatmap tokens when present |
 | Vibe tracker | `vibe-tracker` | `~/.vibe-wrapper/sessions.jsonl` | Optional hook sink |
 
-Override roots with `--codex-root`, `--claude-root`, `--cursor-db`, `--cline-root`, `--roo-root`, `--continue-root`, `--gemini-root`, `--aider-root`, `--windsurf-root`, `--copilot-root`.
+Override roots with `--codex-root`, `--claude-root`, `--cursor-db`, `--cline-root`, `--roo-root`, `--continue-root`, `--gemini-root`, `--aider-root`, `--windsurf-root`, `--copilot-root`, `--amazonq-root`, `--antigravity-root`.
+
+**Not supported (no reliable plaintext session store on this machine / formats):** JetBrains AI Assistant cloud history, ChatGPT desktop (encrypted), Cursor cloud-only threads without local bubbles, Antigravity / Windsurf Cascade protobuf trajectories without a JSON export.
 
 Cursor support is currently best-effort. It reads user `bubbleId` / composer / chat rows from `ItemTable` and `cursorDiskKV` (requires local `sqlite3`). Compact Cursor rows often omit token usage; prompts without timestamps are omitted from date-filtered views.
 
@@ -119,7 +123,7 @@ Coverage for primary + extra session sources:
 | Codex | `test/fixtures/codex/sessions/**/*.jsonl` | JSONL prompt/token parse, date range, inspect + CLI |
 | Claude Code | `test/fixtures/claude/projects/**/*.jsonl` | user-message extract, tokens, inspect + CLI |
 | Cursor | `test/fixtures/cursor/state.vscdb` | SQLite row parse, path resolution, date filter, inspect + CLI |
-| Cline / Roo / Continue / Gemini / Aider / Windsurf / Copilot | `test/fixtures/{cline,roo,continue,gemini,aider,windsurf,copilot}/…` | prompt extract, empty-root safety, multi-source merge |
+| Cline / Roo / Continue / Gemini / Aider / Windsurf / Copilot / Amazon Q / Antigravity | `test/fixtures/{cline,roo,continue,gemini,aider,windsurf,copilot,amazonq,antigravity}/…` | prompt extract, empty-root safety, multi-source merge |
 
 Multi-source `inspectSources` also asserts `profile_signals` and `vibe_profile` (agent score / figure paths) when Codex + Claude + Cursor fixtures are combined. TokenTracker activity uses `test/fixtures/tokentracker/queue.jsonl`.
 

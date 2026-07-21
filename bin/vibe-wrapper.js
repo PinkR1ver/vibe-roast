@@ -51,6 +51,8 @@ async function main(argv) {
       aider: opts.aiderRoot,
       windsurf: opts.windsurfRoot,
       copilot: opts.copilotRoot,
+      amazonq: opts.amazonqRoot,
+      antigravity: opts.antigravityRoot,
       tokenTrackerQueue: opts.tokenTrackerQueue,
     },
   });
@@ -79,6 +81,8 @@ function parseArgs(args) {
     else if (key === "aider-root") opts.aiderRoot = value;
     else if (key === "windsurf-root") opts.windsurfRoot = value;
     else if (key === "copilot-root") opts.copilotRoot = value;
+    else if (key === "amazonq-root") opts.amazonqRoot = value;
+    else if (key === "antigravity-root") opts.antigravityRoot = value;
     else if (key === "token-tracker-queue") opts.tokenTrackerQueue = value;
   }
   return opts;

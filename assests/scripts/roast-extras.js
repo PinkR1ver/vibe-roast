@@ -75,7 +75,7 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   if (!canvas || !words?.length) return;
   const parent = canvas.parentElement;
   const width = Math.max(200, Math.floor(parent?.clientWidth || canvas.clientWidth || 640));
-  const height = Math.max(120, Math.floor(parent?.clientHeight || canvas.clientHeight || 168));
+  const height = Math.max(120, Math.floor(parent?.clientHeight || canvas.clientHeight || 140));
   const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
@@ -89,9 +89,9 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   const max = Math.max(1, Number(words[0]?.count) || 1);
   const palette = [accent, "#c45c26", "#f0c14a", "#23d6a5", "#5b8cff", "#6b6560", "#d97706", "#e07a3a"];
   const placed = [];
-  const shuffled = words.slice(0, 56);
-  const pad = 4;
-  const gap = 2;
+  const shuffled = words.slice(0, 80);
+  const pad = 1;
+  const gap = 0.5;
 
   function collides(x, y, w, h) {
     for (const box of placed) {
@@ -105,17 +105,17 @@ export function renderWordCloud(canvas, words, accent = "#ff5a1f") {
   for (let i = 0; i < shuffled.length; i++) {
     const { term, count } = shuffled[i];
     const weight = Math.max(0, Number(count) || 0) / max;
-    const size = 10 + Math.pow(weight, 0.65) * Math.min(28, height * 0.18);
-    const rotate = i % 9 === 0 ? (i % 2 === 0 ? -0.18 : 0.18) : 0;
+    const size = 8 + Math.pow(weight, 0.55) * Math.min(34, height * 0.28);
+    const rotate = i % 11 === 0 ? (i % 2 === 0 ? -0.16 : 0.16) : 0;
     ctx.font = `700 ${size}px Outfit, system-ui, sans-serif`;
     const tw = ctx.measureText(term).width;
     const th = size;
     let placedOk = false;
-    for (let attempt = 0; attempt < 160; attempt++) {
-      const angle = attempt * 0.42;
-      const radius = 1 + attempt * 1.85;
-      const cx = width / 2 + Math.cos(angle) * radius * (width / Math.max(height, 1)) * 0.62;
-      const cy = height / 2 + Math.sin(angle) * radius * 0.78;
+    for (let attempt = 0; attempt < 220; attempt++) {
+      const angle = attempt * 0.38;
+      const radius = 0.5 + attempt * 1.2;
+      const cx = width / 2 + Math.cos(angle) * radius * (width / Math.max(height, 1)) * 0.52;
+      const cy = height / 2 + Math.sin(angle) * radius * 0.68;
       const x = cx - tw / 2;
       const y = cy + th * 0.32;
       if (x < pad || y < th + pad * 0.25 || x + tw > width - pad || y > height - pad) continue;
@@ -362,9 +362,9 @@ export function renderActivity2D(container, activity, weeks = 52) {
     return;
   }
 
-  const cellSize = 11;
+  const cellSize = 18;
   const cellGap = 2;
-  const labelWidth = 20;
+  const labelWidth = 16;
   const totalWidth = Math.max(weeksData.length * (cellSize + cellGap) + labelWidth, 120);
   const height = 7 * (cellSize + cellGap) + 4;
   const rects = [];
@@ -392,7 +392,7 @@ export function renderActivity2D(container, activity, weeks = 52) {
       <div><span>Peak</span><strong>${peak?.value ? compactNumber(peak.value) : "—"}</strong></div>
       <div><span>Provider</span><strong>${(activity.top_provider || "—").toString().toUpperCase()}</strong></div>
     </div>`;
-  container.innerHTML = `${kpi}<div class="activity-2d-wrap"><svg width="${totalWidth}" height="${height}" role="img" aria-label="2D activity heatmap">${labels}${rects.join("")}</svg></div>`;
+  container.innerHTML = `${kpi}<div class="activity-2d-wrap" style="min-height:230px;align-items:center"><svg width="${totalWidth}" height="${height}" role="img" aria-label="2D activity heatmap">${labels}${rects.join("")}</svg></div>`;
 }
 
 /** Compact activity map with 2D default and optional 3D toggle. */
@@ -404,7 +404,7 @@ export function renderActivityMap(container, activity, weeks = 52, { defaultMode
   const paintBody = (body) => {
     body.classList.remove("is-exit");
     body.classList.add("is-enter");
-    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 196, animate: true });
+    if (mode === "3d") renderActivityIso(body, activity, weeks, { svgHeight: 240, animate: true });
     else renderActivity2D(body, activity, weeks);
   };
 

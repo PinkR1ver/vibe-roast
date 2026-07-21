@@ -1,0 +1,39 @@
+{
+  "filename": "chat-history-fixture.json",
+  "collections": [
+    {
+      "name": "tabs",
+      "data": [
+        {
+          "historyId": "hist-1",
+          "updatedAt": 1780833600000,
+          "title": "Lambda retry",
+          "conversations": [
+            {
+              "conversationId": "conv-1",
+              "clientType": "IDE-VSCode",
+              "messages": [
+                {
+                  "body": "How do I add exponential backoff to this Lambda?",
+                  "type": "prompt"
+                },
+                {
+                  "body": "Use a retry wrapper with jitter.",
+                  "type": "answer"
+                },
+                {
+                  "body": "Show a TypeScript snippet for the backoff helper.",
+                  "type": "prompt"
+                }
+              ]
+            }
+          ],
+          "meta": {
+            "created": 1780830000000,
+            "updated": 1780833600000
+          }
+        }
+      ]
+    }
+  ]
+}

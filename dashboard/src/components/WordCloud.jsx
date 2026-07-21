@@ -44,7 +44,7 @@ export default function WordCloud({
     const measure = () => {
       const rect = el.getBoundingClientRect();
       const w = Math.max(180, Math.floor(rect.width) || widthProp);
-      const h = Math.max(140, Math.floor(rect.height) || heightProp);
+      const h = Math.max(120, Math.floor(rect.height) || heightProp);
       setSize((prev) => (prev.width === w && prev.height === h ? prev : { width: w, height: h }));
     };
 
@@ -86,13 +86,13 @@ export default function WordCloud({
     const weightFactor = (w) => {
       const t = w / max;
       // Soft curve keeps mid-weight terms readable without crushing the top.
-      const px = 11 + Math.pow(t, 0.68) * (span / weightDivisor);
+      const px = 10 + Math.pow(t, 0.62) * (span / weightDivisor);
       return px * dpr;
     };
 
     draw(canvas, {
       list,
-      gridSize: Math.max(4, Math.round(baseGrid * dpr)),
+      gridSize: Math.max(3, Math.round(baseGrid * dpr)),
       weightFactor,
       fontFamily,
       fontWeight: "700",
@@ -136,7 +136,7 @@ export default function WordCloud({
   return (
     <div
       ref={wrapRef}
-      className={`relative flex h-full w-full min-h-[140px] items-center justify-center overflow-hidden ${className}`}
+      className={`relative flex h-full w-full min-h-[120px] items-center justify-center overflow-hidden ${className}`}
     >
       <canvas ref={canvasRef} className="block max-w-full" aria-hidden="true" />
     </div>
