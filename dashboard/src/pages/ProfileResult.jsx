@@ -20,7 +20,7 @@ function compactNumber(value) {
   return `${(n / 1000000000).toFixed(n >= 10000000000 ? 0 : 2)}B`;
 }
 
-export default function ProfileResult({ data, onBack }) {
+export default function ProfileResult({ data }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
   const vibe = data?.vibe_profile;
@@ -42,11 +42,7 @@ export default function ProfileResult({ data, onBack }) {
   if (!vibe) {
     return (
       <div className="min-h-[calc(100vh-49px)] bg-[#f3f1ec] text-[#1a1a1a] px-6 py-10">
-        {onBack && (
-          <button type="button" onClick={onBack} className="text-sm font-semibold text-[#6b6560] mb-6">
-            ← {t("profile.back")}
-          </button>
-        )}
+        <p className="text-sm font-semibold text-[#6b6560] mb-6">{t("profile.heroLabel")}</p>
         <p className="text-[#6b6560]">{t("profile.empty")}</p>
       </div>
     );
@@ -78,17 +74,7 @@ export default function ProfileResult({ data, onBack }) {
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 py-8 pb-20">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#6b6560] hover:text-[#1a1a1a]"
-            >
-              ← {t("profile.back")}
-            </button>
-          ) : (
-            <span className="text-sm font-semibold text-[#6b6560]">{t("profile.heroLabel")}</span>
-          )}
+          <span className="text-sm font-semibold text-[#6b6560]">{t("profile.heroLabel")}</span>
           <button
             type="button"
             onClick={handleSharePoster}

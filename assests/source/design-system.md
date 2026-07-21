@@ -41,11 +41,10 @@ Primary style: classic 16Personalities geometric faceted flat vector (Piotr Antk
 
 ## Product display
 
-- `result.html` places the figure **on a soft abstract stage blob** — not inside a bordered card.
+- Roast Result places the figure **on a soft abstract stage blob** — not inside a bordered card.
 - Figure PNGs use `mix-blend-mode: multiply` so light scene canvases dissolve into the page (no rectangular card chrome).
-- Score / tier / signals sit in a separate frosted `meta-panel` below the figure.
-- `preview.html` / `review.html` show the same freestanding figures (review also keeps legacy SBTI boards for archive).
+- Score / tier / signals sit beside/below the figure in the React Roast Result UI (and optional `live-report.html` export).
 
 ## Preview
 
-Open `preview.html` and `result.html` (picker cycles all 8). Server: `cd assests && python3 -m http.server 8765`.
+Run `npm run serve` and open `http://localhost:7681/` for the live Roast Result. Figures load from `assests/characters/`.

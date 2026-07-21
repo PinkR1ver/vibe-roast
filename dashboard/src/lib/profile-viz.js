@@ -1,36 +1,3 @@
-export const DNA_DIMENSIONS = [
-  { key: "build", categories: ["implementation", "packaging"] },
-  { key: "debug", categories: ["debugging"] },
-  { key: "plan", categories: ["planning", "research"] },
-  { key: "design", categories: ["ui_design", "explanation"] },
-  { key: "quality", categories: ["testing", "refactor"] },
-  { key: "workflow", categories: ["workflow"] },
-];
-
-export function buildDnaDimensions(categories = {}) {
-  const dimensions = DNA_DIMENSIONS.map((dimension) => {
-    const value = dimension.categories.reduce((sum, category) => {
-      return sum + Number(categories[category]?.count || 0);
-    }, 0);
-    return { key: dimension.key, value };
-  });
-  const max = Math.max(...dimensions.map((dimension) => dimension.value), 1);
-
-  return dimensions.map((dimension) => ({
-    ...dimension,
-    score: roundScore(dimension.value / max),
-  }));
-}
-
-export function buildWorldMetrics(env = {}) {
-  return [
-    { key: "skills", value: String(env.skills?.count ?? env.skills?.names?.length ?? 0) },
-    { key: "mcp", value: String(env.mcp_servers?.count ?? env.mcp_servers?.names?.length ?? 0) },
-    { key: "plugins", value: String(env.plugins?.count ?? env.plugins?.names?.length ?? 0) },
-    { key: "model", value: env.config?.model || "default" },
-  ];
-}
-
 export function buildModelBreakdown(activity = {}) {
   const modelTotals = new Map();
   const sourceTotals = new Map();
@@ -79,10 +46,6 @@ export function buildModelBreakdown(activity = {}) {
     models,
     sources,
   };
-}
-
-function roundScore(value) {
-  return Math.round(value * 100) / 100;
 }
 
 function percentOf(value, total) {

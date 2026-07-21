@@ -1,20 +1,21 @@
 # Vibe Wrapper
 
-Local-first vibe coding session analysis: inspect Codex / Claude Code / Cursor / TokenTracker and other mainstream local agents, score an agent profile, and roast it with MBTI-style figures (ghfind-shaped result UX).
+Local-first vibe coding session analysis: inspect Codex / Claude Code / Cursor / TokenTracker and other mainstream local agents, score an agent profile, and **roast** it with MBTI-style figures.
 
-## Quick start (full app)
+The only product UI is **Roast Result** (cream ghfind-like page: figure · score · radar · roast · word cloud · activity heatmap · hashtags · share poster).
+
+## Quick start
 
 ```bash
 npm install
 cd dashboard && npm install && cd ..
-npm run build          # builds dashboard/dist
+npm run build          # builds Roast Result UI → dashboard/dist
 npm run serve          # http://localhost:7681
 ```
 
-- **Roast Result** (default landing): `http://localhost:7681/` — score · tier · radar · roast · word cloud · activity heatmap · `#hashtags` · 竖屏分享海报 (3:4)
-- Dashboard (activity + DNA radar): top nav → **Dashboard**
-- Static live report: `http://localhost:7681/assests/live-report.html`
-- Visual asset demo (static, no inspect): `http://localhost:7681/assests/result.html`
+- **Roast Result**: `http://localhost:7681/`
+- Optional static export: `http://localhost:7681/assests/live-report.html`
+- Character figures / badges / banners: served under `/assests/characters`, `/assests/badges`, `/assests/banners`
 
 Dev mode (API + Vite HMR):
 
@@ -22,21 +23,8 @@ Dev mode (API + Vite HMR):
 # terminal 1
 VIBE_WRAPPER_NO_OPEN=1 npm run serve
 # terminal 2
-cd dashboard && npm run dev   # http://localhost:5173 (proxies /api and /assests)
+npm run dev            # http://localhost:5173 (proxies /api and /assests)
 ```
-
-## Visual pack only (`assests/`)
-
-Static MBTI figures, badges, banners, and the ghfind-like demo page — no Node inspect required:
-
-```bash
-# after npm run serve, or open files directly:
-open assests/result.html      # roast demo with 8 personas
-open assests/preview.html     # figure gallery
-open assests/review.html      # QA board
-```
-
-See [`assests/README.md`](assests/README.md) for the visual pack structure.
 
 ## Inspect Local Sessions
 
@@ -108,7 +96,11 @@ Override roots with `--codex-root`, `--claude-root`, `--cursor-db`, `--cline-roo
 
 Cursor support is currently best-effort. It reads user `bubbleId` / composer / chat rows from `ItemTable` and `cursorDiskKV` (requires local `sqlite3`). Compact Cursor rows often omit token usage; prompts without timestamps are omitted from date-filtered views.
 
-The dashboard activity heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+The Roast Result activity heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+
+## Visual assets (`assests/`)
+
+MBTI figures, badges, and banners used by Roast Result. See [`assests/README.md`](assests/README.md).
 
 ## Testing
 

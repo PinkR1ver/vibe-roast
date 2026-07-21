@@ -17,7 +17,7 @@
     "inspect": "node bin/vibe-wrapper.js inspect",
     "serve": "node bin/vibe-wrapper.js serve",
     "build": "cd dashboard && npm install && npm run build",
-    "dev:dashboard": "cd dashboard && npm run dev",
+    "dev": "cd dashboard && npm run dev",
     "prepack": "npm run build"
   },
   "engines": {
