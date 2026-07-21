@@ -3,9 +3,8 @@ export const LOCALES = ["en", "zh"];
 export const DICTIONARY = {
   en: {
     "app.language": "中文",
-    "app.profileView": "Roast Result",
+    "app.brand": "Vibe Roaster",
 
-    "profile.heroLabel": "Roast Result",
     "profile.empty": "No vibe profile yet — inspect some local sessions first.",
     "profile.radar": "Score radar",
     "profile.sixAxis": "Six-axis / 100",
@@ -73,9 +72,8 @@ export const DICTIONARY = {
   },
   zh: {
     "app.language": "EN",
-    "app.profileView": "Roast 结果",
+    "app.brand": "Vibe Roaster",
 
-    "profile.heroLabel": "Roast 结果",
     "profile.empty": "还没有 vibe 画像——先 inspect 一些本地会话。",
     "profile.radar": "分数雷达",
     "profile.sixAxis": "六维 / 100",

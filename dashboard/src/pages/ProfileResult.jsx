@@ -20,6 +20,50 @@ function compactNumber(value) {
   return `${(n / 1000000000).toFixed(n >= 10000000000 ? 0 : 2)}B`;
 }
 
+function PageChrome({ accent, onShare, posterBusy, t }) {
+  const { toggleLocale } = useLocale();
+
+  return (
+    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+      <h1 className="roast-brand m-0 text-[44px] sm:text-[52px] leading-[0.95] text-[#1a1a1a]">
+        Vibe Roaster
+      </h1>
+      <div className="flex items-center gap-1 pb-1">
+        <button
+          type="button"
+          onClick={toggleLocale}
+          className="h-8 px-2 rounded-lg text-[11px] font-semibold text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors"
+          title="Language"
+        >
+          {t("app.language")}
+        </button>
+        <a
+          href="https://github.com/PinkR1ver/vibe-wrapper"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-2 rounded-lg text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors"
+          aria-label="GitHub"
+        >
+          <svg width="16" height="16" viewBox="0 0 15 15" fill="currentColor">
+            <path d="M7.5.5a7 7 0 0 0-2.21 13.64c.35.06.48-.15.48-.33v-1.16c-1.97.42-2.38-.94-2.38-.94-.33-.82-.8-1.04-.8-1.04-.64-.44.05-.43.05-.43.71.05 1.09.72 1.09.72.64 1.08 1.67.77 2.07.59.06-.46.25-.77.45-.95-1.58-.18-3.24-.78-3.24-3.5 0-.77.28-1.4.73-1.9-.07-.18-.32-.9.07-1.87 0 0 .6-.19 1.95.73A6.8 6.8 0 0 1 7.5 3.9a6.8 6.8 0 0 1 1.78.24c1.35-.92 1.95-.73 1.95-.73.39.97.14 1.69.07 1.87.45.5.73 1.13.73 1.9 0 2.73-1.66 3.32-3.25 3.5.26.22.48.65.48 1.3v1.93c0 .18.13.4.49.33A7 7 0 0 0 7.5.5Z" />
+          </svg>
+        </a>
+        {onShare && (
+          <button
+            type="button"
+            onClick={onShare}
+            disabled={posterBusy}
+            className="ml-1 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_rgba(255,90,31,0.25)] disabled:opacity-60"
+            style={{ background: accent }}
+          >
+            {posterBusy ? t("profile.posterBusy") : t("profile.posterCta")}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProfileResult({ data }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
@@ -41,9 +85,11 @@ export default function ProfileResult({ data }) {
 
   if (!vibe) {
     return (
-      <div className="min-h-[calc(100vh-49px)] bg-[#f3f1ec] text-[#1a1a1a] px-6 py-10">
-        <p className="text-sm font-semibold text-[#6b6560] mb-6">{t("profile.heroLabel")}</p>
-        <p className="text-[#6b6560]">{t("profile.empty")}</p>
+      <div className="min-h-screen bg-[#f3f1ec] text-[#1a1a1a] px-4 py-8">
+        <div className="mx-auto w-full max-w-[1120px]">
+          <PageChrome accent={accent} t={t} />
+          <p className="text-[#6b6560]">{t("profile.empty")}</p>
+        </div>
       </div>
     );
   }
@@ -69,22 +115,16 @@ export default function ProfileResult({ data }) {
 
   return (
     <div
-      className="min-h-[calc(100vh-49px)] bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a]"
+      className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a]"
       style={{ ["--roast-accent"]: accent }}
     >
-      <div className="mx-auto w-full max-w-[1120px] px-4 py-8 pb-20">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-sm font-semibold text-[#6b6560]">{t("profile.heroLabel")}</span>
-          <button
-            type="button"
-            onClick={handleSharePoster}
-            disabled={posterBusy}
-            className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-[0_10px_20px_rgba(255,90,31,0.25)] disabled:opacity-60"
-            style={{ background: accent }}
-          >
-            {posterBusy ? t("profile.posterBusy") : t("profile.posterCta")}
-          </button>
-        </div>
+      <div className="mx-auto w-full max-w-[1120px] px-4 pt-7 pb-20">
+        <PageChrome
+          accent={accent}
+          onShare={handleSharePoster}
+          posterBusy={posterBusy}
+          t={t}
+        />
         {posterError && <p className="mb-4 text-sm text-[#e24b4b]">{posterError}</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] gap-5 items-start min-w-0">
