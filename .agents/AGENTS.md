@@ -1,15 +1,13 @@
 # Vibe Wrapper Agent Notes
 
-Local-first **Roast Result** product: inspect local AI coding sessions (Codex / Claude Code / Cursor / TokenTracker and other adapters), score a six-axis vibe profile, and roast it with MBTI-style figures for social sharing.
+This project is a local-first, playful "vibe coding personality" tool. It analyzes local AI coding session history and produces MBTI-like profile results meant for social sharing.
 
-## Product surface
+Current direction:
+- First milestone is a data access spike, not the final personality engine.
+- Initial sources are Codex, Claude Code, and Cursor local session data.
+- TokenTracker is MIT-licensed and is the primary reference for source discovery and adapter structure.
+- The product should eventually support date-based result generation because a user's vibe coding style changes over time.
 
-- Primary UI: React **Roast Result** (`dashboard/`) — figure · score · radar · roast · word cloud · activity heatmap · hashtags · share poster modal.
-- Optional static export: `assests/live-report.html`.
-- CLI: `vibe-wrapper inspect` / `serve` / `install` (hooks).
-
-## Durable docs
-
-- Keep decisions and completed feature specs under `.agents/`.
-- Keep useful memory notes in `.agents/memory/` (data limits, npm packaging).
-- Do not store secrets or raw private session dumps here.
+Coordination:
+- Keep durable project decisions in `.agents/`.
+- Do not store secrets or raw private session dumps in `.agents/`.
