@@ -1,0 +1,8 @@
+{
+  "sessionId": "sess-1",
+  "dateCreated": "2026-06-07T10:00:00.000Z",
+  "history": [
+    {"message": {"role": "user", "content": "Continue explain this reducer"}},
+    {"message": {"role": "assistant", "content": "This reducer merges state slices."}}
+  ]
+}

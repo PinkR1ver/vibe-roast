@@ -31,23 +31,3 @@ export function useApi(range = {}) {
 
   return { data, loading, error };
 }
-
-export function SkeletonCard({ className = "" }) {
-  return (
-    <div className={`rounded-xl border border-oai-gray-200 dark:border-oai-gray-800 bg-white dark:bg-oai-gray-900 p-5 ${className}`}>
-      <div className="skeleton h-5 w-1/3 mb-4" />
-      <div className="skeleton h-4 w-full mb-2" />
-      <div className="skeleton h-4 w-2/3 mb-2" />
-      <div className="skeleton h-4 w-1/2" />
-    </div>
-  );
-}
-
-export function SkeletonMetric({ className = "" }) {
-  return (
-    <div className={`text-center ${className}`}>
-      <div className="skeleton h-16 w-24 mx-auto mb-2" />
-      <div className="skeleton h-3 w-16 mx-auto" />
-    </div>
-  );
-}

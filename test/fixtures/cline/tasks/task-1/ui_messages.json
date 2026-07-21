@@ -1,0 +1,5 @@
+[
+  {"type":"say","say":"user_feedback","text":"Cline please fix the flaky test","ts":1780826400000},
+  {"type":"say","say":"assistant","text":"Sure, I will investigate.","ts":1780826460000},
+  {"role":"user","content":"Also add a regression guard","ts":1780826520000}
+]

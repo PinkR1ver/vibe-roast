@@ -46,21 +46,24 @@ async function inspectCodex({ root, range } = {}) {
 
 function extractCodexPrompt(obj) {
   const payload = obj?.payload || {};
+  const nested = payload.msg && typeof payload.msg === "object" ? payload.msg : null;
+  const type = String(payload.type || nested?.type || "").toLowerCase();
+  // Codex rollouts mix user / agent / tool / token events — only keep user prompts.
+  if (type !== "user_message") return "";
+
   const candidates = [
     payload.message,
     payload.text,
     payload.input,
-    payload.msg?.message,
-    payload.msg?.text,
-    payload.msg?.input,
-    payload.msg?.content,
+    payload.content,
+    nested?.message,
+    nested?.text,
+    nested?.input,
+    nested?.content,
   ];
   for (const candidate of candidates) {
     const text = normalizeWhitespace(textFromContent(candidate));
     if (text) return text;
-  }
-  if (payload.type === "user_message" && typeof payload.content === "string") {
-    return normalizeWhitespace(payload.content);
   }
   return "";
 }
