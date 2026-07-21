@@ -323,9 +323,7 @@
       }
 
       .cloud-stage {
-        aspect-ratio: 1 / 1;
-        width: 100%;
-        max-height: 380px;
+        height: 140px;
         display: block;
         position: relative;
       }
@@ -337,25 +335,10 @@
       }
 
       .activity-stage {
-        aspect-ratio: 1 / 1;
-        width: 100%;
-        max-height: 380px;
-        min-height: 0;
+        min-height: 280px;
+        max-height: 360px;
         padding: 0;
         position: relative;
-      }
-
-      .viz-row {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 16px;
-        align-items: start;
-      }
-
-      @media (min-width: 768px) {
-        .viz-row {
-          grid-template-columns: 1fr 1fr;
-        }
       }
 
       .activity-view-toggle {
@@ -1024,19 +1007,17 @@
             <div class="roast" id="roast"></div>
           </article>
 
-          <div class="viz-row">
-            <article class="card panel panel-compact">
-              <h2 id="cloudTitle">Word cloud</h2>
-              <p class="sub" id="cloudSub">From inspect word_frequencies</p>
-              <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
-            </article>
+          <article class="card panel panel-compact">
+            <h2 id="cloudTitle">Word cloud</h2>
+            <p class="sub" id="cloudSub">From inspect word_frequencies</p>
+            <div class="cloud-stage"><canvas id="wordCloud"></canvas></div>
+          </article>
 
-            <article class="card panel panel-compact">
-              <h2 id="activityTitle">Activity</h2>
-              <p class="sub" id="activitySub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
-              <div class="activity-stage" id="activityMap"></div>
-            </article>
-          </div>
+          <article class="card panel panel-compact">
+            <h2 id="activityTitle">Activity</h2>
+            <p class="sub" id="activitySub">Emerald heatmap · TokenTracker when available · toggle 3D</p>
+            <div class="activity-stage" id="activityMap"></div>
+          </article>
         </div>
       </section>
 
