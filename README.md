@@ -1,6 +1,30 @@
 # Vibe Wrapper
 
-Local-first spike for reading vibe coding session data from Codex, Claude Code, Cursor, and TokenTracker activity buckets.
+Local-first vibe coding session analysis: inspect Codex / Claude Code / Cursor / TokenTracker and other mainstream local agents, score an agent profile, and **roast** it with MBTI-style figures.
+
+The only product UI is **Roast Result** (cream ghfind-like page: figure · score · radar · roast · word cloud · activity heatmap · hashtags · share poster).
+
+## Quick start
+
+```bash
+npm install
+cd dashboard && npm install && cd ..
+npm run build          # builds Roast Result UI → dashboard/dist
+npm run serve          # http://localhost:7681
+```
+
+- **Roast Result**: `http://localhost:7681/`
+- Optional static export: `http://localhost:7681/assests/live-report.html`
+- Character figures / badges / banners: served under `/assests/characters`, `/assests/badges`, `/assests/banners`
+
+Dev mode (API + Vite HMR):
+
+```bash
+# terminal 1
+VIBE_WRAPPER_NO_OPEN=1 npm run serve
+# terminal 2
+npm run dev            # http://localhost:5173 (proxies /api and /assests)
+```
 
 ## Inspect Local Sessions
 
@@ -8,8 +32,20 @@ Local-first spike for reading vibe coding session data from Codex, Claude Code, 
 npm run inspect -- --from 2026-06-01 --to 2026-06-08 --sources codex,claude,cursor
 ```
 
+Multi-source (primary + best-effort mainstream agents):
+
+```bash
+npm run inspect -- --from 2026-06-01 --to 2026-06-08 \
+  --sources codex,claude,cursor,cline,roo,continue,gemini,aider,windsurf,copilot
+```
+
 The command prints JSON with source counts, prompt counts, token totals where available, TokenTracker-backed activity rows when available, word frequencies, and prompt records.
-It also includes `profile_signals`, which separates useful intent prompts from pasted code/log reference material and reports local Codex setup signals such as skill count, MCP servers, enabled plugins, and custom instructions. Reference material is still analyzed for code/log signals such as languages, file extensions, file paths, and error types.
+It also includes:
+
+- `profile_signals` — useful vs reference prompts, categories, Codex skills/MCP/plugins
+- `vibe_profile` — six-axis agent score (orchestration / prompt craft / build / debug / context / ship), tier, dominant archetype, figure paths, and roast copy
+
+Missing roots are safe: empty directories (or absent agent installs) return zero counts and do not crash.
 
 ## Preview Profile Signals
 
@@ -22,46 +58,71 @@ const { inspectSources } = require('./src/inspect');
     to: '2026-06-08',
     sources: ['codex', 'claude', 'cursor'],
   });
-  const prompt = report.profile_signals.prompt_analysis;
-  const env = report.profile_signals.environment.codex;
   console.log(JSON.stringify({
     summary: report.summary,
-    prompt_counts: {
-      total: prompt.total_prompts,
-      useful: prompt.useful_prompt_count,
-      reference: prompt.reference_prompt_count,
-      useful_ratio: prompt.useful_ratio,
+    vibe_profile: {
+      total: report.vibe_profile.total,
+      tier: report.vibe_profile.tier.id,
+      archetype: report.vibe_profile.archetype.code,
     },
-    categories: Object.fromEntries(
-      Object.entries(prompt.categories)
-        .map(([name, row]) => [name, row.count])
-        .filter(([, count]) => count > 0)
-    ),
-    reference_signals: prompt.reference_summary.signals,
-    environment: {
-      skills: {
-        total: env.skills.count,
-        user: env.skills.user_count,
-        plugin: env.skills.plugin_count,
-        sample: env.skills.names.slice(0, 12),
-      },
-      mcp_servers: env.mcp_servers,
-      plugins_enabled: env.plugins.enabled_count,
-      custom_instructions_chars: env.custom_instructions.char_count,
-    },
-    top_terms: report.word_frequencies.slice(0, 15),
+    top_terms: report.word_frequencies.slice(0, 10),
   }, null, 2));
 })();
 NODE
 ```
 
-Default local sources:
+## Supported sources
 
-- Codex: `~/.codex/sessions`
-- Claude Code: `~/.claude/projects`
-- Cursor: `~/Library/Application Support/Cursor/User/globalStorage/state.vscdb` on macOS
-- TokenTracker activity: `~/.tokentracker/tracker/queue.jsonl`
+| Source | `--sources` id | Default local path | Notes |
+| --- | --- | --- | --- |
+| Codex | `codex` | `~/.codex/sessions` | JSONL rollouts |
+| Claude Code | `claude` | `~/.claude/projects` | Project JSONL |
+| Cursor | `cursor` | Cursor `state.vscdb` (platform path) | Best-effort SQLite (`sqlite3`) |
+| Cline | `cline` | VS Code/Cursor `globalStorage/saoudrizwan.claude-dev/tasks` | `ui_messages.json` |
+| Roo Code | `roo` | VS Code/Cursor `globalStorage/rooveterinaryinc.roo-cline/tasks` | Same task layout as Cline |
+| Continue | `continue` | `~/.continue/sessions` | Session JSON |
+| Gemini CLI | `gemini` | `~/.gemini/tmp/*/chats` | Session JSON |
+| Aider | `aider` | `.aider.chat.history.md` under cwd / `~/projects`… | Markdown history |
+| Windsurf | `windsurf` | `~/.codeium/windsurf` | Plaintext JSON/JSONL only; Cascade `.pb` is encrypted |
+| Copilot Chat | `copilot` | VS Code/Cursor `globalStorage/github.copilot-chat` | Best-effort session JSON |
+| Amazon Q | `amazonq` | `~/.aws/amazonq/history` | LokiJS `chat-history-*.json` (`type: prompt`) |
+| Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` | Plaintext JSON exports only; conversation `.pb` is binary |
+| TokenTracker | _(activity)_ | `~/.tokentracker/tracker/queue.jsonl` | Heatmap tokens when present |
+| Vibe tracker | `vibe-tracker` | `~/.vibe-wrapper/sessions.jsonl` | Optional hook sink |
 
-Cursor support is currently best-effort. It reads user `bubbleId` rows from `cursorDiskKV`, but those compact prompt rows may not include reliable timestamps or token usage.
+Override roots with `--codex-root`, `--claude-root`, `--cursor-db`, `--cline-root`, `--roo-root`, `--continue-root`, `--gemini-root`, `--aider-root`, `--windsurf-root`, `--copilot-root`, `--amazonq-root`, `--antigravity-root`.
 
-The dashboard 3D heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+**Not supported (no reliable plaintext session store on this machine / formats):** JetBrains AI Assistant cloud history, ChatGPT desktop (encrypted), Cursor cloud-only threads without local bubbles, Antigravity / Windsurf Cascade protobuf trajectories without a JSON export.
+
+Cursor support is currently best-effort. It reads user `bubbleId` / composer / chat rows from `ItemTable` and `cursorDiskKV` (requires local `sqlite3`). Compact Cursor rows often omit token usage; prompts without timestamps are omitted from date-filtered views.
+
+The Roast Result activity heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+
+## Visual assets (`assests/`)
+
+MBTI figures, badges, and banners used by Roast Result. See [`assests/README.md`](assests/README.md).
+
+## Testing
+
+```bash
+npm test
+```
+
+Coverage for primary + extra session sources:
+
+| Source | Fixtures | What tests cover |
+| --- | --- | --- |
+| Codex | `test/fixtures/codex/sessions/**/*.jsonl` | JSONL prompt/token parse, date range, inspect + CLI |
+| Claude Code | `test/fixtures/claude/projects/**/*.jsonl` | user-message extract, tokens, inspect + CLI |
+| Cursor | `test/fixtures/cursor/state.vscdb` | SQLite row parse, path resolution, date filter, inspect + CLI |
+| Cline / Roo / Continue / Gemini / Aider / Windsurf / Copilot / Amazon Q / Antigravity | `test/fixtures/{cline,roo,continue,gemini,aider,windsurf,copilot,amazonq,antigravity}/…` | prompt extract, empty-root safety, multi-source merge |
+
+Multi-source `inspectSources` also asserts `profile_signals` and `vibe_profile` (agent score / figure paths) when Codex + Claude + Cursor fixtures are combined. TokenTracker activity uses `test/fixtures/tokentracker/queue.jsonl`.
+
+## Hooks (optional)
+
+```bash
+npm run inspect -- install    # or: node bin/vibe-wrapper.js install
+```
+
+Installs SessionEnd hooks for Claude Code / Codex so token usage lands in `~/.vibe-wrapper/sessions.jsonl`.

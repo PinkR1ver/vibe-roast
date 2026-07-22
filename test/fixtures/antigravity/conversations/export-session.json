@@ -1,0 +1,13 @@
+{
+  "updatedAt": "2026-06-07T12:00:00.000Z",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Refactor the antigravity adapter to skip protobuf files."
+    },
+    {
+      "role": "assistant",
+      "content": "Sure — skip .pb and only parse JSON exports."
+    }
+  ]
+}

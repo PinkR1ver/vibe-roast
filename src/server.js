@@ -5,16 +5,23 @@ const { exec } = require("node:child_process");
 const { inspectSources } = require("./inspect");
 
 const PORT = process.env.PORT === undefined ? 7681 : Number(process.env.PORT);
-const DIST_DIR = path.join(__dirname, "..", "dashboard", "dist");
+const ROOT_DIR = path.join(__dirname, "..");
+const DIST_DIR = path.join(ROOT_DIR, "dashboard", "dist");
+const ASSETS_DIR = path.join(ROOT_DIR, "assests");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
-  ".js": "application/javascript",
-  ".css": "text/css",
+  ".js": "application/javascript; charset=utf-8",
+  ".mjs": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
   ".ico": "image/x-icon",
-  ".json": "application/json",
+  ".json": "application/json; charset=utf-8",
+  ".md": "text/markdown; charset=utf-8",
 };
 
 function parseQuery(url) {
@@ -33,23 +40,13 @@ async function handleApi(req, res) {
   res.end(JSON.stringify(report));
 }
 
-function serveStatic(req, res) {
-  let filePath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
-  filePath = path.join(DIST_DIR, filePath);
-
-  if (!filePath.startsWith(DIST_DIR + path.sep)) {
-    res.writeHead(403);
-    res.end("Forbidden");
-    return;
-  }
-
+function sendFile(filePath, res, { spaFallback = false } = {}) {
   const ext = path.extname(filePath);
   const contentType = MIME[ext] || "application/octet-stream";
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      if (err.code === "ENOENT") {
-        // SPA fallback: serve index.html for unknown routes
+      if (err.code === "ENOENT" && spaFallback) {
         fs.readFile(path.join(DIST_DIR, "index.html"), (err2, data2) => {
           if (err2) {
             res.writeHead(404);
@@ -61,6 +58,11 @@ function serveStatic(req, res) {
         });
         return;
       }
+      if (err.code === "ENOENT") {
+        res.writeHead(404);
+        res.end("Not Found");
+        return;
+      }
       res.writeHead(500);
       res.end("Internal Server Error");
       return;
@@ -70,10 +72,38 @@ function serveStatic(req, res) {
   });
 }
 
+function serveUnderRoot(req, res, rootDir, urlPrefix) {
+  const rawPath = decodeURIComponent(req.url.split("?")[0]);
+  const relative = rawPath.slice(urlPrefix.length) || "index.html";
+  const filePath = path.normalize(path.join(rootDir, relative));
+  if (!filePath.startsWith(rootDir + path.sep) && filePath !== rootDir) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
+  sendFile(filePath, res);
+}
+
+function serveStatic(req, res) {
+  let filePath = req.url === "/" ? "/index.html" : req.url.split("?")[0];
+  filePath = path.join(DIST_DIR, filePath);
+
+  if (!filePath.startsWith(DIST_DIR + path.sep)) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
+
+  sendFile(filePath, res, { spaFallback: true });
+}
+
 function createServer() {
   return http.createServer((req, res) => {
     if (req.url.startsWith("/api/inspect")) {
       return handleApi(req, res);
+    }
+    if (req.url.startsWith("/assests/") || req.url === "/assests") {
+      return serveUnderRoot(req, res, ASSETS_DIR, "/assests");
     }
     serveStatic(req, res);
   });
@@ -94,7 +124,8 @@ function start() {
       const address = server.address();
       const port = typeof address === "object" && address ? address.port : PORT;
       const url = `http://localhost:${port}`;
-      process.stderr.write(`vibe-wrapper dashboard → ${url}\n`);
+      process.stderr.write(`vibe-wrapper roast result → ${url}\n`);
+      process.stderr.write(`static live report      → ${url}/assests/live-report.html\n`);
       openBrowser(url);
       resolve(server);
     });

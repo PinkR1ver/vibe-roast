@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Info, Maximize2, Pause, Play, RotateCcw, Terminal, X } from "lucide-react";
 import ActivityHeatmap3D, { PALETTES } from "./ActivityHeatmap3D.jsx";
+import ActivityHeatmap from "./ActivityHeatmap.jsx";
 import { buildActivityHeatmap } from "../lib/activity-heatmap.js";
 import { useTheme } from "../contexts/ThemeContext.jsx";
 import { useLocale } from "../contexts/LocaleContext.jsx";
@@ -88,14 +89,21 @@ export default function ActivityHeatmap3DPanel({
   activity = null,
   weeks = 20,
   className = "",
+  forceLight = false,
+  defaultPalette = "emerald",
+  roastStyle = false,
+  showViewToggle = false,
+  defaultViewMode,
 }) {
   const { theme } = useTheme();
   const { t } = useLocale();
-  const isDark =
-    theme === "dark" ||
-    (theme === "system" && typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
-  const metric = activity?.daily_rows?.length > 0 ? activity.metric || "tokens" : "prompts";
-  const dailyRows = metric === "tokens" ? activity.daily_rows : null;
+  const isDark = forceLight
+    ? false
+    : theme === "dark" ||
+      (theme === "system" && typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+  const hasDaily = Array.isArray(activity?.daily_rows) && activity.daily_rows.length > 0;
+  const metric = hasDaily ? activity.metric || "tokens" : "prompts";
+  const dailyRows = hasDaily ? activity.daily_rows : null;
   const heatmapWeeks = metric === "tokens" ? Math.max(weeks, 52) : weeks;
   const unitLabel = metric === "tokens" ? t("heatmap.tokens") : t("heatmap.prompts");
   const heatmap = useMemo(
@@ -105,14 +113,38 @@ export default function ActivityHeatmap3DPanel({
   const stats = useMemo(() => calculateStats(heatmap.weeks || [], metric, t), [heatmap.weeks, metric, t]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [activePalette, setActivePalette] = useState("emerald");
+  const [activePalette, setActivePalette] = useState(defaultPalette);
   const [modalAutoRotate, setModalAutoRotate] = useState(false);
+  const [viewMode, setViewMode] = useState(
+    defaultViewMode ?? (showViewToggle || roastStyle ? "2d" : "3d"),
+  );
+  const [viewAnimKey, setViewAnimKey] = useState(0);
+  const [viewTransition, setViewTransition] = useState("in"); // out | in
   const resetViewRef = useRef(null);
+  const transitionTimerRef = useRef(null);
+  const compactShell = roastStyle || showViewToggle;
+  const shellMin = compactShell ? "min-h-[220px]" : "min-h-[240px]";
+  const shellMax = compactShell ? "max-h-[320px]" : "";
 
   const accent = PALETTE_ACCENTS[activePalette] || PALETTE_ACCENTS.emerald;
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
 
   const closeModal = () => setIsClosing(true);
+
+  const switchViewMode = (mode) => {
+    if (mode === viewMode) return;
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    setViewTransition("out");
+    transitionTimerRef.current = setTimeout(() => {
+      setViewMode(mode);
+      setViewAnimKey((k) => k + 1);
+      setViewTransition("in");
+    }, 160);
+  };
+
+  useEffect(() => () => {
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+  }, []);
 
   useEffect(() => {
     if (!isModalOpen || isClosing) return;
@@ -314,32 +346,99 @@ export default function ActivityHeatmap3DPanel({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => {
-          setIsClosing(false);
-          setIsModalOpen(true);
-        }}
-        className={`group relative w-full h-full min-h-[240px] overflow-hidden rounded-lg border border-transparent hover:border-oai-gray-700 transition-all cursor-pointer ${className}`}
-        title={t("heatmap.openTitle")}
-      >
-        <ActivityHeatmap3D
-          prompts={prompts}
-          dailyRows={dailyRows}
-          weeks={heatmapWeeks}
-          interactive={false}
-          autoRotateInit={false}
-          isDark={isDark}
-          palette={activePalette}
-          unitLabel={unitLabel}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-oai-gray-950/20 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2">
-          <span className="text-[10px] bg-white/95 dark:bg-oai-gray-900/95 shadow border border-oai-gray-200/60 dark:border-oai-gray-800/80 px-2.5 py-1 rounded-full font-medium text-oai-gray-500 dark:text-oai-gray-400 flex items-center gap-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200">
-            <Maximize2 size={9} />
-            {t("heatmap.open")}
-          </span>
+      <div className={`relative w-full h-full ${shellMin} ${shellMax} ${className}`}>
+        {showViewToggle && (
+          <div
+            className={`absolute top-1.5 right-1.5 z-20 flex items-center gap-0.5 rounded-full p-0.5 text-[10px] font-bold ${
+              roastStyle
+                ? "border border-black/5 bg-[#fffcf7]/95 text-[#6b6560]"
+                : "border border-oai-gray-200/70 bg-white/90 text-oai-gray-500 dark:border-oai-gray-800 dark:bg-oai-gray-900/90 dark:text-oai-gray-400"
+            }`}
+          >
+            {["2d", "3d"].map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => switchViewMode(mode)}
+                className={`rounded-full px-2.5 py-1 uppercase tracking-wide transition-colors ${
+                  viewMode === mode
+                    ? roastStyle
+                      ? "bg-emerald-500 text-white"
+                      : "bg-emerald-500/90 text-white"
+                    : "hover:text-emerald-600"
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div
+          key={`${viewMode}-${viewAnimKey}`}
+          className={`h-full w-full ${shellMin} ${shellMax} ${
+            viewTransition === "out" ? "heatmap-view-exit" : "heatmap-view-enter"
+          }`}
+        >
+        {viewMode === "2d" ? (
+          <div
+            className={`flex h-full ${shellMin} ${shellMax} items-center justify-center overflow-x-auto rounded-lg border ${
+              compactShell ? "p-0" : "px-3 py-4"
+            } ${roastStyle ? "border-black/[0.04] bg-[#f7f4ef]" : "border-transparent"}`}
+          >
+            <ActivityHeatmap
+              prompts={prompts}
+              dailyRows={dailyRows}
+              weeks={heatmapWeeks}
+              dark={isDark}
+              compact={false}
+              dense={compactShell}
+            />
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setIsClosing(false);
+              setIsModalOpen(true);
+            }}
+            className={`group relative w-full h-full ${shellMin} ${shellMax} overflow-hidden rounded-lg border transition-all cursor-pointer ${
+              roastStyle
+                ? "border-black/[0.04] bg-[#f7f4ef] hover:border-[color-mix(in_srgb,var(--roast-accent,#ff5a1f)_35%,#e4dfd6)]"
+                : "border-transparent hover:border-oai-gray-700"
+            }`}
+            title={t("heatmap.openTitle")}
+          >
+            <ActivityHeatmap3D
+              prompts={prompts}
+              dailyRows={dailyRows}
+              weeks={heatmapWeeks}
+              interactive={false}
+              autoRotateInit={false}
+              isDark={isDark}
+              palette={activePalette}
+              unitLabel={unitLabel}
+            />
+            <div
+              className={`absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center pb-2 ${
+                roastStyle ? "bg-gradient-to-t from-[#f3f1ec]/70 to-transparent" : "bg-gradient-to-t from-oai-gray-950/20 to-transparent"
+              }`}
+            >
+              <span
+                className={`text-[10px] shadow px-2.5 py-1 rounded-full font-medium flex items-center gap-1 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-200 ${
+                  roastStyle
+                    ? "bg-[#fffcf7]/95 border border-black/5 text-[#6b6560]"
+                    : "bg-white/95 dark:bg-oai-gray-900/95 border border-oai-gray-200/60 dark:border-oai-gray-800/80 text-oai-gray-500 dark:text-oai-gray-400"
+                }`}
+              >
+                <Maximize2 size={9} />
+                {t("heatmap.open")}
+              </span>
+            </div>
+          </button>
+        )}
         </div>
-      </button>
+      </div>
       {modal}
     </>
   );

@@ -1,0 +1,8 @@
+{
+  "sessionId": "gemini-1",
+  "lastUpdated": "2026-06-07T11:00:00.000Z",
+  "messages": [
+    {"type": "user", "content": "Gemini draft a migration plan", "timestamp": "2026-06-07T11:00:00.000Z"},
+    {"type": "gemini", "content": "Here is a staged migration plan.", "timestamp": "2026-06-07T11:01:00.000Z"}
+  ]
+}

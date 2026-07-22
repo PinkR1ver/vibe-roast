@@ -9,6 +9,7 @@
     "bin/",
     "src/",
     "dashboard/dist/",
+    "assests/",
     "README.md"
   ],
   "scripts": {
@@ -16,6 +17,7 @@
     "inspect": "node bin/vibe-wrapper.js inspect",
     "serve": "node bin/vibe-wrapper.js serve",
     "build": "cd dashboard && npm install && npm run build",
+    "dev": "cd dashboard && npm run dev",
     "prepack": "npm run build"
   },
   "engines": {
