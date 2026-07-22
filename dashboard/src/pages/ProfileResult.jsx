@@ -212,6 +212,7 @@ export default function ProfileResult({ data }) {
   const tldr = zh ? vibe.tldrZh : vibe.tldr;
   const tierBlurb = zh ? vibe.tier.blurbZh : vibe.tier.blurb;
   const hook = zh ? vibe.archetype.hookZh : vibe.archetype.hook;
+  const personalityTitle = zh ? (vibe.archetype.titleZh || vibe.archetype.title) : vibe.archetype.title;
 
   async function handleSharePoster() {
     setPosterBusy(true);
@@ -266,7 +267,12 @@ export default function ProfileResult({ data }) {
               />
               <img
                 src={vibe.figure}
-                alt={vibe.archetype.title}
+                alt={personalityTitle}
+                onError={(event) => {
+                  if (vibe.figure_fallback && event.currentTarget.src !== new URL(vibe.figure_fallback, window.location.href).href) {
+                    event.currentTarget.src = vibe.figure_fallback;
+                  }
+                }}
                 width={384}
                 height={512}
                 className="relative z-[1] mx-auto h-auto w-[88%] max-w-[280px] object-contain drop-shadow-[0_18px_28px_rgba(40,28,12,0.12)]"
@@ -274,7 +280,7 @@ export default function ProfileResult({ data }) {
             </div>
             <p className="m-0 text-[13px] font-bold tracking-wide text-[#6b6560]">@{vibe.archetype.code.toLowerCase()}</p>
             <h1 className="mt-1 mb-1 text-[28px] font-extrabold tracking-tight" style={{ color: accent }}>
-              {vibe.archetype.title}
+              {personalityTitle}
             </h1>
             <p className="m-0 text-sm font-semibold text-[#6b6560]">{hook}</p>
 
@@ -298,22 +304,23 @@ export default function ProfileResult({ data }) {
             <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <div className="font-[JetBrains_Mono,ui-monospace,monospace] text-[42px] font-bold leading-none tracking-tight">
-                    {Number(vibe.total).toFixed(1)}
-                    <span className="ml-1 text-base font-semibold text-[#6b6560]">/ 100</span>
+                  <div className="font-[JetBrains_Mono,ui-monospace,monospace] text-[42px] font-bold leading-none tracking-[0.08em]">
+                    {vibe.type_code || vibe.archetype.code}
                   </div>
                   <div className="mt-2 text-sm font-bold" style={{ color: vibe.tier.color }}>
-                    {vibe.tier.emoji} {vibe.tier.id}
+                    {vibe.tier.emoji} {vibe.confidence}% {zh ? "类型置信度" : "TYPE CONFIDENCE"}
                   </div>
                   <p className="mt-1 mb-0 text-sm text-[#6b6560]">{tierBlurb}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2 text-center">
                   {vibe.signals.map((signal) => (
-                    <div key={signal.label} className="min-w-[88px] rounded-xl bg-[#f3f1ec] px-2.5 py-2">
+                    <div key={signal.label} className="min-w-0 rounded-xl bg-[#f3f1ec] px-2.5 py-2">
                       <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6b6560]">
                         {zh ? signal.labelZh : signal.label}
                       </div>
-                      <div className="mt-1 text-sm font-bold tabular-nums">{signal.value}</div>
+                      <div className="mt-1 break-words text-sm font-bold leading-tight tabular-nums" title={signal.value}>
+                        {signal.value}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -333,17 +340,17 @@ export default function ProfileResult({ data }) {
               </div>
 
               <div className="min-w-0 rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-4 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.axes")}</h2>
+                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{zh ? "四维类型" : "TYPE AXES"}</h2>
                 <div className="space-y-2.5">
-                  {vibe.dimensions.map((dim) => (
-                    <div key={dim.key} className="flex items-start justify-between gap-3 min-w-0">
-                      <div className="min-w-0">
-                        <div className="text-sm font-bold">{zh ? dim.labelZh : dim.label}</div>
-                        <div className="text-[11px] text-[#8b8680] break-words">{zh ? (dim.hintZh || dim.hint) : dim.hint}</div>
+                  {(vibe.type_axes || []).map((axis) => (
+                    <div key={axis.key} className="min-w-0">
+                      <div className="mb-1 flex justify-between gap-2 text-xs font-bold">
+                        <span style={{ color: axis.letter === axis.left.code ? accent : undefined }}>{axis.left.code} · {zh ? axis.left.labelZh : axis.left.label} {axis.left.percent}%</span>
+                        <span style={{ color: axis.letter === axis.right.code ? accent : undefined }}>{axis.right.percent}% {axis.right.code} · {zh ? axis.right.labelZh : axis.right.label}</span>
                       </div>
-                      <div className="shrink-0 whitespace-nowrap font-[JetBrains_Mono,ui-monospace,monospace] text-sm font-bold tabular-nums" style={{ color: accent }}>
-                        {Number(dim.value).toFixed(1)}
-                        <span className="text-[#8b8680]">/{dim.max}</span>
+                      <div className="flex h-2 overflow-hidden rounded-full bg-[#e8e4db]">
+                        <div style={{ width: `${axis.left.percent}%`, background: accent }} />
+                        <div className="bg-[#d6d0c6]" style={{ width: `${axis.right.percent}%` }} />
                       </div>
                     </div>
                   ))}

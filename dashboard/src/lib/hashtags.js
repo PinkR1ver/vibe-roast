@@ -103,12 +103,12 @@ export function buildHashtags(vibe, categories = {}, opts = {}) {
   if (arch.code && CODE_TAGS[arch.code]) {
     push(pickLocale(CODE_TAGS[arch.code], zh));
   } else if (arch.code) {
-    push(pascalCase(arch.code));
+    push(/^[MA][OP][VS][FX]$/.test(arch.code) ? arch.code : pascalCase(arch.code));
   }
 
   const tierId = vibe?.tier?.id;
-  if (tierId && TIER_TAGS[tierId]) push(pickLocale(TIER_TAGS[tierId], zh));
-  else if (tierId) push(tierId);
+  if (!vibe?.type_code && tierId && TIER_TAGS[tierId]) push(pickLocale(TIER_TAGS[tierId], zh));
+  else if (!vibe?.type_code && tierId) push(tierId);
 
   const ranked = Object.keys(CATEGORY_TAGS)
     .map((key) => [key, categoryCount(categories, key)])

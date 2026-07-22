@@ -1,0 +1,22 @@
+{
+  "version": "vibe-types-v1",
+  "display": "freestanding-figure-no-card-frame",
+  "profiles": [
+    { "code": "MOVF", "folder": "movf-agent-engineer", "name": "agent-engineer", "label": "Agent Engineer" },
+    { "code": "MOVX", "folder": "movx-systems-wrangler", "name": "systems-wrangler", "label": "Systems Wrangler" },
+    { "code": "MOSF", "folder": "mosf-yolo-shipper", "name": "yolo-shipper", "label": "YOLO Shipper" },
+    { "code": "MOSX", "folder": "mosx-agent-commander", "name": "agent-commander", "label": "Agent Commander" },
+    { "code": "MPVF", "folder": "mpvf-debugger", "name": "debugger", "label": "Debugger" },
+    { "code": "MPVX", "folder": "mpvx-context-maxxer", "name": "context-maxxer", "label": "Context Maxxer" },
+    { "code": "MPSF", "folder": "mpsf-builder", "name": "builder", "label": "Builder" },
+    { "code": "MPSX", "folder": "mpsx-tab-hoarder", "name": "tab-hoarder", "label": "Tab Hoarder" },
+    { "code": "AOVF", "folder": "aovf-systems-architect", "name": "systems-architect", "label": "Systems Architect" },
+    { "code": "AOVX", "folder": "aovx-context-cartographer", "name": "context-cartographer", "label": "Context Cartographer" },
+    { "code": "AOSF", "folder": "aosf-strategy-shipper", "name": "strategy-shipper", "label": "Strategy Shipper" },
+    { "code": "AOSX", "folder": "aosx-agent-believer", "name": "agent-believer", "label": "Agent Believer" },
+    { "code": "APVF", "folder": "apvf-architect", "name": "architect", "label": "Architect" },
+    { "code": "APVX", "folder": "apvx-prompt-priest", "name": "prompt-priest", "label": "Prompt Priest" },
+    { "code": "APSF", "folder": "apsf-diagram-sprinter", "name": "diagram-sprinter", "label": "Diagram Sprinter" },
+    { "code": "APSX", "folder": "apsx-infinite-planner", "name": "infinite-planner", "label": "Infinite Planner" }
+  ]
+}

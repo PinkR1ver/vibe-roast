@@ -30,6 +30,8 @@ function summarizeActivity(activity = {}) {
   let currentStreak = 0;
   let peakDay = { day: null, value: 0 };
   const sourceTotals = new Map();
+  const providerTotals = new Map();
+  const modelTotals = new Map();
 
   let prevDay = null;
   for (const row of rows) {
@@ -50,6 +52,15 @@ function summarizeActivity(activity = {}) {
     for (const [source, raw] of Object.entries(row.sources || {})) {
       sourceTotals.set(source, (sourceTotals.get(source) || 0) + number(raw));
     }
+    for (const [key, raw] of Object.entries(row.models || {})) {
+      const value = number(raw);
+      if (!value) continue;
+      const model = modelFromKey(key);
+      if (!isConcreteModel(model)) continue;
+      modelTotals.set(model, (modelTotals.get(model) || 0) + value);
+      const provider = inferModelProvider(model);
+      if (provider) providerTotals.set(provider, (providerTotals.get(provider) || 0) + value);
+    }
   }
 
   if (!totalValue && number(activity.total_tokens)) {
@@ -59,7 +70,9 @@ function summarizeActivity(activity = {}) {
     activeDays = number(activity.active_day_count);
   }
 
-  const topProvider = [...sourceTotals.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+  const topAgent = topKey(sourceTotals);
+  const topProvider = topKey(providerTotals);
+  const topModel = topKey(modelTotals);
   const metric = activity.metric || (totalValue > 0 && activity.source === "token-tracker" ? "tokens" : "prompts");
   const spanDays = rows.length > 0
     ? Math.max(1, daysBetween(rows[0].day, rows[rows.length - 1].day) + 1)
@@ -72,12 +85,61 @@ function summarizeActivity(activity = {}) {
     activeDays,
     maxStreak,
     peakDay,
+    topAgent,
     topProvider,
+    topModel,
     activeRate,
     estimatedCostUsd: activity.estimated_cost_usd == null || activity.estimated_cost_usd === ""
       ? null
       : (Number.isFinite(Number(activity.estimated_cost_usd)) ? Number(activity.estimated_cost_usd) : null),
   };
+}
+
+function topKey(totals) {
+  return [...totals.entries()]
+    .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))[0]?.[0] || null;
+}
+
+function modelFromKey(key) {
+  const [, ...modelParts] = String(key || "").split("/");
+  return (modelParts.join("/") || String(key || "")).trim();
+}
+
+function isConcreteModel(model) {
+  const normalized = String(model || "").trim().toLowerCase();
+  return Boolean(normalized) && !["auto", "unknown", "default", "other", "n/a"].includes(normalized);
+}
+
+function inferModelProvider(model) {
+  const value = String(model || "").trim().toLowerCase();
+  if (!isConcreteModel(value)) return null;
+  if (/(^|[-_/.])(gpt|chatgpt|codex|o[1-9])([-_/.]|$)/.test(value)) return "OpenAI";
+  if (/(claude|sonnet|opus|haiku)/.test(value)) return "Anthropic";
+  if (/(gemini|gemma)/.test(value)) return "Google";
+  if (/deepseek/.test(value)) return "DeepSeek";
+  if (/grok/.test(value)) return "xAI";
+  if (/(qwen|qwq)/.test(value)) return "Alibaba";
+  if (/llama/.test(value)) return "Meta";
+  if (/(mistral|mixtral|codestral)/.test(value)) return "Mistral";
+  if (/(command-r|cohere)/.test(value)) return "Cohere";
+  if (/(kimi|moonshot)/.test(value)) return "Moonshot";
+  if (/(glm|zhipu)/.test(value)) return "Zhipu";
+  if (/(ernie|baidu)/.test(value)) return "Baidu";
+  if (/(doubao|seed-code)/.test(value)) return "ByteDance";
+  if (/minimax/.test(value)) return "MiniMax";
+  if (/(nova|amazon)/.test(value)) return "Amazon";
+  if (/(phi[-_.]|^phi$)/.test(value)) return "Microsoft";
+  if (/composer/.test(value)) return "Cursor";
+  return null;
+}
+
+function formatModelName(model) {
+  return String(model || "")
+    .replace(/^gpt(?=[-_.]|$)/i, "GPT")
+    .replace(/^claude(?=[-_.]|$)/i, "Claude")
+    .replace(/^gemini(?=[-_.]|$)/i, "Gemini")
+    .replace(/^deepseek(?=[-_.]|$)/i, "DeepSeek")
+    .replace(/^grok(?=[-_.]|$)/i, "Grok");
 }
 
 function consecutiveDays(prev, next) {
@@ -116,13 +178,29 @@ function buildActivitySignals({ activity = {}, summary = {}, categories = {} } =
     const cost = formatUsd(stats.estimatedCostUsd);
     if (cost) {
       signals.push({ label: "Est. cost", labelZh: "估算费用", value: cost });
-    } else if (stats.topProvider) {
+    }
+    if (stats.topAgent) {
+      signals.push({
+        label: "Top agent",
+        labelZh: "主 Agent",
+        value: String(stats.topAgent).toUpperCase(),
+      });
+    }
+    if (stats.topProvider) {
       signals.push({
         label: "Top provider",
-        labelZh: "主平台",
-        value: String(stats.topProvider).toUpperCase(),
+        labelZh: "主供应商",
+        value: stats.topProvider,
       });
-    } else {
+    }
+    if (stats.topModel) {
+      signals.push({
+        label: "Top model",
+        labelZh: "主模型",
+        value: formatModelName(stats.topModel),
+      });
+    }
+    if (signals.length === 2) {
       signals.push({
         label: "Peak day",
         labelZh: "峰值日",
@@ -150,6 +228,7 @@ function buildActivitySignals({ activity = {}, summary = {}, categories = {} } =
 module.exports = {
   compactNumber,
   formatUsd,
+  inferModelProvider,
   summarizeActivity,
   buildActivitySignals,
 };

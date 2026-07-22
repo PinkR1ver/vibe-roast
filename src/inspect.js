@@ -135,7 +135,9 @@ function enrichActivity(activity) {
     peak_day: stats.peakDay.day
       ? { day: stats.peakDay.day, value: stats.peakDay.value }
       : null,
+    top_agent: stats.topAgent,
     top_provider: stats.topProvider,
+    top_model: stats.topModel,
     active_rate: stats.activeRate,
     estimated_cost_usd: parseOptionalCost(activity.estimated_cost_usd),
   };

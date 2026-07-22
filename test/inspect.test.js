@@ -79,11 +79,12 @@ test("inspectSources builds vibe_profile from multi-source prompts", async () =>
 
   const vibe = report.vibe_profile;
   assert.ok(vibe);
-  assert.ok(Number.isFinite(vibe.total));
-  assert.ok(vibe.tier?.id);
-  assert.ok(vibe.archetype?.id);
-  assert.match(vibe.figure, /^\/assests\/characters\/.+-figure\.png$/);
-  assert.match(vibe.badge, /^\/assests\/badges\/.+-badge\.svg$/);
+  assert.ok(Number.isFinite(vibe.confidence));
+  assert.match(vibe.type_code, /^[MA][OP][VS][FX]$/);
+  assert.equal(vibe.type_axes.length, 4);
+  assert.ok(vibe.personality?.id);
+  assert.match(vibe.figure, /^\/assests\/characters-vibe-types\/.+-figure\.png$/);
+  assert.equal(vibe.badge, null);
   assert.equal(vibe.dimensions.length, 6);
   assert.ok(!vibe.signals.some((signal) => signal.label === "Useful prompts"));
   assert.equal(
@@ -482,7 +483,8 @@ test("analyzePrompts separates useful intent from pasted code and logs", () => {
   assert.equal(analysis.total_prompts, 4);
   assert.equal(analysis.useful_prompt_count, 2);
   assert.equal(analysis.reference_prompt_count, 2);
-  assert.equal(analysis.categories.debugging.count, 1);
+  assert.equal(analysis.categories.debugging.count, 0.5);
+  assert.equal(analysis.categories.testing.count, 0.5);
   assert.equal(analysis.categories.planning.count, 1);
   assert.ok(analysis.useful_prompts.some((p) => p.text.includes("回归测试")));
 });

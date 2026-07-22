@@ -1,6 +1,6 @@
 # Feature Specs
 
-Last synchronized: 2026-07-22
+Last synchronized: 2026-07-23
 
 ## Current product line
 
@@ -9,6 +9,7 @@ Last synchronized: 2026-07-22
 | Vibe Roaster release and mainstream adapters | completed | `vibe-roaster-release.md` |
 | Profile signal extractor | completed | `profile-signal-extractor.md` |
 | TokenTracker queue activity adapter | completed | `token-tracker-queue-activity.md` |
+| Four-axis sixteen-type personality engine | completed | `vibe-type-personality-engine.md` |
 | npm release entrypoint | completed | `../memory/npm-release-entrypoint.md` |
 
 ## Historical foundation

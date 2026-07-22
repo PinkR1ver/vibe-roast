@@ -20,6 +20,8 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
   const usefulForStats = [];
   const referencePrompts = [];
   let usefulCount = 0;
+  let usefulCharacterCount = 0;
+  let longPromptCount = 0;
 
   for (const prompt of prompts || []) {
     const text = String(prompt?.text || "").trim();
@@ -31,21 +33,26 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
       timestamp: prompt.timestamp || null,
       text,
       category: classification.category,
+      categories: classification.categories,
       usefulness: classification.usefulness,
       reasons: classification.reasons,
     };
 
-    const bucket = categories[classification.category] || categories.reference;
-    bucket.count += 1;
-    if (bucket.examples.length < 3) {
-      bucket.examples.push(preview(entry));
-    }
-
     if (classification.useful) {
       usefulCount += 1;
+      usefulCharacterCount += text.length;
+      if (text.length >= 600) longPromptCount += 1;
+      const weight = 1 / classification.categories.length;
+      for (const category of classification.categories) {
+        const bucket = categories[category];
+        bucket.count = Number((bucket.count + weight).toFixed(4));
+        if (bucket.examples.length < 3) bucket.examples.push(preview(entry));
+      }
       usefulForStats.push({ text: entry.text, source: entry.source, timestamp: entry.timestamp });
       if (usefulPrompts.length < usefulLimit) usefulPrompts.push(entry);
     } else {
+      categories.reference.count += 1;
+      if (categories.reference.examples.length < 3) categories.reference.examples.push(preview(entry));
       referencePrompts.push(entry);
     }
   }
@@ -56,6 +63,10 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
     reference_prompt_count: referencePrompts.length,
     useful_ratio:
       prompts && prompts.length > 0 ? Number((usefulCount / prompts.length).toFixed(4)) : 0,
+    average_useful_prompt_chars:
+      usefulCount > 0 ? Math.round(usefulCharacterCount / usefulCount) : 0,
+    long_prompt_ratio:
+      usefulCount > 0 ? Number((longPromptCount / usefulCount).toFixed(4)) : 0,
     categories,
     useful_prompts: usefulPrompts,
     useful_for_stats: usefulForStats,
@@ -73,6 +84,7 @@ function classifyPrompt(text) {
       useful: false,
       usefulness: "reference",
       category: "reference",
+      categories: ["reference"],
       reasons: ["system_or_tool_noise"],
     };
   }
@@ -82,6 +94,7 @@ function classifyPrompt(text) {
       useful: false,
       usefulness: "reference",
       category: "reference",
+      categories: ["reference"],
       reasons: ["looks_like_error_or_log"],
     };
   }
@@ -92,6 +105,7 @@ function classifyPrompt(text) {
       useful: false,
       usefulness: "reference",
       category: "reference",
+      categories: ["reference"],
       reasons: ["looks_like_pasted_code"],
     };
   }
@@ -106,11 +120,12 @@ function classifyPrompt(text) {
     };
   }
 
-  const category = inferCategory(normalized);
+  const categories = inferCategories(normalized);
   return {
     useful: true,
     usefulness: "high",
-    category,
+    category: categories[0],
+    categories,
     reasons: ["contains_user_intent"],
   };
 }
@@ -136,23 +151,23 @@ function hasSubstantialUserIntent(text) {
   return hasIntentVerb(stripped.toLowerCase()) || /[\p{Script=Han}]{2,}/u.test(stripped);
 }
 
-function inferCategory(text) {
-  if (/(方案|计划|设计|架构|先不要写代码|brainstorm|plan|design|architecture)/i.test(text)) {
-    return "planning";
+function inferCategories(text) {
+  const rules = [
+    ["planning", /(方案|计划|架构|先不要写代码|brainstorm|plan|architecture)/i],
+    ["debugging", /(bug|报错|错误|失败|修复|debug|error|exception|traceback|syntaxerror)/i],
+    ["testing", /(测试|test|spec|回归|覆盖率|断言)/i],
+    ["refactor", /(重构|refactor|抽象|拆分|整理)/i],
+    ["packaging", /(打包|发布|npm|xpi|release|publish|build)/i],
+    ["explanation", /(解释|为什么|讲一下|说明|explain|why)/i],
+    ["research", /(查找|调研|搜索|资料|文档|research|search|look up)/i],
+    ["ui_design", /(页面|布局|组件|交互|视觉|按钮|ui|ux|style|css|design)/i],
+    ["workflow", /(workflow|流程|自动化|hook|mcp|skill|agent|instructions|system prompt)/i],
+  ];
+  const matched = rules.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
+  if (/(实现|编写|创建|新增|修改|开发|implement|create|add|write|code|update|build)/i.test(text)) {
+    matched.push("implementation");
   }
-  if (/(bug|报错|错误|失败|修复|debug|error|exception|traceback|syntaxerror)/i.test(text)) {
-    return "debugging";
-  }
-  if (/(测试|test|spec|回归|覆盖率|断言)/i.test(text)) return "testing";
-  if (/(重构|refactor|抽象|拆分|整理)/i.test(text)) return "refactor";
-  if (/(打包|发布|npm|xpi|release|publish|build)/i.test(text)) return "packaging";
-  if (/(解释|为什么|讲一下|说明|explain|why)/i.test(text)) return "explanation";
-  if (/(查找|调研|搜索|资料|文档|research|search|look up)/i.test(text)) return "research";
-  if (/(页面|布局|组件|交互|视觉|按钮|ui|ux|style|css)/i.test(text)) return "ui_design";
-  if (/(workflow|流程|自动化|hook|mcp|skill|agent|instructions|system prompt)/i.test(text)) {
-    return "workflow";
-  }
-  return "implementation";
+  return [...new Set(matched.length > 0 ? matched : ["implementation"])];
 }
 
 function hasIntentVerb(text) {
@@ -345,4 +360,4 @@ function mapToObject(map) {
   );
 }
 
-module.exports = { analyzePrompts, classifyPrompt };
+module.exports = { analyzePrompts, classifyPrompt, inferCategories };

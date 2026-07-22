@@ -42,6 +42,7 @@ Prompt adapters return a report shaped like:
 
 - Local Codex/Claude logs do not provide reliable per-message token attribution. Their token totals must not be presented as token usage for an individual prompt.
 - If TokenTracker has rows in range, `report.activity.metric` is `tokens` and the heatmap/model breakdown use daily TokenTracker totals.
+- Token activity distinguishes three rankings: `top_agent` comes from TokenTracker source totals (Cursor/Codex/etc.); `top_provider` is inferred from concrete model names (OpenAI/Anthropic/etc.); `top_model` is the highest-token concrete model. Generic `auto`/`unknown` model buckets count toward Agent totals but are excluded from Provider and Model rankings.
 - Otherwise `report.activity.metric` is `prompts`; daily values come only from prompts with timestamps, `total_tokens` remains zero, and UI copy must say prompts rather than tokens.
 - Date filters apply to both adapter prompts and TokenTracker buckets. Cursor rows without timestamps can appear in all-time prompt totals but cannot be placed on a day.
 

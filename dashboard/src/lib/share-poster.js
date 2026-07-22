@@ -106,7 +106,13 @@ export async function renderSharePoster({ vibe, hashtags = [], locale = "en", wi
 
   let figureY = pad + 56;
   try {
-    const img = await loadImage(vibe.figure);
+    let img;
+    try {
+      img = await loadImage(vibe.figure);
+    } catch (error) {
+      if (!vibe.figure_fallback) throw error;
+      img = await loadImage(vibe.figure_fallback);
+    }
     const maxW = width * 0.58;
     const maxH = height * 0.42;
     const scale = Math.min(maxW / img.width, maxH / img.height);
@@ -122,15 +128,14 @@ export async function renderSharePoster({ vibe, hashtags = [], locale = "en", wi
   ctx.textAlign = "center";
   ctx.fillStyle = accent;
   ctx.font = "800 42px Outfit, system-ui, sans-serif";
-  ctx.fillText(vibe?.archetype?.title || "Vibe", width / 2, figureY);
+  ctx.fillText((zh ? vibe?.archetype?.titleZh : vibe?.archetype?.title) || "Vibe", width / 2, figureY);
 
   ctx.fillStyle = "#1a1a1a";
   ctx.font = "700 56px 'JetBrains Mono', ui-monospace, monospace";
-  const score = Number(vibe?.total || 0).toFixed(1);
-  ctx.fillText(`${score}`, width / 2, figureY + 64);
+  ctx.fillText(vibe?.type_code || vibe?.archetype?.code || "????", width / 2, figureY + 64);
   ctx.fillStyle = "#6b6560";
   ctx.font = "600 20px Outfit, system-ui, sans-serif";
-  ctx.fillText("/ 100", width / 2, figureY + 92);
+  ctx.fillText(`${Number(vibe?.confidence || 0)}% ${zh ? "类型置信度" : "TYPE CONFIDENCE"}`, width / 2, figureY + 92);
 
   const tier = vibe?.tier || {};
   ctx.fillStyle = tier.color || accent;
