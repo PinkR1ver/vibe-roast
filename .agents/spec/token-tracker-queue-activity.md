@@ -2,26 +2,30 @@
 
 Status: completed
 Created: 2026-06-09
-Last updated: 2026-06-17
+Last updated: 2026-07-22
 
 ## Goal
 
-Make the dashboard 3D heatmap use the same kind of data as TokenTracker: daily token usage aggregated from TokenTracker's local queue.
+Use TokenTracker's local hourly queue as the preferred activity metric while keeping prompt analysis independent from TokenTracker.
 
-## Scope
+## Current contract
 
-- Read `~/.tokentracker/tracker/queue.jsonl` when present.
-- Treat TokenTracker rows as activity data, not prompt text, so personality analysis and word frequencies remain based on local prompt adapters.
-- Deduplicate append-only queue rows by latest `(source, model, hour_start)`, matching TokenTracker's dashboard behavior.
-- Aggregate deduplicated hourly buckets into daily token rows with model/source breakdowns.
-- Expose the result as `report.activity` from `inspectSources`.
-- Prefer `report.activity.daily_rows` in the dashboard 3D heatmap; fall back to prompt counts if TokenTracker data is unavailable.
-- Apply `inspectSources` date ranges to TokenTracker activity rows so dashboard provider cards, total tokens, and model breakdowns match the selected time filter.
+- Read `~/.tokentracker/tracker/queue.jsonl` when present or accept an override for tests/CLI use.
+- Treat rows as activity only; never inject them into authored prompts, word frequencies, or prompt categories.
+- Deduplicate append-only rows by latest `(source, model, hour_start)` and aggregate daily token/model/source totals.
+- Apply the inspect date range before aggregation.
+- Expose the result through `report.activity` with `metric: "tokens"` and derived streak, peak-day, active-rate, and top-provider values.
+- When no TokenTracker rows exist, build timestamped daily prompt counts with `metric: "prompts"` and keep `total_tokens` at zero.
+- UI labels and scoring signals must respect the metric; never present prompt counts as tokens.
 
-## Testing Notes
+## UI consumption
 
-Added fixture-backed Node tests for queue aggregation, deduplication, daily rows, date-range filtering, model breakdown, and `inspectSources` integration.
+The current Roast Result page shows a compact 2D activity map, expandable 3D detail, token/prompt KPI cards, and a TokenTracker model breakdown where available. The former dashboard provider-card selection behavior is obsolete and was removed with the old dashboard.
 
-## Completion Summary
+## Testing notes
 
-Implemented `src/sources/token-tracker.js`, added `activity` to inspect output, updated the dashboard heatmap to consume token daily rows, and documented the data source.
+Fixture-backed tests cover queue aggregation, deduplication, daily rows, date filtering, model/source breakdown, prompt-count fallback, activity summaries, and inspect integration.
+
+## Completion summary
+
+Implemented in `src/sources/token-tracker.js`, enriched in `src/inspect.js` and `src/lib/activity-metrics.js`, and consumed by the Roast Result activity components and `dashboard/src/lib/profile-viz.js`.

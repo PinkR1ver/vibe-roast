@@ -94,6 +94,88 @@ const STOP_WORDS = new Set([
   "然后",
   "可以",
   "帮我",
+  "class",
+  "classname",
+  "dashboard",
+  "div",
+  "file",
+  "files",
+  "path",
+  "paths",
+  "key",
+  "keys",
+  "id",
+  "ids",
+  "model",
+  "models",
+  "name",
+  "names",
+  "provider",
+  "providers",
+  "selected",
+  "source",
+  "sources",
+  "text",
+  "usage",
+  "breakdown",
+  "active",
+  "blah",
+  "clipboard",
+  "codex",
+  "claude",
+  "config",
+  "cursor",
+  "range",
+  "gemini",
+  "json",
+  "judew",
+  "mentioned",
+  "opencode",
+  "png",
+  "pot",
+  "request",
+  "staff",
+  "user",
+  "world",
+  "patch",
+  "const",
+  "let",
+  "var",
+  "function",
+  "return",
+  "import",
+  "export",
+  "async",
+  "await",
+  "true",
+  "false",
+  "null",
+  "undefined",
+  "if",
+  "else",
+  "for",
+  "while",
+  "map",
+  "filter",
+  "props",
+  "state",
+  "style",
+  "class",
+  "classname",
+  "border",
+  "rounded",
+  "flex",
+  "grid",
+  "gray",
+  "white",
+  "black",
+  "bg",
+  "px",
+  "py",
+  "mt",
+  "mb",
+  "oai",
+  "md",
 ]);
 
 function wordFrequencies(prompts, { limit = 30 } = {}) {
@@ -114,11 +196,16 @@ function promptTextForCloud(text) {
   return String(text || "")
     .replace(/```[\s\S]*?```/g, " ")
     .replace(/`[^`]+`/g, " ")
-    .replace(/\/(?:Users|home|var|tmp|private)\/[^\s"'`]+/gi, " ")
+    .replace(/\/(?:Users|Volumes|home|var|tmp|private)\/[^\s"'`]+/gi, " ")
     .replace(/[A-Za-z]:\\[^\s"'`]+/g, " ")
-    .replace(/^\s{0,4}(?:import |from |const |let |var |def |class |function |export |return |self\.|#include|# ).*$/gim, " ")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/--[A-Za-z0-9_-]+\s*:[^;]+;?/g, " ")
+    .replace(/\b(?:import|from\s+\S+\s+import|class\s+\w+|def\s+\w+|const\s+\w+|let\s+\w+|var\s+\w+|function\s+\w+)\b[\s\S]*$/gim, " ")
     .replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/gi, " ")
-    .replace(/\b(?:torch|numpy|nn|plt|pd|np)\.[A-Za-z_][\w.]*\b/g, " ");
+    .replace(/\b(?:torch|numpy|nn|plt|pd|np)\.[A-Za-z_][\w.]*\b/g, " ")
+    .split(/\r?\n/)
+    .filter((line) => !looksLikeCodeLine(line))
+    .join("\n");
 }
 
 function tokenize(text) {
@@ -135,7 +222,20 @@ function tokenize(text) {
       terms.push(...splitAsciiTerm(match));
     }
   }
-  return terms.filter((term) => !STOP_WORDS.has(term));
+  return terms.filter((term) => !STOP_WORDS.has(term) && !/^\d+$/.test(term));
+}
+
+function looksLikeCodeLine(line) {
+  const trimmed = String(line || "").trim();
+  if (!trimmed) return false;
+  const withoutDiff = trimmed.replace(/^[+-]\s?/, "");
+  const hasHan = /[\p{Script=Han}]/u.test(withoutDiff);
+  if (/^(const|let|var|return|import|export|function|class|if|else|for|while|await|async)\b/.test(withoutDiff)) return true;
+  if (/\b(className|useState|useEffect|style=|aria-|data-|set[A-Z][A-Za-z0-9_]*)\b/.test(withoutDiff)) return true;
+  if (!hasHan && /[{}<>;=]/.test(withoutDiff)) return true;
+  const styleTokens = withoutDiff.match(/\b(?:text|bg|border|rounded|flex|grid|items|justify|gap|px|py|mt|mb|w|h|dark):?-[A-Za-z0-9/[\].%-]+/g) || [];
+  if (!hasHan && styleTokens.length >= 3) return true;
+  return false;
 }
 
 function splitAsciiTerm(term) {

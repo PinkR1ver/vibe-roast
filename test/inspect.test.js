@@ -7,9 +7,11 @@ const path = require("node:path");
 
 const { inspectSources } = require("../src/inspect");
 const { analyzePrompts } = require("../src/extract/prompt-analysis");
-const { tokenize } = require("../src/extract/phrase-stats");
+const { tokenize, wordFrequencies } = require("../src/extract/phrase-stats");
 const { inspectEnvironment } = require("../src/extract/environment");
 const { dayBounds } = require("../src/lib/dates");
+const { extractCodexPrompt } = require("../src/sources/codex");
+const { extractClaudePrompt } = require("../src/sources/claude");
 const { extractCursorEntriesFromRows, inspectCursor } = require("../src/sources/cursor");
 const { inspectTokenTracker } = require("../src/sources/token-tracker");
 
@@ -130,6 +132,34 @@ test("Cursor row parser treats cursorDiskKV type 1 bubbles as user prompts", () 
 
   assert.equal(entries.length, 1);
   assert.equal(entries[0].text, "给这个项目补一个最小 CLI 入口");
+});
+
+test("Codex prompt extractor ignores assistant messages", () => {
+  assert.equal(extractCodexPrompt({
+    payload: {
+      type: "assistant_message",
+      message: "我会先检查项目结构。",
+    },
+  }), "");
+  assert.equal(extractCodexPrompt({
+    payload: {
+      type: "user_message",
+      message: "帮我检查项目结构",
+    },
+  }), "帮我检查项目结构");
+});
+
+test("Claude prompt extractor ignores tool result content", () => {
+  assert.equal(extractClaudePrompt({
+    type: "user",
+    message: {
+      role: "user",
+      content: [
+        { type: "tool_result", content: "Fast-forward 13 files changed create mode 100644" },
+        { type: "text", text: "总结一下这次改动" },
+      ],
+    },
+  }), "总结一下这次改动");
 });
 
 test("Cursor date range omits prompt rows without timestamps", async (t) => {
@@ -305,12 +335,140 @@ test("Cursor row parser drops system notifications and assistant bubbles", () =>
   assert.ok(!entries.some((e) => /xerophyte/i.test(e.text)));
 });
 
+test("inspectSources computes word frequencies from all useful prompts", async () => {
+  const prompts = Array.from({ length: 65 }, (_, i) => ({
+    source: "codex",
+    timestamp: `2026-06-07T00:${String(i).padStart(2, "0")}:00.000Z`,
+    session_file: `s-${i}`,
+    text: i < 60 ? "实现 alpha 功能" : "实现 omega omega omega 功能",
+    tokens: {},
+  }));
+
+  const report = await inspectSources({
+    from: "2026-06-07",
+    to: "2026-06-07",
+    sources: [],
+    roots: {
+      tokenTrackerQueue: path.join(fixtures, "missing-token-queue.jsonl"),
+    },
+    injectedReports: {
+      codex: {
+        source: "codex",
+        root: "injected",
+        files_scanned: 1,
+        prompt_count: prompts.length,
+        token_totals: {},
+        prompts,
+        notes: [],
+      },
+    },
+  });
+
+  const omega = report.word_frequencies.find((row) => row.term === "omega");
+  assert.equal(omega?.count, 15);
+});
+
+test("inspectSources prefers timestamped prompts for word frequencies", async () => {
+  const report = await inspectSources({
+    sources: [],
+    roots: {
+      tokenTrackerQueue: path.join(fixtures, "missing-token-queue.jsonl"),
+    },
+    injectedReports: {
+      cursor: {
+        source: "cursor",
+        root: "injected",
+        files_scanned: 1,
+        prompt_count: 2,
+        token_totals: {},
+        prompts: [
+          {
+            source: "cursor",
+            timestamp: null,
+            session_file: "cursor",
+            text: "legacyblob legacyblob legacyblob",
+          },
+          {
+            source: "cursor",
+            timestamp: "2026-06-07T12:00:00.000Z",
+            session_file: "cursor",
+            text: "电子发票 报销",
+          },
+        ],
+        notes: [],
+      },
+    },
+  });
+
+  const terms = report.word_frequencies.map((row) => row.term);
+  assert.ok(terms.includes("发票"));
+  assert.ok(!terms.includes("legacyblob"));
+});
+
 test("tokenize extracts session from Claude Code style identifiers", () => {
   const terms = tokenize("Claude Code SessionEnd hook 里的 session_id 没抓住");
 
   assert.ok(terms.includes("session"));
   assert.ok(terms.includes("end"));
   assert.ok(terms.includes("hook"));
+});
+
+test("tokenize filters common UI state words from word cloud terms", () => {
+  const terms = tokenize("selectedSource provider model key className dashboard 发票 统计");
+
+  assert.ok(!terms.includes("selected"));
+  assert.ok(!terms.includes("source"));
+  assert.ok(!terms.includes("provider"));
+  assert.ok(!terms.includes("model"));
+  assert.ok(!terms.includes("key"));
+  assert.ok(terms.includes("发票"));
+  assert.ok(terms.includes("统计"));
+});
+
+test("wordFrequencies ignores pasted code lines inside useful prompts", () => {
+  const words = wordFrequencies([
+    {
+      text: `帮我优化电子发票页面
+const activeSource = resolveSelectedSource(selectedSource, sources);
+<div className="flex items-center gap-2 text-oai-gray-500">`,
+    },
+  ]).map((row) => row.term);
+
+  assert.ok(words.includes("电子"));
+  assert.ok(words.includes("发票"));
+  assert.ok(!words.includes("activesource"));
+  assert.ok(!words.includes("resolve"));
+  assert.ok(!words.includes("span"));
+});
+
+test("wordFrequencies keeps natural language before inline code", () => {
+  const words = wordFrequencies([
+    {
+      text: "U-Net架构可以引入代码块说明 import torch from torch import nn class convBlock(nn.Module): self.layer = nn.Sequential()",
+    },
+    {
+      text: "胶囊还是太大<div class=\"z-10\"><span fill=\"currentColor\">Klaviyo</span></div>",
+    },
+  ]).map((row) => row.term);
+
+  assert.ok(words.includes("架构"));
+  assert.ok(words.includes("代码"));
+  assert.ok(words.includes("胶囊"));
+  assert.ok(!words.includes("torch"));
+  assert.ok(!words.includes("self"));
+  assert.ok(!words.includes("currentcolor"));
+});
+
+test("wordFrequencies strips local path fragments", () => {
+  const words = wordFrequencies([
+    {
+      text: "请检查 /Volumes/macOSexternal/Documents/proj/vibe-wrapper/dashboard/src/pages/Dashboard.jsx 里的发票页面",
+    },
+  ]).map((row) => row.term);
+
+  assert.ok(words.includes("发票"));
+  assert.ok(!words.includes("volumes"));
+  assert.ok(!words.includes("macosexternal"));
 });
 
 test("analyzePrompts separates useful intent from pasted code and logs", () => {

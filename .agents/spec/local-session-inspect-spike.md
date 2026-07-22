@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-08
-Last updated: 2026-06-08
+Last updated: 2026-07-22
 
 ## Goal
 
@@ -34,3 +34,7 @@ Use Node's built-in test runner with fixture session files. Cursor tests use fak
 ## Completion Summary
 
 Implemented a minimal Node CLI and source adapters for Codex, Claude Code, and Cursor. Verification on this machine found local prompt signal from all three sources. Cursor currently yields prompt text from `cursorDiskKV` `bubbleId` rows, but compact rows do not provide reliable timestamps or token usage.
+
+## Expansion Note
+
+The spike became the production aggregation layer in PR #6. `src/sources/index.js` now defaults to twelve mainstream prompt adapters, `src/inspect.js` also builds activity and `vibe_profile`, and missing source roots are required to return empty reports safely. See `vibe-roaster-release.md` and `.agents/docs/architecture.md` for the current contract.

@@ -1,8 +1,8 @@
 # Dashboard Bilingual Layout
 
-Status: completed
+Status: completed; superseded by Roast Result UI
 Created: 2026-06-09
-Last updated: 2026-06-09
+Last updated: 2026-07-22
 
 ## Goal
 
@@ -25,3 +25,7 @@ Added a Node test for i18n lookup and fallback behavior. Browser verification ch
 ## Completion Summary
 
 Implemented `dashboard/src/lib/i18n.js`, `dashboard/src/contexts/LocaleContext.jsx`, top-bar language toggle, translated dashboard/heatmap chrome, and the revised middle-column layout. The word cloud now uses a larger wide-format canvas with denser placement and restrained rotation.
+
+## Supersession Note
+
+PR #6 removed the former multi-page dashboard and its top-bar layout. The reusable locale context/dictionary and bilingual heatmap behavior remain, but the current language toggle, word cloud, activity view, and all product copy live in the single `ProfileResult` Roast Result page. Treat the earlier layout requirements as historical context, not current page structure.

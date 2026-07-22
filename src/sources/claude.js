@@ -3,7 +3,7 @@ const path = require("node:path");
 
 const { walkFiles, readJsonl } = require("../lib/jsonl");
 const { isInRange } = require("../lib/dates");
-const { normalizeWhitespace, textFromContent } = require("../extract/text");
+const { normalizeWhitespace } = require("../extract/text");
 
 async function inspectClaude({ root, range } = {}) {
   const projectsRoot = root || path.join(os.homedir(), ".claude", "projects");
@@ -46,7 +46,20 @@ function extractClaudePrompt(obj) {
   // Skip synthetic user rows that only wrap tool results / meta.
   if (obj?.isMeta || obj?.isCompactSummary) return "";
   const content = obj?.message?.content ?? obj?.content;
-  return normalizeWhitespace(textFromContent(content));
+  return normalizeWhitespace(textFromClaudeUserContent(content));
+}
+
+function textFromClaudeUserContent(content) {
+  if (typeof content === "string") return content;
+  if (!Array.isArray(content)) return "";
+  return content
+    .map((block) => {
+      if (!block || typeof block !== "object") return "";
+      if (block.type && block.type !== "text") return "";
+      return typeof block.text === "string" ? block.text : "";
+    })
+    .filter(Boolean)
+    .join("\n");
 }
 
 function extractClaudeTokens(obj) {

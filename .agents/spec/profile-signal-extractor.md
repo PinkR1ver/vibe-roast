@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-08
-Last updated: 2026-06-08
+Last updated: 2026-07-22
 
 ## Goal
 
@@ -22,3 +22,5 @@ Cursor prompt text extraction is available, but Cursor timestamps and token usag
 ## Completion Summary
 
 Implemented `profile_signals` in the inspect report. It now includes useful/reference prompt classification, category counts, useful prompt examples, reference summaries, reference code/log signals, Codex skill counts split by user/plugin source, MCP server names, plugin counts, config basics, and custom instruction metadata. Reference code/log signals include detected languages, file extensions, file paths, and error types.
+
+PR #6 made these signals inputs to the six-axis `vibe_profile`. Subsequent prompt-hygiene work keeps the complete useful prompt set for statistics while bounding displayed examples, prefers timestamped prompts for word clouds, and excludes assistant/tool/system text plus pasted code and path noise.

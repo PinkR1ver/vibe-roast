@@ -6,9 +6,12 @@ const { buildVibeProfile } = require("./lib/agent-score");
 const { inspectTokenTracker } = require("./sources/token-tracker");
 const { SOURCE_INSPECTORS, normalizeSources } = require("./sources");
 
-async function inspectSources({ from, to, sources, roots = {} } = {}) {
+async function inspectSources({ from, to, sources, roots = {}, injectedReports = {} } = {}) {
   const range = dayBounds(from, to);
-  const selected = normalizeSources(sources);
+  const injectedSourceNames = Object.keys(injectedReports || {});
+  const selected = Array.isArray(sources) && sources.length === 0 && injectedSourceNames.length > 0
+    ? injectedSourceNames
+    : normalizeSources(sources);
   const sourceReports = {};
   const prompts = [];
   const tokenTrackerActivity = await inspectTokenTracker({
@@ -18,8 +21,8 @@ async function inspectSources({ from, to, sources, roots = {} } = {}) {
 
   for (const source of selected) {
     const inspect = SOURCE_INSPECTORS[source];
-    if (!inspect) continue;
-    const report = await inspect({
+    if (!inspect && !injectedReports[source]) continue;
+    const report = injectedReports[source] || await inspect({
       root: roots[source],
       dbPath: roots.cursorDb || roots.cursor,
       range,
@@ -31,6 +34,10 @@ async function inspectSources({ from, to, sources, roots = {} } = {}) {
 
   prompts.sort((a, b) => String(a.timestamp || "").localeCompare(String(b.timestamp || "")));
   const promptAnalysis = analyzePrompts(prompts);
+  const wordSourcePrompts = prompts.filter((prompt) => prompt.timestamp);
+  const wordPromptAnalysis = analyzePrompts(wordSourcePrompts.length > 0 ? wordSourcePrompts : prompts, {
+    usefulLimit: prompts.length,
+  });
   const environment = await inspectEnvironment({
     home: roots.home,
     codexHome: roots.codexHome,
@@ -51,7 +58,7 @@ async function inspectSources({ from, to, sources, roots = {} } = {}) {
     summary,
     sources: sourceReports,
     activity,
-    word_frequencies: wordFrequencies(promptAnalysis.useful_for_stats || promptAnalysis.useful_prompts),
+    word_frequencies: wordFrequencies(wordPromptAnalysis.useful_for_stats || wordPromptAnalysis.useful_prompts),
     profile_signals: {
       prompt_analysis: promptAnalysis,
       environment,
