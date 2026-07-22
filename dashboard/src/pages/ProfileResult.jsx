@@ -58,7 +58,7 @@ function PageChrome({ accent, onShare, posterBusy, t }) {
           {t("app.language")}
         </button>
         <a
-          href="https://github.com/PinkR1ver/vibe-wrapper"
+          href="https://github.com/PinkR1ver/vibe-roast"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors"
