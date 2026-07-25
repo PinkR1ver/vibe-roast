@@ -3,7 +3,7 @@ const path = require("node:path");
 const os = require("node:os");
 const { createInterface } = require("node:readline");
 
-const STORE_DIR = path.join(os.homedir(), ".vibe-wrapper");
+const STORE_DIR = path.join(os.homedir(), ".vibe-roast");
 
 async function inspectVibeTracker({ range } = {}) {
   const storeFile = path.join(STORE_DIR, "sessions.jsonl");

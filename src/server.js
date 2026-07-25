@@ -5,6 +5,7 @@ const os = require("node:os");
 const path = require("node:path");
 const { createHash, randomBytes, randomUUID } = require("node:crypto");
 const { exec } = require("node:child_process");
+const { createTerminalLaunch } = require("./lib/terminal-ui");
 const { inspectSources } = require("./inspect");
 const { generateAiRoast, PROVIDERS } = require("./lib/ai-roast");
 const { encodeRoastSnapshot } = require("./lib/roast-snapshot");
@@ -16,27 +17,27 @@ const ASSETS_DIR = path.join(ROOT_DIR, "assests");
 const DEFAULT_GITHUB_CLIENT_ID = "Iv23li5jqHs7pMarqWPZ";
 const DEFAULT_GITHUB_AUTH_BROKER_URL = "https://auth.pinktalk.online";
 const GITHUB_OAUTH_FLOWS = new Map();
-const GITHUB_SESSION_COOKIE = "vibe_wrapper_github_session";
+const GITHUB_SESSION_COOKIE = "vibe_roast_github_session";
 const GITHUB_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_JSON_BODY = 64 * 1024;
 const FREE_AI_PROVIDER = "cloudflare";
 const FREE_AI_MODEL = "@cf/qwen/qwen3-30b-a3b-fp8";
 
 function githubClientId() {
-  return process.env.VIBE_WRAPPER_GITHUB_CLIENT_ID || DEFAULT_GITHUB_CLIENT_ID;
+  return process.env.VIBE_ROAST_GITHUB_CLIENT_ID || DEFAULT_GITHUB_CLIENT_ID;
 }
 
 function githubAuthConfig() {
-  const explicitBrokerUrl = String(process.env.VIBE_WRAPPER_AUTH_BROKER_URL || "").replace(/\/+$/, "");
+  const explicitBrokerUrl = String(process.env.VIBE_ROAST_AUTH_BROKER_URL || "").replace(/\/+$/, "");
   if (explicitBrokerUrl) {
     return { configured: true, mode: "broker", brokerUrl: explicitBrokerUrl };
   }
-  if (process.env.VIBE_WRAPPER_GITHUB_CLIENT_SECRET) {
+  if (process.env.VIBE_ROAST_GITHUB_CLIENT_SECRET) {
     return {
       configured: true,
       mode: "direct",
       clientId: githubClientId(),
-      clientSecret: process.env.VIBE_WRAPPER_GITHUB_CLIENT_SECRET,
+      clientSecret: process.env.VIBE_ROAST_GITHUB_CLIENT_SECRET,
     };
   }
   return {
@@ -47,8 +48,8 @@ function githubAuthConfig() {
 }
 
 function githubSessionFile() {
-  return process.env.VIBE_WRAPPER_GITHUB_SESSION_FILE
-    || path.join(os.homedir(), ".vibe-wrapper", "github-auth.json");
+  return process.env.VIBE_ROAST_GITHUB_SESSION_FILE
+    || path.join(os.homedir(), ".vibe-roast", "github-auth.json");
 }
 
 function base64Url(bytes) {
@@ -64,7 +65,7 @@ function requestOrigin(req) {
 }
 
 function githubCallbackUrl(req) {
-  return process.env.VIBE_WRAPPER_GITHUB_CALLBACK_URL
+  return process.env.VIBE_ROAST_GITHUB_CALLBACK_URL
     || `${requestOrigin(req)}/api/auth/github/callback`;
 }
 
@@ -307,7 +308,7 @@ function sendRedirect(res, location) {
 
 function authCallbackPage(res, { ok, message, cookie }) {
   const payload = JSON.stringify({
-    type: "vibe-wrapper:github-auth",
+    type: "vibe-roast:github-auth",
     status: ok ? "connected" : "failed",
     error: ok ? undefined : message,
   }).replace(/</g, "\\u003c");
@@ -338,7 +339,7 @@ async function handleGithubOAuthStart(req, res) {
   const config = githubAuthConfig();
   if (!config.configured) {
     sendJson(res, 503, {
-      error: "GitHub OAuth is not configured. Set VIBE_WRAPPER_AUTH_BROKER_URL, or use a local VIBE_WRAPPER_GITHUB_CLIENT_SECRET for development.",
+      error: "GitHub OAuth is not configured. Set VIBE_ROAST_AUTH_BROKER_URL, or use a local VIBE_ROAST_GITHUB_CLIENT_SECRET for development.",
       code: "github_not_configured",
     });
     return;
@@ -609,22 +610,22 @@ function createServer() {
 }
 
 function openBrowser(url) {
-  if (process.env.VIBE_WRAPPER_NO_OPEN === "1") return;
+  if (process.env.VIBE_ROAST_NO_OPEN === "1") return;
   const cmd = process.platform === "darwin" ? `open "${url}"`
     : process.platform === "win32" ? `start "" "${url}"`
     : `xdg-open "${url}"`;
   exec(cmd, () => {});
 }
 
-function start() {
+function start({ terminal = createTerminalLaunch() } = {}) {
+  terminal.intro();
   const server = createServer();
   return new Promise((resolve) => {
-    server.listen(PORT, () => {
+    server.listen(PORT, async () => {
       const address = server.address();
       const port = typeof address === "object" && address ? address.port : PORT;
       const url = `http://localhost:${port}`;
-      process.stderr.write(`vibe-roast result         → ${url}\n`);
-      process.stderr.write(`static live report      → ${url}/assests/live-report.html\n`);
+      await terminal.ready(url);
       openBrowser(url);
       resolve(server);
     });

@@ -119,7 +119,7 @@ async function removeClaudeHook(settingsPath) {
 /* ── Codex ─────────────────────────────────────────────── */
 
 const CODEX_HOOK_TOML = `
-# Vibe Wrapper — token tracking hook
+# Vibe Roaster — token tracking hook
 [[notify.hooks]]
 event = "session_end"
 command = "node ${HOOK_SCRIPT}"
@@ -153,7 +153,7 @@ async function removeCodexHook(configPath) {
     }
 
     const lines = existing.split("\n").filter((line) => !line.includes(HOOK_SCRIPT));
-    // Also remove the Vibe Wrapper comment and empty [[notify.hooks]] blocks
+    // Also remove the Vibe Roaster comment and empty [[notify.hooks]] blocks
     const cleaned = cleanCodexConfig(lines);
 
     await fs.writeFile(configPath, cleaned);
@@ -168,8 +168,8 @@ function cleanCodexConfig(lines) {
   let skip = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    // Skip Vibe Wrapper comment and associated hook entries
-    if (line.includes("# Vibe Wrapper")) {
+    // Skip the Vibe Roaster comment and associated hook entries.
+    if (line.includes("# Vibe Roaster")) {
       skip = true;
       continue;
     }

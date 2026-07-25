@@ -43,7 +43,7 @@ Primary style: classic 16Personalities geometric faceted flat vector (Piotr Antk
 
 - Roast Result places the figure **on a soft abstract stage blob** — not inside a bordered card.
 - Figure PNGs use `mix-blend-mode: multiply` so light scene canvases dissolve into the page (no rectangular card chrome).
-- Score / tier / signals sit beside/below the figure in the React Roast Result UI (and optional `live-report.html` export).
+- Score / tier / signals sit beside/below the figure in the React Roast Result UI.
 
 ## Preview
 

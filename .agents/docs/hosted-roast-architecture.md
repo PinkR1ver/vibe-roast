@@ -14,7 +14,7 @@ flowchart LR
         Sessions["Local agent sessions<br/>Cursor · Codex · Claude · others"]
         Inspect["vibe-roast local server<br/>inspect + deterministic profile"]
         UI["Roast UI<br/>localhost"]
-        Store["~/.vibe-wrapper<br/>owner-only session"]
+        Store["~/.vibe-roast<br/>owner-only session"]
 
         Sessions --> Inspect
         Inspect -->|"aggregate report"| UI
@@ -98,7 +98,7 @@ sequenceDiagram
 - The GitHub client secret and broker signing secret never ship in the npm
   package. They remain encrypted Worker secrets.
 - The local server stores only the signed, expiring broker session under
-  `~/.vibe-wrapper/` with owner-only permissions.
+  `~/.vibe-roast/` with owner-only permissions.
 - Deterministic type, axes, confidence, and dimensions cannot be changed by the
   LLM. Generated copy is accepted after bilingual JSON/schema validation and
   paragraph formatting. There is intentionally no post-generation semantic,

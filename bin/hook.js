@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* Vibe Wrapper SessionEnd hook — receives hook data from stdin,
+/* Vibe Roaster SessionEnd hook — receives hook data from stdin,
    reads the transcript to extract token usage, appends to local store. */
 
 const fs = require("node:fs");
@@ -7,7 +7,7 @@ const path = require("node:path");
 const os = require("node:os");
 const { createInterface } = require("node:readline");
 
-const STORE_DIR = path.join(os.homedir(), ".vibe-wrapper");
+const STORE_DIR = path.join(os.homedir(), ".vibe-roast");
 const STORE_FILE = path.join(STORE_DIR, "sessions.jsonl");
 
 async function main() {
@@ -62,8 +62,10 @@ async function main() {
   };
 
   // Append to store
-  fs.mkdirSync(STORE_DIR, { recursive: true });
-  fs.appendFileSync(STORE_FILE, JSON.stringify(record) + "\n");
+  fs.mkdirSync(STORE_DIR, { recursive: true, mode: 0o700 });
+  fs.chmodSync(STORE_DIR, 0o700);
+  fs.appendFileSync(STORE_FILE, JSON.stringify(record) + "\n", { mode: 0o600 });
+  fs.chmodSync(STORE_FILE, 0o600);
 
   // Return success (non-blocking)
   process.stdout.write(JSON.stringify({ continue: true }) + "\n");

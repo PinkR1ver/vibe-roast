@@ -10,7 +10,7 @@ Build a minimal CLI that verifies whether this project can read local Codex, Cla
 
 ## Scope
 
-- Provide `vibe-wrapper inspect`.
+- Provide `vibe-roast inspect`.
 - Support `--from`, `--to`, `--sources`, `--format json`, and source root overrides for testability.
 - Extract prompt text and token usage where available.
 - Produce local stdout output only.
@@ -23,7 +23,7 @@ Build a minimal CLI that verifies whether this project can read local Codex, Cla
 - `src/sources/cursor.js`: inspect Cursor SQLite state database and parse recognizable prompt-bearing values.
 - `src/extract/phrase-stats.js`: simple word and phrase frequency summaries.
 - `src/inspect.js`: orchestrate sources and aggregate reports.
-- `bin/vibe-wrapper.js`: CLI entry point.
+- `bin/vibe-roast.js`: CLI entry point.
 
 ## Testing Notes
 

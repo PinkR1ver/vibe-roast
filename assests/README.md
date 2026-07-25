@@ -10,7 +10,6 @@ Figures, badges, and banners for the **Roast Result** product UI at the repo roo
 - **8 badges** — symbolic icons (64×64 SVG, not mascot crops)
 - Old SBTI diamond rasters archived as `*.sbti-archive.svg`
 - **`scripts/score-engine.js`** — four-axis type and six-dimension reference helpers (Node mirrors this in `src/lib/agent-score.js`)
-- **`live-report.html`** — optional static export of a live inspect snapshot (not the primary UI)
 
 ## Style
 
@@ -30,11 +29,8 @@ assests/
 │   └── *.sbti-archive.svg    # old SBTI diamond cards
 ├── badges/01-builder … 08-yolo-shipper/
 ├── banners/  home-hero.*  share-strip.*  result-header.*
-├── live-report.html          # optional static roast export
-├── notes/live-inspect-summary.json  # redacted snapshot for live-report
 ├── scripts/score-engine.js   # type and behavior-dimension reference helpers
 ├── scripts/vibe-types.json   # 16-type figure manifest
-├── scripts/roast-extras.js   # word cloud / heatmap / share poster helpers
 ├── source/design-system.md
 ├── source/vibe-types-visual-brief.md
 └── source/references/        # legacy SBTI boards + badge board

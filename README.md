@@ -67,6 +67,8 @@ Vibe Roaster scans the supported local stores it can find, starts the local dash
 http://localhost:7681
 ```
 
+Interactive terminals get a short branded launch sequence with rotating English humour. Piped output, CI, and `NO_COLOR` environments automatically use stable plain text.
+
 Missing agents are ignored safely. You do not need to configure every source, create an account, or provide an API key to see the local result.
 
 ### Choose how the roast is written
@@ -232,7 +234,7 @@ Vibe Roaster is local-first, but “local-first” does not mean every optional 
 
 The UI opens through localhost, but the Node server is a local development service rather than a hardened public endpoint. Do not expose port `7681` to an untrusted network.
 
-Hosted GitHub sessions are stored outside the project under `~/.vibe-wrapper/` with owner-only permissions. A cached roast is reused until the profile changes materially, avoiding repeated model calls and unstable results.
+Hosted GitHub sessions are stored outside the project under `~/.vibe-roast/` with owner-only permissions. A cached roast is reused until the profile changes materially, avoiding repeated model calls and unstable results.
 
 ## Supported sources
 
@@ -253,7 +255,7 @@ Vibe Roaster inspects the sources it can find and treats missing roots as empty.
 | Amazon Q | `amazonq` | `~/.aws/amazonq/history` |
 | Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` |
 | TokenTracker | activity only | `~/.tokentracker/tracker/queue.jsonl` |
-| Vibe tracker | `vibe-tracker` | `~/.vibe-wrapper/sessions.jsonl` |
+| Vibe tracker | `vibe-tracker` | `~/.vibe-roast/sessions.jsonl` |
 
 Cursor is best-effort and requires the local `sqlite3` command. Encrypted or binary histories are skipped rather than guessed.
 
@@ -322,8 +324,9 @@ Most users need no environment variables.
 | Variable | Purpose |
 | --- | --- |
 | `PORT` | Change the local server port from `7681` |
-| `VIBE_WRAPPER_NO_OPEN=1` | Start without opening the browser |
-| `VIBE_WRAPPER_AUTH_BROKER_URL` | Override the hosted OAuth/AI broker for development or self-hosting |
+| `VIBE_ROAST_NO_OPEN=1` | Start without opening the browser |
+| `VIBE_ROAST_PLAIN_OUTPUT=1` | Disable terminal color and launch animation |
+| `VIBE_ROAST_AUTH_BROKER_URL` | Override the hosted OAuth/AI broker for development or self-hosting |
 | `DEEPSEEK_BASE_URL` | Override the default DeepSeek-compatible endpoint |
 | `DEEPSEEK_MODEL` | Override the default DeepSeek model |
 
@@ -347,7 +350,7 @@ npm run serve
 
 ```bash
 # terminal 1: API and local assets
-VIBE_WRAPPER_NO_OPEN=1 npm run serve
+VIBE_ROAST_NO_OPEN=1 npm run serve
 
 # terminal 2: Vite HMR
 npm run dev
