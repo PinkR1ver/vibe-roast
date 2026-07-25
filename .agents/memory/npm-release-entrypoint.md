@@ -15,7 +15,7 @@ As of the v0.98.0 rename, the npm package is `vibe-roast` and runs the dashboard
 Release status notes:
 
 - Historical v0.1.0 was published as `vibe-wrapper`.
-- v0.98.0 is prepared for first publication as `vibe-roast`; update this note with the registry URL after publication succeeds.
+- v0.98.0 was published as `vibe-roast` on 2026-07-26: <https://www.npmjs.com/package/vibe-roast/v/0.98.0>.
 - Future npm publishes may require an OTP or a granular access token with publish 2FA bypass enabled.
 - Keep npm credentials only in ignored local files such as `.env/`; never commit registry tokens.
 - `assests/` is the stable package directory and URL spelling. Renaming it requires an explicit compatibility migration across score paths, server routes, Vite proxying, README, and existing consumers.
