@@ -3,5 +3,8 @@ dashboard/dist/
 dashboard/node_modules/
 .venv-img/
 .env
+.env.local
+worker/.dev.vars
+worker/.wrangler/
 *.log
 .DS_Store

@@ -216,7 +216,11 @@ function buildActivitySignals({ activity = {}, summary = {}, categories = {} } =
       labelZh: "活跃天数",
       value: String(stats.activeDays || activity.active_day_count || 0),
     },
-    { label: "Sources", labelZh: "数据源", value: String(summary.source_count ?? 0) },
+    {
+      label: "Agents found",
+      labelZh: "检测到 Agent",
+      value: String(summary.active_source_count ?? summary.source_count ?? 0),
+    },
     {
       label: "Top category",
       labelZh: "主类别",

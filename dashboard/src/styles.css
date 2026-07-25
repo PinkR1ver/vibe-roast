@@ -27,6 +27,333 @@ html.dark {
   color: #fafafa;
 }
 
+.roast-page {
+  --roast-page: #f3f1ec;
+  --roast-card: #fffcf7;
+  --roast-soft: #f7f4ef;
+  --roast-soft-strong: #f3f1ec;
+  --roast-text: #1a1a1a;
+  --roast-muted: #6b6560;
+  --roast-subtle: #8b8680;
+  --radar-grid: rgba(40, 30, 20, 0.1);
+}
+
+html.dark .roast-page {
+  --roast-page: #0a0a0a;
+  --roast-card: #171717;
+  --roast-soft: #121212;
+  --roast-soft-strong: #202020;
+  --roast-text: #fafafa;
+  --roast-muted: #b0b0b0;
+  --roast-subtle: #8f8f8f;
+  --radar-grid: rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(900px 520px at 5% -10%, rgba(255, 90, 31, 0.12), transparent 58%),
+    radial-gradient(760px 480px at 100% 0%, rgba(16, 185, 129, 0.12), transparent 55%),
+    linear-gradient(180deg, #0a0a0a 0%, #101010 100%);
+}
+
+html.dark .roast-page [class~="bg-[#fffcf7]"] { background-color: var(--roast-card); }
+html.dark .roast-page [class~="bg-[#f7f4ef]"] { background-color: var(--roast-soft); }
+html.dark .roast-page [class~="bg-[#f3f1ec]"] { background-color: var(--roast-soft-strong); }
+html.dark .roast-page [class~="bg-[#fff0e8]"] { background-color: #2d201b; }
+html.dark .roast-page [class~="bg-[#e8e4db]"],
+html.dark .roast-page [class~="bg-[#d6d0c6]"] { background-color: #303030; }
+html.dark .roast-page [class~="text-[#1a1a1a]"] { color: var(--roast-text); }
+html.dark .roast-page [class~="text-[#6b6560]"] { color: var(--roast-muted); }
+html.dark .roast-page [class~="text-[#8b8680]"] { color: var(--roast-subtle); }
+html.dark .roast-page [class*="border-black/"] { border-color: rgba(255, 255, 255, 0.08); }
+
+.activity-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(127, 127, 127, 0.35) transparent;
+}
+
+/* Roast motion language */
+:root {
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-ease-spring: cubic-bezier(0.2, 1.35, 0.35, 1);
+}
+
+.motion-chrome {
+  animation: motionChromeIn 700ms var(--motion-ease-out) both;
+}
+
+.motion-hero {
+  animation: motionHeroIn 820ms var(--motion-ease-out) 80ms both;
+}
+
+.motion-reveal {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0) scale(0.985);
+  filter: blur(5px);
+  transition:
+    opacity 680ms var(--motion-ease-out) var(--motion-delay, 0ms),
+    transform 680ms var(--motion-ease-out) var(--motion-delay, 0ms),
+    filter 560ms ease-out var(--motion-delay, 0ms),
+    background-color 280ms ease,
+    border-color 280ms ease,
+    box-shadow 280ms ease;
+  will-change: opacity, transform;
+}
+
+.motion-reveal.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .motion-surface.is-visible:hover {
+    transform: translate3d(0, -2px, 0);
+    box-shadow: 0 16px 38px rgba(40, 28, 12, 0.09);
+  }
+
+  html.dark .motion-surface.is-visible:hover {
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  }
+
+  .motion-character:hover {
+    animation-play-state: paused;
+    transform: translateY(-4px) scale(1.015);
+  }
+}
+
+.motion-button {
+  transform: translateZ(0);
+  transition:
+    transform 180ms var(--motion-ease-spring),
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.motion-button:hover {
+  transform: translateY(-1px);
+}
+
+.motion-button:active {
+  transform: translateY(0) scale(0.94);
+  transition-duration: 90ms;
+}
+
+.motion-share {
+  animation: motionShareGlow 3.8s ease-in-out 1.2s infinite;
+}
+
+.motion-character {
+  animation: motionCharacterFloat 5.5s ease-in-out 1s infinite;
+  transition: transform 280ms var(--motion-ease-spring);
+}
+
+.motion-chip {
+  animation: motionChipIn 520ms var(--motion-ease-spring) both;
+}
+
+.motion-chip:nth-child(2) { animation-delay: 45ms; }
+.motion-chip:nth-child(3) { animation-delay: 90ms; }
+.motion-chip:nth-child(4) { animation-delay: 135ms; }
+.motion-chip:nth-child(5) { animation-delay: 180ms; }
+.motion-chip:nth-child(6) { animation-delay: 225ms; }
+.motion-chip:nth-child(7) { animation-delay: 270ms; }
+.motion-chip:nth-child(8) { animation-delay: 315ms; }
+
+.motion-stat {
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+}
+
+.motion-reveal.is-visible .motion-stat {
+  animation: motionStatIn 520ms var(--motion-ease-spring) var(--motion-delay, 0ms) forwards;
+}
+
+.motion-progress {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.motion-reveal.is-visible .motion-progress {
+  animation: motionProgressIn 760ms var(--motion-ease-out) var(--motion-delay, 0ms) forwards;
+}
+
+.radar-grid {
+  opacity: 0;
+}
+
+.motion-reveal.is-visible .radar-grid {
+  animation: motionFadeIn 480ms ease-out 100ms forwards;
+}
+
+.radar-shape {
+  stroke-dasharray: 720;
+  stroke-dashoffset: 720;
+  fill-opacity: 0;
+}
+
+.motion-reveal.is-visible .radar-shape {
+  animation: motionRadarDraw 950ms var(--motion-ease-out) 180ms forwards;
+}
+
+.radar-dot {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.motion-reveal.is-visible .radar-dot {
+  animation: motionRadarDot 420ms var(--motion-ease-spring) 760ms forwards;
+}
+
+.activity-cell {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.motion-reveal.is-visible .activity-cell {
+  animation: motionCellIn 430ms var(--motion-ease-spring) var(--motion-delay, 0ms) backwards;
+}
+
+.usage-segment {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.motion-reveal.is-visible .usage-segment {
+  animation: motionProgressIn 720ms var(--motion-ease-out) var(--motion-delay, 0ms) forwards;
+}
+
+.motion-source-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.motion-reveal.is-visible .motion-source-card {
+  animation: motionStatIn 480ms var(--motion-ease-spring) backwards;
+}
+
+.motion-reveal.is-visible .motion-source-card:nth-child(2) { animation-delay: 55ms; }
+.motion-reveal.is-visible .motion-source-card:nth-child(3) { animation-delay: 110ms; }
+.motion-reveal.is-visible .motion-source-card:nth-child(4) { animation-delay: 165ms; }
+.motion-reveal.is-visible .motion-source-card:nth-child(5) { animation-delay: 220ms; }
+.motion-reveal.is-visible .motion-source-card:nth-child(6) { animation-delay: 275ms; }
+
+.usage-trend-bar {
+  transform: scaleY(0);
+  transform-origin: center bottom;
+}
+
+.motion-reveal.is-visible .usage-trend-bar {
+  animation: motionTrendGrow 720ms var(--motion-ease-out) var(--motion-delay, 0ms) forwards;
+}
+
+.roast-page,
+.roast-page [class~="bg-[#fffcf7]"],
+.roast-page [class~="bg-[#f7f4ef]"],
+.roast-page [class~="bg-[#f3f1ec]"] {
+  transition-property: color, background-color, border-color, box-shadow;
+  transition-duration: 280ms;
+  transition-timing-function: ease;
+}
+
+@keyframes motionChromeIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motionHeroIn {
+  from { opacity: 0; transform: translateX(-20px) scale(0.98); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes motionCharacterFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes motionShareGlow {
+  0%, 72%, 100% { box-shadow: 0 10px 20px rgba(255, 90, 31, 0.22); }
+  82% { box-shadow: 0 12px 26px rgba(255, 90, 31, 0.38), 0 0 0 6px rgba(255, 90, 31, 0.06); }
+}
+
+@keyframes motionChipIn {
+  from { opacity: 0; transform: translateY(7px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes motionStatIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes motionProgressIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes motionFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motionRadarDraw {
+  0% { stroke-dashoffset: 720; fill-opacity: 0; }
+  70% { fill-opacity: 0; }
+  100% { stroke-dashoffset: 0; fill-opacity: 1; }
+}
+
+@keyframes motionRadarDot {
+  from { opacity: 0; transform: scale(0); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motionCellIn {
+  from { opacity: 0; transform: scale(0.25); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motionTrendGrow {
+  from { transform: scaleY(0); opacity: 0.25; }
+  to { transform: scaleY(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-chrome,
+  .motion-hero,
+  .motion-character,
+  .motion-share,
+  .motion-chip,
+  .motion-stat,
+  .motion-progress,
+  .radar-grid,
+  .radar-shape,
+  .radar-dot,
+  .activity-cell,
+  .usage-segment,
+  .motion-source-card,
+  .usage-trend-bar {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dashoffset: 0 !important;
+    fill-opacity: 1 !important;
+  }
+
+  .motion-reveal,
+  .motion-reveal.is-visible,
+  .motion-button,
+  .roast-page,
+  .roast-page * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   margin: 0;
 }

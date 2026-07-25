@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const { spawn } = require("node:child_process");
 const path = require("node:path");
 
-const cliPath = path.join(__dirname, "..", "bin", "vibe-wrapper.js");
+const cliPath = path.join(__dirname, "..", "bin", "vibe-roast.js");
 const fixtures = path.join(__dirname, "fixtures");
 
 test("CLI starts the dashboard when no command is provided", async () => {
@@ -26,7 +26,7 @@ test("CLI starts the dashboard when no command is provided", async () => {
   });
 
   try {
-    await waitForOutput(() => stderr.includes("vibe-wrapper roast result"));
+    await waitForOutput(() => stderr.includes("vibe-roast result"));
     assert.match(stderr, /http:\/\/localhost:\d+/);
     assert.doesNotMatch(stderr, /http:\/\/localhost:7681/);
     assert.equal(stdout, "");

@@ -8,9 +8,9 @@ Primary style: classic 16Personalities geometric faceted flat vector (Piotr Antk
 - Geometric faceted color planes, clean silhouettes, **no black outlines / no line art**
 - Simplified faces (dot/oval eyes, minimal nose, simple mouth)
 - Large stylized hair masses as 2–3 shade planes (no strand detail)
-- Muted harmonious palette (~6–10 colors) per archetype accent
+- Muted harmonious palette (~6–10 colors) per type accent
 - Faceted shade planes only — no painterly gradients, grunge, or fabric texture
-- Clothing communicates archetype; 1–3 symbolic props
+- Clothing communicates type; one compact symbolic prop grouping
 - Natural narrative poses
 - Minimal / abstract environment only (product page supplies soft stage blob)
 - **No collectible card frame** on product surfaces
@@ -47,4 +47,4 @@ Primary style: classic 16Personalities geometric faceted flat vector (Piotr Antk
 
 ## Preview
 
-Run `npm run serve` and open `http://localhost:7681/` for the live Roast Result. Figures load from `assests/characters/`.
+Run `npm run serve` and open `http://localhost:7681/` for the live Roast Result. Current figures load from `assests/characters-vibe-types/`; `assests/characters/` is the legacy fallback pack.

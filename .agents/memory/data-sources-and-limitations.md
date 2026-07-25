@@ -1,6 +1,6 @@
 # Data sources and limitations
 
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 ## Normalized source contract
 
@@ -13,6 +13,7 @@ Prompt adapters return a report shaped like:
   files_scanned,
   prompt_count,
   token_totals,
+  context_breakdown_daily,
   prompts: [{ source, timestamp, session_file, text }],
   notes,
 }
@@ -24,8 +25,8 @@ Prompt adapters return a report shaped like:
 
 | Source | Primary format | Important limitation |
 | --- | --- | --- |
-| Codex | rollout JSONL | Keep only `user_message`; token events are session/event totals, not per-prompt attribution. |
-| Claude Code | project JSONL | Keep user text blocks only; exclude tool results, meta rows, and compact summaries. |
+| Codex | rollout JSONL | Keep only `user_message`; context categories use non-overlapping token deltas and heuristic per-turn tool attribution, never per-prompt attribution. |
+| Claude Code | project JSONL | Keep user text blocks only; exclude tool results, meta rows, and compact summaries. Context categories merge streaming snapshots by message id before approximate content-block allocation. |
 | Cursor | `state.vscdb` | Schema varies; requires local `sqlite3`; compact bubbles often lack reliable timestamps and tokens. |
 | Cline / Roo | VS Code-family task JSON | Search several editor `globalStorage` roots; layouts vary by extension version. |
 | Continue | session JSON | Best-effort message-shape normalization. |
@@ -45,6 +46,8 @@ Prompt adapters return a report shaped like:
 - Token activity distinguishes three rankings: `top_agent` comes from TokenTracker source totals (Cursor/Codex/etc.); `top_provider` is inferred from concrete model names (OpenAI/Anthropic/etc.); `top_model` is the highest-token concrete model. Generic `auto`/`unknown` model buckets count toward Agent totals but are excluded from Provider and Model rankings.
 - Otherwise `report.activity.metric` is `prompts`; daily values come only from prompts with timestamps, `total_tokens` remains zero, and UI copy must say prompts rather than tokens.
 - Date filters apply to both adapter prompts and TokenTracker buckets. Cursor rows without timestamps can appear in all-time prompt totals but cannot be placed on a day.
+- Codex/Claude context breakdown rows are attached to matching TokenTracker activity days. The UI rescales their category proportions to the authoritative TokenTracker source total for the selected time range.
+- Codex Messages/Tool calls attribution is heuristic: each non-overlapping turn delta goes to the distinct tools observed in that turn, or Messages when no tool was observed; reported reasoning tokens stay separate. Claude output is approximately distributed by merged text/thinking/tool-use content-block size, while message input/cache tokens remain Messages or the first-session System prompt.
 
 ## Prompt hygiene
 

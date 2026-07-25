@@ -131,4 +131,20 @@ export function buildHashtags(vibe, categories = {}, opts = {}) {
   return tags.slice(0, limit);
 }
 
+export function mergeHashtags(generated = [], limit = 8) {
+  const tags = [];
+  const seen = new Set();
+  for (const raw of generated || []) {
+    const bare = String(raw || "")
+      .replace(/^#+/, "")
+      .replace(/[^A-Za-z0-9\u4e00-\u9fff]/g, "");
+    if (!bare) continue;
+    const key = bare.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    tags.push(`#${bare}`);
+  }
+  return tags.slice(0, limit);
+}
+
 export { ARCHETYPE_TAGS, CODE_TAGS, CATEGORY_TAGS, TIER_TAGS };

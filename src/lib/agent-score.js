@@ -111,9 +111,27 @@ function confidenceFor(promptAnalysis, axes) {
 }
 
 function confidenceTier(confidence) {
-  if (confidence >= 75) return { id: "CLEAR", color: "#2bb673", emoji: "◆", blurb: "Clear behavioral signal", blurbZh: "行为信号清晰" };
-  if (confidence >= 45) return { id: "EMERGING", color: "#d49a25", emoji: "◇", blurb: "Pattern still emerging", blurbZh: "模式仍在形成" };
-  return { id: "LOW DATA", color: "#8b8680", emoji: "·", blurb: "Use at least 20 useful prompts", blurbZh: "至少需要 20 条有效提示" };
+  if (confidence >= 75) return {
+    id: "CLEAR",
+    color: "#2bb673",
+    emoji: "◆",
+    blurb: "Strong sample · clear axis separation",
+    blurbZh: "样本充足 · 行为轴区分清晰",
+  };
+  if (confidence >= 45) return {
+    id: "EMERGING",
+    color: "#d49a25",
+    emoji: "◇",
+    blurb: "Growing sample · mixed axis separation",
+    blurbZh: "样本增长中 · 部分行为轴仍接近",
+  };
+  return {
+    id: "LOW DATA",
+    color: "#8b8680",
+    emoji: "·",
+    blurb: "More prompts needed · provisional type",
+    blurbZh: "仍需更多提示 · 当前类型为暂定",
+  };
 }
 
 function buildRoast(personality, axes, confidence, usefulCount) {

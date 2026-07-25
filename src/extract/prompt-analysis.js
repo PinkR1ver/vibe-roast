@@ -48,7 +48,12 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
         bucket.count = Number((bucket.count + weight).toFixed(4));
         if (bucket.examples.length < 3) bucket.examples.push(preview(entry));
       }
-      usefulForStats.push({ text: entry.text, source: entry.source, timestamp: entry.timestamp });
+      usefulForStats.push({
+        text: entry.text,
+        source: entry.source,
+        timestamp: entry.timestamp,
+        categories: entry.categories,
+      });
       if (usefulPrompts.length < usefulLimit) usefulPrompts.push(entry);
     } else {
       categories.reference.count += 1;

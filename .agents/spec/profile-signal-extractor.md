@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-08
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 ## Goal
 
@@ -24,3 +24,5 @@ Cursor prompt text extraction is available, but Cursor timestamps and token usag
 Implemented `profile_signals` in the inspect report. It now includes useful/reference prompt classification, category counts, useful prompt examples, reference summaries, reference code/log signals, Codex skill counts split by user/plugin source, MCP server names, plugin counts, config basics, and custom instruction metadata. Reference code/log signals include detected languages, file extensions, file paths, and error types.
 
 PR #6 made these signals inputs to the six-axis `vibe_profile`. Subsequent prompt-hygiene work keeps the complete useful prompt set for statistics while bounding displayed examples, prefers timestamped prompts for word clouds, and excludes assistant/tool/system text plus pasted code and path noise.
+
+Word-cloud ranking now treats distinct-prompt coverage as the primary relevance signal and gives repetition inside one prompt only a logarithmic bonus. The report retains raw `count` and adds `prompt_count` plus display `weight`. Chinese segmentation combines `Intl.Segmenter` with a compact developer-term vocabulary, and common bilingual concept variants are grouped before ranking. UI rendering narrows the vocabulary to coding-domain terms and specific behavioral categories, omits the generic Implementation fallback, and collapses lexical/category duplicates. Unknown recurring terms can be promoted as project-domain entities using independent-Prompt coverage, mentions per Prompt, time concentration, and observed-acronym signals; casing such as `HIT` is preserved. Lightweight `word_cloud_records` let Usage Analytics rebuild the cloud for Day/Week/Month/Total/Custom and Agent filters, while a lifetime domain index keeps established entities eligible in narrow selections.

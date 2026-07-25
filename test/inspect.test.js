@@ -7,13 +7,15 @@ const path = require("node:path");
 
 const { inspectSources } = require("../src/inspect");
 const { analyzePrompts } = require("../src/extract/prompt-analysis");
-const { tokenize, wordFrequencies } = require("../src/extract/phrase-stats");
+const { tokenize, wordCloudRecords, wordFrequencies } = require("../src/extract/phrase-stats");
 const { inspectEnvironment } = require("../src/extract/environment");
 const { dayBounds } = require("../src/lib/dates");
 const { extractCodexPrompt } = require("../src/sources/codex");
 const { extractClaudePrompt } = require("../src/sources/claude");
 const { extractCursorEntriesFromRows, inspectCursor } = require("../src/sources/cursor");
 const { inspectTokenTracker } = require("../src/sources/token-tracker");
+const { codexUsageDelta } = require("../src/sources/codex");
+const { collectClaudeContextMessage, splitClaudeOutput } = require("../src/sources/claude");
 
 const fixtures = path.join(__dirname, "fixtures");
 
@@ -49,6 +51,8 @@ test("inspectSources includes Codex, Claude, and Cursor when fixtures are presen
   });
 
   assert.equal(report.summary.source_count, 3);
+  assert.equal(report.summary.active_source_count, 3);
+  assert.deepEqual(report.summary.active_sources.sort(), ["claude", "codex", "cursor"]);
   assert.equal(report.summary.prompt_count, 5);
   assert.equal(report.sources.codex.prompt_count, 2);
   assert.equal(report.sources.claude.prompt_count, 1);
@@ -88,7 +92,7 @@ test("inspectSources builds vibe_profile from multi-source prompts", async () =>
   assert.equal(vibe.dimensions.length, 6);
   assert.ok(!vibe.signals.some((signal) => signal.label === "Useful prompts"));
   assert.equal(
-    vibe.signals.find((signal) => signal.label === "Sources")?.value,
+    vibe.signals.find((signal) => signal.label === "Agents found")?.value,
     "3",
   );
   assert.ok(report.profile_signals.prompt_analysis.useful_prompt_count >= 4);
@@ -211,6 +215,76 @@ test("TokenTracker queue adapter aggregates hourly token buckets by day", async 
   assert.equal(report.daily_rows[1].billable_total_tokens, 750);
 });
 
+test("Codex context uses non-overlapping cumulative token deltas", () => {
+  const delta = codexUsageDelta(
+    {
+      total: {
+        input_tokens: 1600,
+        cached_input_tokens: 600,
+        output_tokens: 500,
+        reasoning_output_tokens: 100,
+        total_tokens: 2100,
+      },
+    },
+    {
+      input_tokens: 1000,
+      cached_input_tokens: 400,
+      output_tokens: 200,
+      reasoning_output_tokens: 50,
+      total_tokens: 1200,
+    },
+  );
+
+  assert.deepEqual(delta, {
+    input_tokens: 400,
+    cached_input_tokens: 200,
+    cache_creation_input_tokens: 0,
+    output_tokens: 300,
+    reasoning_output_tokens: 50,
+    total_tokens: 900,
+  });
+});
+
+test("Claude context assigns output across text, thinking, and tool blocks", () => {
+  const split = splitClaudeOutput(100, 20, [
+    { type: "text", text: "abcd" },
+    { type: "thinking", thinking: "ignored when explicit reasoning exists" },
+    { type: "tool_use", name: "Read", input: { file: "x" } },
+  ]);
+
+  assert.equal(split.reasoning, 20);
+  assert.equal(split.messages + split.tool_calls + split.reasoning + split.custom_agents, 100);
+  assert.ok(split.tool_calls > split.messages);
+  assert.equal(split.tool_call_count, 1);
+});
+
+test("Claude context merges streaming snapshots before assigning usage", () => {
+  const messages = new Map();
+  const base = {
+    timestamp: "2026-07-01T10:00:00Z",
+    message: {
+      id: "message-1",
+      usage: { input_tokens: 100, output_tokens: 20 },
+    },
+  };
+  collectClaudeContextMessage(messages, {
+    ...base,
+    message: { ...base.message, content: [{ type: "thinking", thinking: "plan" }] },
+  }, base.timestamp);
+  collectClaudeContextMessage(messages, {
+    ...base,
+    message: {
+      ...base.message,
+      content: [{ type: "tool_use", id: "tool-1", name: "Read", input: { file: "a" } }],
+    },
+  }, base.timestamp);
+
+  const [message] = messages.values();
+  assert.equal(messages.size, 1);
+  assert.deepEqual(message.content.map((block) => block.type), ["thinking", "tool_use"]);
+  assert.equal(message.usage.output_tokens, 20);
+});
+
 test("inspectSources exposes TokenTracker activity without adding synthetic prompts", async () => {
   const report = await inspectSources({
     from: "2026-06-07",
@@ -227,6 +301,8 @@ test("inspectSources exposes TokenTracker activity without adding synthetic prom
   assert.equal(report.activity.daily_rows.length, 2);
   assert.equal(report.activity.total_tokens, 5800);
   assert.equal(report.summary.prompt_count, 2);
+  assert.deepEqual(report.summary.active_sources, ["cursor", "codex", "claude"]);
+  assert.equal(report.summary.active_source_count, 3);
   assert.equal(report.sources["token-tracker"], undefined);
   assert.equal(report.vibe_profile.signals[0].label, "Total tokens");
   assert.ok(!report.vibe_profile.signals.some((s) => s.label === "Useful prompts"));
@@ -282,7 +358,7 @@ test("inspectSources computes useful high-frequency terms", async () => {
 
   const terms = report.word_frequencies.map((row) => row.term);
   assert.ok(terms.includes("token"));
-  assert.ok(terms.includes("测试"));
+  assert.ok(report.word_frequencies.some((row) => row.key === "category:testing"));
 });
 
 test("word cloud input excludes assistant and tool content", async () => {
@@ -367,6 +443,8 @@ test("inspectSources computes word frequencies from all useful prompts", async (
 
   const omega = report.word_frequencies.find((row) => row.term === "omega");
   assert.equal(omega?.count, 15);
+  assert.equal(omega?.prompt_count, 5);
+  assert.ok(omega?.weight < omega?.count);
 });
 
 test("inspectSources prefers timestamped prompts for word frequencies", async () => {
@@ -426,6 +504,55 @@ test("tokenize filters common UI state words from word cloud terms", () => {
   assert.ok(terms.includes("统计"));
 });
 
+test("tokenize uses developer-aware Chinese terms instead of noisy bigrams", () => {
+  const terms = tokenize("优化电子发票页面动效");
+
+  assert.ok(terms.includes("优化"));
+  assert.ok(terms.includes("电子"));
+  assert.ok(terms.includes("发票"));
+  assert.ok(terms.includes("页面"));
+  assert.ok(terms.includes("动效"));
+  assert.ok(!terms.includes("化电"));
+  assert.ok(!terms.includes("子发"));
+});
+
+test("wordFrequencies prioritizes prompt coverage over repetition", () => {
+  const words = wordFrequencies([
+    { text: "alpha alpha alpha alpha alpha alpha alpha alpha alpha alpha" },
+    { text: "beta" },
+    { text: "beta" },
+    { text: "beta" },
+  ]);
+
+  assert.equal(words[0].term, "beta");
+  assert.equal(words[0].prompt_count, 3);
+  assert.equal(words.find((row) => row.term === "alpha")?.count, 10);
+});
+
+test("wordFrequencies merges common bilingual concept variants", () => {
+  const words = wordFrequencies([
+    { text: "动效 animation" },
+    { text: "动效 motion" },
+  ]);
+  const motion = words.find((row) => row.term === "动效");
+
+  assert.equal(motion?.count, 4);
+  assert.equal(motion?.prompt_count, 2);
+  assert.equal(words.filter((row) => ["动效", "animation", "motion"].includes(row.term)).length, 1);
+});
+
+test("wordCloudRecords preserves observed acronyms for domain discovery", () => {
+  const [record] = wordCloudRecords([
+    { source: "cursor", timestamp: "2026-01-14T00:00:00Z", text: "继续做 HIT 和前庭分析界面" },
+  ]);
+  const hit = record.concepts.find((concept) => concept.key === "term:hit");
+  const vestibular = record.concepts.find((concept) => concept.key === "term:前庭");
+
+  assert.equal(hit?.acronym, true);
+  assert.equal(hit?.variants.HIT, 1);
+  assert.equal(vestibular?.vibe, false);
+});
+
 test("wordFrequencies ignores pasted code lines inside useful prompts", () => {
   const words = wordFrequencies([
     {
@@ -453,7 +580,7 @@ test("wordFrequencies keeps natural language before inline code", () => {
   ]).map((row) => row.term);
 
   assert.ok(words.includes("架构"));
-  assert.ok(words.includes("代码"));
+  assert.ok(words.includes("代码块"));
   assert.ok(words.includes("胶囊"));
   assert.ok(!words.includes("torch"));
   assert.ok(!words.includes("self"));

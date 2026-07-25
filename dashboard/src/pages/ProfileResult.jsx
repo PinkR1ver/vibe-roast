@@ -1,24 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useLocale } from "../contexts/LocaleContext.jsx";
-import WordCloud from "../components/WordCloud.jsx";
+import { useTheme } from "../contexts/ThemeContext.jsx";
 import ActivityHeatmap3DPanel from "../components/ActivityHeatmap3DPanel.jsx";
-import { buildHashtags } from "../lib/hashtags.js";
-import { buildModelBreakdown } from "../lib/profile-viz.js";
-import { downloadCanvasPng, renderSharePoster } from "../lib/share-poster.js";
+import AgentIcon from "../components/AgentIcon.jsx";
+import SharePosterModal from "../components/SharePosterModal.jsx";
+import UsageAnalytics from "../components/UsageAnalytics.jsx";
+import { buildHashtags, mergeHashtags } from "../lib/hashtags.js";
+import { canvasToPngFile, downloadCanvasPng, renderSharePoster } from "../lib/share-poster.js";
 
-const ROAST_CLOUD_COLORS = [
-  "#ff5a1f", "#f0c14a", "#e07a3a", "#c45c26", "#8b5a2b",
-  "#23d6a5", "#5b8cff", "#6b6560", "#d97706", "#b45309",
-];
-
-function compactNumber(value) {
-  const n = Number(value) || 0;
-  if (n < 1000) return n.toLocaleString();
-  if (n < 1000000) return `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}K`;
-  if (n < 10000000) return `${(n / 1000000).toFixed(2)}M`;
-  if (n < 1000000000) return `${(n / 1000000).toFixed(1)}M`;
-  return `${(n / 1000000000).toFixed(n >= 10000000000 ? 0 : 2)}B`;
+function rangeLabel(range, zh) {
+  if (!range?.from && !range?.to) return zh ? "全部时间" : "ALL TIME";
+  return `${range?.from || "…"} → ${range?.to || "…"}`;
 }
 
 function ShareIcon({ size = 18 }) {
@@ -41,17 +34,46 @@ function ShareIcon({ size = 18 }) {
 
 function PageChrome({ accent, onShare, posterBusy, t }) {
   const { toggleLocale } = useLocale();
+  const { theme, setTheme } = useTheme();
+  const themeOptions = [
+    { key: "light", Icon: Sun },
+    { key: "dark", Icon: Moon },
+    { key: "system", Icon: Monitor },
+  ];
 
   return (
-    <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
-      <h1 className="roast-brand m-0 text-[44px] sm:text-[52px] leading-[0.95] text-[#1a1a1a]">
+    <div className="motion-chrome mb-7 flex flex-wrap items-end justify-between gap-4">
+      <h1 className="roast-brand m-0 text-[44px] sm:text-[52px] leading-[0.95] text-[#1a1a1a] dark:text-[#fafafa]">
         {t("app.brand")}
       </h1>
       <div className="flex items-center gap-1 pb-1">
+        <div
+          className="mr-1 inline-flex items-center rounded-xl border border-black/[0.06] bg-white/45 p-1 dark:border-white/[0.08] dark:bg-white/[0.04]"
+          role="group"
+          aria-label={t("theme.system")}
+        >
+          {themeOptions.map(({ key, Icon }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTheme(key)}
+              className={`motion-button inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
+                theme === key
+                  ? "bg-white text-[#1a1a1a] shadow-sm dark:bg-[#2a2a2a] dark:text-white"
+                  : "text-[#8b8680] hover:text-[#1a1a1a] dark:text-[#8f8f8f] dark:hover:text-white"
+              }`}
+              title={t(`theme.${key}`)}
+              aria-label={t(`theme.${key}`)}
+              aria-pressed={theme === key}
+            >
+              <Icon size={14} />
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           onClick={toggleLocale}
-          className="h-10 min-w-[2.5rem] px-2.5 rounded-xl text-[11px] font-semibold text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors"
+          className="motion-button h-10 min-w-[2.5rem] px-2.5 rounded-xl text-[11px] font-semibold text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors dark:text-[#a3a3a3] dark:hover:bg-white/[0.06] dark:hover:text-white"
           title={t("app.languageTitle")}
           aria-label={t("app.languageTitle")}
         >
@@ -61,7 +83,7 @@ function PageChrome({ accent, onShare, posterBusy, t }) {
           href="https://github.com/PinkR1ver/vibe-roast"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors"
+          className="motion-button inline-flex h-10 w-10 items-center justify-center rounded-xl text-[#6b6560] hover:text-[#1a1a1a] hover:bg-black/[0.04] transition-colors dark:text-[#a3a3a3] dark:hover:bg-white/[0.06] dark:hover:text-white"
           aria-label={t("app.github")}
           title={t("app.github")}
         >
@@ -74,7 +96,7 @@ function PageChrome({ accent, onShare, posterBusy, t }) {
             type="button"
             onClick={onShare}
             disabled={posterBusy}
-            className="ml-1 inline-flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-[0_10px_20px_rgba(255,90,31,0.25)] disabled:opacity-60"
+            className="motion-button motion-share ml-1 inline-flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-[0_10px_20px_rgba(255,90,31,0.25)] disabled:opacity-60"
             style={{ background: accent }}
             aria-label={posterBusy ? t("profile.posterBusy") : t("profile.posterShare")}
             title={posterBusy ? t("profile.posterBusy") : t("profile.posterShare")}
@@ -91,87 +113,6 @@ function PageChrome({ accent, onShare, posterBusy, t }) {
   );
 }
 
-function PosterModal({ open, previewUrl, accent, busy, onClose, onDownload, t }) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
-
-  if (!open || typeof document === "undefined") return null;
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-end justify-center bg-black/45 backdrop-blur-[2px] sm:items-center sm:p-4"
-      onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-      role="presentation"
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("profile.posterTitle")}
-        className="flex max-h-[96vh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-[22px] bg-[#fffcf7] shadow-[0_-12px_40px_rgba(40,28,12,0.18)] sm:max-h-[92vh] sm:rounded-[22px] sm:shadow-[0_24px_60px_rgba(40,28,12,0.22)]"
-      >
-        <div className="flex items-center justify-between gap-3 border-b border-black/[0.06] px-4 py-3.5">
-          <div>
-            <div className="text-sm font-extrabold text-[#1a1a1a]">{t("profile.posterTitle")}</div>
-            <div className="mt-0.5 text-[11px] text-[#8b8680]">{t("profile.posterHint")}</div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-11 min-w-[4.5rem] items-center justify-center rounded-xl px-3 text-sm font-bold text-[#6b6560] hover:bg-black/[0.04]"
-          >
-            {t("profile.posterClose")}
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-auto px-4 py-4">
-          <div className="mx-auto aspect-[3/4] w-full max-w-[320px] overflow-hidden rounded-2xl border border-black/[0.06] bg-[#f3f1ec] shadow-[0_10px_28px_rgba(40,28,12,0.1)]">
-            {previewUrl ? (
-              <img src={previewUrl} alt={t("profile.posterTitle")} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm font-semibold text-[#8b8680]">
-                {busy ? t("profile.posterBusy") : "…"}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 border-t border-black/[0.06] px-4 py-3.5 pb-[max(0.9rem,env(safe-area-inset-bottom))]">
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-12 items-center justify-center rounded-xl border border-black/[0.08] bg-white text-sm font-bold text-[#1a1a1a]"
-          >
-            {t("profile.posterClose")}
-          </button>
-          <button
-            type="button"
-            onClick={onDownload}
-            disabled={!previewUrl || busy}
-            className="inline-flex h-12 items-center justify-center rounded-xl text-sm font-bold text-white disabled:opacity-50"
-            style={{ background: accent }}
-          >
-            {t("profile.posterDownload")}
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body,
-  );
-}
-
 export default function ProfileResult({ data }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
@@ -183,23 +124,53 @@ export default function ProfileResult({ data }) {
   const [posterOpen, setPosterOpen] = useState(false);
   const [posterPreview, setPosterPreview] = useState("");
   const [posterCanvas, setPosterCanvas] = useState(null);
+  const [shareNotice, setShareNotice] = useState("");
+  const pageRef = useRef(null);
 
   const categories = data?.profile_signals?.prompt_analysis?.categories || {};
   const hashtags = useMemo(
-    () => buildHashtags(vibe, categories, { locale: zh ? "zh" : "en" }),
+    () => {
+      const generated = zh ? vibe?.hashtagsZh : vibe?.hashtags;
+      if (Array.isArray(generated) && generated.length >= 3) {
+        return mergeHashtags(generated);
+      }
+      return buildHashtags(vibe, categories, { locale: zh ? "zh" : "en" });
+    },
     [vibe, categories, zh],
   );
-  const words = data?.word_frequencies || [];
   const accent = vibe?.archetype?.accent || "#ff5a1f";
-  const modelBreakdown = useMemo(() => buildModelBreakdown(activity || {}), [activity]);
-  const isTokenMetric = activity?.metric === "tokens" && Number(activity?.total_tokens || 0) > 0;
-  const peak = activity?.peak_day;
-  const hasCost = activity?.estimated_cost_usd != null && Number(activity.estimated_cost_usd) > 0;
-  const estCost = hasCost ? Number(activity.estimated_cost_usd) : null;
+  const nativeShareSupported = useMemo(() => {
+    if (!posterCanvas || typeof navigator === "undefined" || typeof File === "undefined" || !navigator.share || !navigator.canShare) return false;
+    try {
+      const probe = new File([""], "vibe-roast-card.png", { type: "image/png" });
+      return navigator.canShare({ files: [probe] });
+    } catch {
+      return false;
+    }
+  }, [posterCanvas]);
 
+  useEffect(() => {
+    const root = pageRef.current;
+    if (!root) return undefined;
+    const nodes = [...root.querySelectorAll(".motion-reveal")];
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || typeof IntersectionObserver === "undefined") {
+      nodes.forEach((node) => node.classList.add("is-visible"));
+      return undefined;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: 0.12, rootMargin: "0px 0px -7% 0px" });
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [vibe?.type_code]);
   if (!vibe) {
     return (
-      <div className="min-h-screen bg-[#f3f1ec] text-[#1a1a1a] px-4 py-8">
+      <div className="min-h-screen bg-[#f3f1ec] text-[#1a1a1a] px-4 py-8 dark:bg-[#0a0a0a] dark:text-[#fafafa]">
         <div className="mx-auto w-full max-w-[1120px]">
           <PageChrome accent={accent} t={t} />
           <p className="text-[#6b6560]">{t("profile.empty")}</p>
@@ -220,6 +191,7 @@ export default function ProfileResult({ data }) {
     setPosterOpen(true);
     setPosterPreview("");
     setPosterCanvas(null);
+    setShareNotice("");
     try {
       const canvas = await renderSharePoster({ vibe, hashtags, locale });
       setPosterCanvas(canvas);
@@ -235,16 +207,67 @@ export default function ProfileResult({ data }) {
   function handleDownloadPoster() {
     if (!posterCanvas) return;
     const code = (vibe.archetype?.code || "vibe").toLowerCase();
-    downloadCanvasPng(posterCanvas, `vibe-roast-${code}-3x4.png`);
+    downloadCanvasPng(posterCanvas, `vibe-roast-${code}-card.png`);
+    setShareNotice(t("profile.posterSaved"));
   }
 
   function handleClosePoster() {
     setPosterOpen(false);
   }
 
+  function buildShareCaption() {
+    const code = vibe.type_code || vibe.archetype?.code || "";
+    const title = zh ? vibe.archetype?.titleZh : vibe.archetype?.title;
+    const shareTldr = zh ? (vibe.tldrZh || vibe.tldr) : (vibe.tldr || vibe.tldrZh);
+    const invitation = zh ? "测测你的编码人格" : "Roast your coding vibe";
+    return [
+      `${title || "Vibe Coder"} · ${code}`,
+      shareTldr,
+      hashtags.slice(0, 4).join(" "),
+      `${invitation}: https://github.com/PinkR1ver/vibe-roast`,
+    ].filter(Boolean).join("\n\n");
+  }
+
+  async function handleNativeShare() {
+    if (!posterCanvas || !navigator.share) return;
+    const code = (vibe.archetype?.code || "vibe").toLowerCase();
+    try {
+      const file = await canvasToPngFile(posterCanvas, `vibe-roast-${code}-card.png`);
+      await navigator.share({
+        title: t("profile.posterTitle"),
+        text: buildShareCaption(),
+        files: [file],
+      });
+      setShareNotice(t("profile.posterShared"));
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        setShareNotice(error?.message || t("profile.posterShareFailed"));
+      }
+    }
+  }
+
+  async function handleCopyCaption() {
+    const caption = buildShareCaption();
+    try {
+      await navigator.clipboard.writeText(caption);
+      setShareNotice(t("profile.posterCaptionCopied"));
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = caption;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+      setShareNotice(t("profile.posterCaptionCopied"));
+    }
+  }
+
   return (
     <div
-      className="min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a]"
+      ref={pageRef}
+      className="roast-page min-h-screen bg-[radial-gradient(1200px_600px_at_10%_-10%,#ffe7d6_0%,transparent_55%),radial-gradient(900px_500px_at_100%_0%,#d9fff3_0%,transparent_50%),linear-gradient(180deg,#f3f1ec_0%,#e8e4db_100%)] text-[#1a1a1a] transition-colors dark:text-[#fafafa]"
       style={{ ["--roast-accent"]: accent }}
     >
       <div className="mx-auto w-full max-w-[1120px] px-4 pt-7 pb-20">
@@ -257,12 +280,12 @@ export default function ProfileResult({ data }) {
         {posterError && <p className="mb-4 text-sm text-[#e24b4b]">{posterError}</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)] gap-5 items-start min-w-0">
-          <aside className="min-w-0 text-center">
+          <aside className="motion-hero min-w-0 text-center">
             <div className="relative mx-auto mb-2 overflow-hidden px-2 pt-3 isolate">
               <div
                 className="pointer-events-none absolute left-1/2 top-[8%] z-0 h-[78%] w-full -translate-x-1/2 rounded-[46%_54%_42%_58%/48%_44%_56%_52%]"
                 style={{
-                  background: `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${accent} 28%, #fff), transparent 58%), radial-gradient(circle at 70% 65%, color-mix(in srgb, ${accent} 16%, #f3f1ec), transparent 62%)`,
+                  background: `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${accent} 28%, var(--roast-card)), transparent 58%), radial-gradient(circle at 70% 65%, color-mix(in srgb, ${accent} 16%, var(--roast-page)), transparent 62%)`,
                 }}
               />
               <img
@@ -275,7 +298,7 @@ export default function ProfileResult({ data }) {
                 }}
                 width={384}
                 height={512}
-                className="relative z-[1] mx-auto h-auto w-[88%] max-w-[280px] object-contain drop-shadow-[0_18px_28px_rgba(40,28,12,0.12)]"
+                className="motion-character relative z-[1] mx-auto h-auto w-[88%] max-w-[280px] object-contain drop-shadow-[0_18px_28px_rgba(40,28,12,0.12)]"
               />
             </div>
             <p className="m-0 text-[13px] font-bold tracking-wide text-[#6b6560]">@{vibe.archetype.code.toLowerCase()}</p>
@@ -288,10 +311,10 @@ export default function ProfileResult({ data }) {
               {hashtags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full px-2.5 py-1 text-[12px] font-bold"
+                  className="motion-chip rounded-full px-2.5 py-1 text-[12px] font-bold"
                   style={{
-                    background: `color-mix(in srgb, ${accent} 14%, #fffcf7)`,
-                    color: `color-mix(in srgb, ${accent} 72%, #222)`,
+                    background: `color-mix(in srgb, ${accent} 14%, var(--roast-card))`,
+                    color: `color-mix(in srgb, ${accent} 72%, var(--roast-text))`,
                   }}
                 >
                   {tag}
@@ -301,20 +324,31 @@ export default function ProfileResult({ data }) {
           </aside>
 
           <section className="space-y-4">
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+            <div className="motion-reveal motion-surface rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <div className="font-[JetBrains_Mono,ui-monospace,monospace] text-[42px] font-bold leading-none tracking-[0.08em]">
                     {vibe.type_code || vibe.archetype.code}
                   </div>
-                  <div className="mt-2 text-sm font-bold" style={{ color: vibe.tier.color }}>
-                    {vibe.tier.emoji} {vibe.confidence}% {zh ? "类型置信度" : "TYPE CONFIDENCE"}
+                  <div
+                    className="mt-2 flex items-baseline gap-1.5 font-bold"
+                    style={{ color: vibe.tier.color }}
+                  >
+                    <span className="text-[12px]" aria-hidden="true">{vibe.tier.emoji}</span>
+                    <span className="text-[17px] tabular-nums">{vibe.confidence}%</span>
+                    <span className="text-[11px] uppercase tracking-[0.06em]">
+                      {zh ? "类型置信度" : "TYPE CONFIDENCE"}
+                    </span>
                   </div>
-                  <p className="mt-1 mb-0 text-sm text-[#6b6560]">{tierBlurb}</p>
+                  <p className="mt-1 mb-0 text-[13px] text-[#6b6560]">{tierBlurb}</p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-2 text-center">
-                  {vibe.signals.map((signal) => (
-                    <div key={signal.label} className="min-w-0 rounded-xl bg-[#f3f1ec] px-2.5 py-2">
+                  {vibe.signals.map((signal, index) => (
+                    <div
+                      key={signal.label}
+                      className="motion-stat min-w-0 rounded-xl bg-[#f3f1ec] px-2.5 py-2"
+                      style={{ ["--motion-delay"]: `${120 + index * 55}ms` }}
+                    >
                       <div className="text-[11px] font-semibold uppercase tracking-wide text-[#6b6560]">
                         {zh ? signal.labelZh : signal.label}
                       </div>
@@ -325,13 +359,29 @@ export default function ProfileResult({ data }) {
                   ))}
                 </div>
               </div>
-              <p className="mt-4 mb-0 text-xs text-[#6b6560]">
-                {data?.range?.from || "…"} → {data?.range?.to || "…"} · {summary.source_count || 0} {t("profile.sources")}
-              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#6b6560]">
+                <span>
+                  {rangeLabel(data?.range, zh)} · {t("profile.agentsFound", {
+                    count: summary.active_source_count ?? summary.active_sources?.length ?? 0,
+                  })}
+                </span>
+                {(summary.active_sources || []).length > 0 && (
+                  <span className="inline-flex items-center gap-1" aria-label={t("profile.detectedAgents")}>
+                    {summary.active_sources.map((agent) => (
+                      <AgentIcon
+                        key={agent}
+                        agent={agent}
+                        size={22}
+                        className="ring-2 ring-[#fffcf7]"
+                      />
+                    ))}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] gap-4 min-w-0">
-              <div className="min-w-0 rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-4 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+              <div className="motion-reveal motion-surface min-w-0 rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-4 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <h2 className="m-0 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.radar")}</h2>
                   <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8b8680]">{t("profile.sixAxis")}</span>
@@ -339,18 +389,18 @@ export default function ProfileResult({ data }) {
                 <ScoreRadar dimensions={vibe.dimensions} accent={accent} zh={zh} ariaLabel={t("profile.radarAria")} />
               </div>
 
-              <div className="min-w-0 rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-4 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{zh ? "四维类型" : "TYPE AXES"}</h2>
+              <div className="motion-reveal motion-surface min-w-0 rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-4 shadow-[0_10px_30px_rgba(40,28,12,0.06)]" style={{ ["--motion-delay"]: "70ms" }}>
+                <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.axes")}</h2>
                 <div className="space-y-2.5">
-                  {(vibe.type_axes || []).map((axis) => (
+                  {(vibe.type_axes || []).map((axis, index) => (
                     <div key={axis.key} className="min-w-0">
                       <div className="mb-1 flex justify-between gap-2 text-xs font-bold">
                         <span style={{ color: axis.letter === axis.left.code ? accent : undefined }}>{axis.left.code} · {zh ? axis.left.labelZh : axis.left.label} {axis.left.percent}%</span>
                         <span style={{ color: axis.letter === axis.right.code ? accent : undefined }}>{axis.right.percent}% {axis.right.code} · {zh ? axis.right.labelZh : axis.right.label}</span>
                       </div>
                       <div className="flex h-2 overflow-hidden rounded-full bg-[#e8e4db]">
-                        <div style={{ width: `${axis.left.percent}%`, background: accent }} />
-                        <div className="bg-[#d6d0c6]" style={{ width: `${axis.right.percent}%` }} />
+                        <div className="motion-progress" style={{ width: `${axis.left.percent}%`, background: accent, ["--motion-delay"]: `${100 + index * 75}ms` }} />
+                        <div className="motion-progress bg-[#d6d0c6]" style={{ width: `${axis.right.percent}%`, ["--motion-delay"]: `${140 + index * 75}ms` }} />
                       </div>
                     </div>
                   ))}
@@ -358,7 +408,7 @@ export default function ProfileResult({ data }) {
               </div>
             </div>
 
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
+            <div className="motion-reveal motion-surface rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.roast")}</h2>
               <p className="m-0 text-[15px] leading-relaxed whitespace-pre-wrap">{roast}</p>
               <p className="mt-4 mb-0 rounded-xl bg-[#fff0e8] px-3 py-2 text-sm">
@@ -366,81 +416,12 @@ export default function ProfileResult({ data }) {
               </p>
             </div>
 
-            {words.length > 0 && (
-              <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-                <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.cloudKicker")}</div>
-                <h2 className="m-0 mb-1.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.cloud")}</h2>
-                <div className="h-[140px] w-full overflow-hidden rounded-xl bg-[#f7f4ef]">
-                  <WordCloud
-                    words={words.slice(0, 80)}
-                    width={720}
-                    height={140}
-                    gridSize={3}
-                    weightDivisor={4.2}
-                    rotateRatio={0.08}
-                    minRotation={-0.18}
-                    maxRotation={0.18}
-                    ellipticity={0.9}
-                    minSize={7}
-                    colors={ROAST_CLOUD_COLORS}
-                    fontFamily="Outfit, system-ui, sans-serif"
-                  />
-                </div>
-              </div>
-            )}
-
-            <div className="rounded-[18px] border border-black/[0.04] bg-[#fffcf7] px-3 py-2.5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
-              <div className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b8680]">{t("profile.activityKicker")}</div>
-              <h2 className="m-0 mb-0.5 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.activity")}</h2>
-              <p className="mt-0 mb-2 text-xs text-[#8b8680]">
-                {isTokenMetric ? t("profile.activityHintTokens") : t("profile.activityHint")}
-              </p>
-
-              <div className="mb-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
-                <RoastStat
-                  label={isTokenMetric ? t("profile.stat.totalTokens") : t("profile.stat.totalPrompts")}
-                  value={compactNumber(isTokenMetric ? activity.total_tokens : (activity?.daily_rows || []).reduce((s, r) => s + Number(r.value || 0), 0))}
-                  accent="#059669"
-                />
-                <RoastStat
-                  label={hasCost ? t("profile.stat.estCost") : t("profile.stat.activeDays")}
-                  value={hasCost ? `$${estCost.toFixed(estCost >= 100 ? 0 : 2)}` : String(activity?.active_day_count || 0)}
-                  accent={hasCost ? "#059669" : undefined}
-                />
-                <RoastStat
-                  label={t("profile.stat.streak")}
-                  value={`${activity?.longest_streak || 0}${zh ? " 天" : "d"}`}
-                />
-                <RoastStat
-                  label={t("profile.stat.peakDay")}
-                  value={peak?.value ? compactNumber(peak.value) : "—"}
-                  suffix={peak?.day || undefined}
-                />
-              </div>
-
-              {modelBreakdown.sources.length > 0 && (
-                <div className="mb-1.5 flex flex-wrap gap-1">
-                  {modelBreakdown.sources.slice(0, 4).map((source) => (
-                    <div
-                      key={source.key}
-                      className="inline-flex items-baseline gap-1.5 rounded-md border border-black/[0.04] bg-[#f7f4ef] px-2 py-1"
-                    >
-                      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-[#8b8680]">{source.key}</span>
-                      <span className="text-sm font-extrabold tabular-nums text-[#1a1a1a]">{source.percent}%</span>
-                      {isTokenMetric && (
-                        <span className="text-[9px] text-[#8b8680]">{compactNumber(source.tokens)}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <div className="h-[320px] max-h-[340px]">
+            <div className="motion-reveal motion-surface rounded-[18px] border border-black/[0.06] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)] dark:border-white/[0.08]">
+              <div>
                 <ActivityHeatmap3DPanel
                   prompts={data?.prompts || []}
                   activity={activity}
                   weeks={52}
-                  forceLight
                   defaultPalette="emerald"
                   roastStyle
                   showViewToggle
@@ -448,36 +429,28 @@ export default function ProfileResult({ data }) {
                 />
               </div>
             </div>
+
+            <UsageAnalytics
+              activity={activity}
+              wordCloudRecords={data?.word_cloud_records || []}
+            />
           </section>
         </div>
       </div>
 
-      <PosterModal
+      <SharePosterModal
         open={posterOpen}
         previewUrl={posterPreview}
         accent={accent}
         busy={posterBusy}
+        nativeShareSupported={nativeShareSupported}
+        notice={shareNotice}
         onClose={handleClosePoster}
         onDownload={handleDownloadPoster}
+        onNativeShare={handleNativeShare}
+        onCopyCaption={handleCopyCaption}
         t={t}
       />
-    </div>
-  );
-}
-
-function RoastStat({ label, value, suffix, accent }) {
-  return (
-    <div className="rounded-lg bg-[#f7f4ef] px-2.5 py-1.5">
-      <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#8b8680]">{label}</div>
-      <div className="mt-0.5 flex items-baseline gap-1">
-        <span
-          className="font-[JetBrains_Mono,ui-monospace,monospace] text-lg font-extrabold tabular-nums tracking-tight"
-          style={accent ? { color: accent } : undefined}
-        >
-          {value}
-        </span>
-        {suffix && <span className="text-[9px] font-semibold text-[#8b8680]">{suffix}</span>}
-      </div>
     </div>
   );
 }
@@ -520,14 +493,14 @@ function ScoreRadar({ dimensions, accent, zh, ariaLabel }) {
               return `${center + Math.cos(angle) * maxRadius * ring},${center + Math.sin(angle) * maxRadius * ring}`;
             })
             .join(" ");
-          return <polygon key={ring} points={ringPoints} fill="none" stroke="rgba(40,30,20,0.1)" strokeWidth="1" />;
+          return <polygon className="radar-grid" key={ring} points={ringPoints} fill="none" stroke="var(--radar-grid)" strokeWidth="1" />;
         })}
         {points.map((point) => (
-          <line key={point.key} x1={center} y1={center} x2={point.axisX} y2={point.axisY} stroke="rgba(40,30,20,0.1)" strokeWidth="1" />
+          <line className="radar-grid" key={point.key} x1={center} y1={center} x2={point.axisX} y2={point.axisY} stroke="var(--radar-grid)" strokeWidth="1" />
         ))}
-        <polygon points={polygon} fill={`${accent}33`} stroke={accent} strokeWidth="2.5" />
+        <polygon className="radar-shape" points={polygon} fill={`${accent}33`} stroke={accent} strokeWidth="2.5" />
         {points.map((point) => (
-          <circle key={`${point.key}-dot`} cx={point.x} cy={point.y} r="3.5" fill={accent} stroke="#fffcf7" strokeWidth="1.5" />
+          <circle className="radar-dot" key={`${point.key}-dot`} cx={point.x} cy={point.y} r="3.5" fill={accent} stroke="var(--roast-card)" strokeWidth="1.5" />
         ))}
         {points.map((point) => {
           const anchor = point.labelX < center - 6 ? "end" : point.labelX > center + 6 ? "start" : "middle";
@@ -538,7 +511,7 @@ function ScoreRadar({ dimensions, accent, zh, ariaLabel }) {
               y={point.labelY}
               textAnchor={anchor}
               dominantBaseline="middle"
-              fill="#6b6560"
+              fill="var(--roast-muted)"
               fontSize="10"
               fontWeight="700"
             >

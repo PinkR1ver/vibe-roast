@@ -352,7 +352,7 @@ export default function ActivityHeatmap3D({
         height="100%"
         preserveAspectRatio="xMidYMid meet"
         role="img"
-        aria-label="3D interactive activity heatmap"
+        aria-label="Interactive activity heatmap"
         style={{ display: "block", width: "100%", height: "100%", maxHeight: interactive ? "78vh" : "100%" }}
         className="transition-transform duration-300 ease-out"
       >

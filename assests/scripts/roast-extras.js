@@ -605,7 +605,7 @@ export async function renderSharePoster({ vibe, hashtags = [], lang = "zh" } = {
   ctx.textAlign = "center";
   ctx.fillStyle = "#8b8680";
   ctx.font = "600 13px Outfit, system-ui, sans-serif";
-  ctx.fillText(zh ? "vibe-wrapper · 本地 roast" : "vibe-wrapper · local roast", width / 2, height - 28);
+  ctx.fillText(zh ? "vibe-roast · 本地 roast" : "vibe-roast · local roast", width / 2, height - 28);
 
   return canvas;
 }

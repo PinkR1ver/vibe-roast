@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-09
-Last updated: 2026-07-22
+Last updated: 2026-07-23
 
 ## Goal
 
@@ -21,11 +21,11 @@ Use TokenTracker's local hourly queue as the preferred activity metric while kee
 
 ## UI consumption
 
-The current Roast Result page shows a compact 2D activity map, expandable 3D detail, token/prompt KPI cards, Top Agent/Provider/Model signals, and a TokenTracker model breakdown where available. The former dashboard provider-card selection behavior is obsolete and was removed with the old dashboard.
+The current Roast Result page shows a TokenTracker-style annual activity card: month/day labels, five-level Less/More legend, local UTC offset, and 2D/3D tabs with an expandable interactive view. Below it, functional usage cards provide Day/Week/Month/Total/Custom filtering, Agent filtering, total tokens, proportional estimated cost when available, Agent breakdown, a filter-linked vibe-coding word cloud, Codex/Claude context breakdowns, a compact per-model token/percent/cost breakdown, and a stacked daily/monthly usage trend. Context rows follow the same time/Agent filters and rescale raw-session category proportions to TokenTracker's authoritative source total; Codex context appears only when Codex is selected, Claude context only when Claude Code is selected, and the section stays hidden for All or unsupported agents. Their UI labels explicitly distinguish Codex turn-delta heuristics from Claude content-block approximation. Model rows aggregate equal concrete names across sources, preserve `auto`/`unknown` routing buckets, and collapse to the leading six until expanded. Heatmap cells, Agent proportions, totals, the cloud, context rows, model list, and trend bars update when their containing section enters the viewport or its filter changes; reduced-motion users receive the final state immediately. Summary KPIs remain in the profile header instead of being duplicated inside Activity. The full page supports persisted light, dark, and system themes. Agent badges use normalized local icon mappings. The profile header reports only agents with real prompt or TokenTracker activity; it does not present the number of scanned adapters as found agents. The former dashboard provider-card selection behavior is obsolete and was removed with the old dashboard.
 
 ## Testing notes
 
-Fixture-backed tests cover queue aggregation, deduplication, daily rows, date filtering, model/source breakdown, prompt-count fallback, activity summaries, and inspect integration.
+Fixture-backed tests cover queue aggregation, deduplication, daily rows, date filtering, model/source breakdown, prompt-count fallback, activity summaries, inspect integration, usage-range filtering, source totals, model counts, context scaling/filtering, Codex cumulative deltas, Claude streaming-snapshot merging, and trend bucketing.
 
 ## Completion summary
 

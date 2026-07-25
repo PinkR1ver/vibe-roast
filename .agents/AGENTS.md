@@ -1,6 +1,6 @@
-# Vibe Wrapper Agent Guide
+# Vibe Roaster Agent Guide
 
-Vibe Wrapper is a local-first Node.js application that reads local AI coding-session history and turns it into a bilingual, shareable "Vibe Roaster" profile. The current product surface is the single Roast Result page; the former multi-page analytics dashboard is no longer part of the app shell.
+Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, that reads local AI coding-session history and turns it into a bilingual, shareable profile. The current product surface is the single Roast Result page; the former multi-page analytics dashboard is no longer part of the app shell.
 
 ## Start here
 

@@ -1,8 +1,9 @@
 const { dayBounds } = require("./lib/dates");
-const { wordFrequencies } = require("./extract/phrase-stats");
+const { wordCloudRecords, wordFrequenciesFromRecords } = require("./extract/phrase-stats");
 const { analyzePrompts } = require("./extract/prompt-analysis");
 const { inspectEnvironment } = require("./extract/environment");
 const { buildVibeProfile } = require("./lib/agent-score");
+const { buildRoastEvidence } = require("./lib/roast-evidence");
 const { inspectTokenTracker } = require("./sources/token-tracker");
 const { SOURCE_INSPECTORS, normalizeSources } = require("./sources");
 
@@ -42,8 +43,8 @@ async function inspectSources({ from, to, sources, roots = {}, injectedReports =
     home: roots.home,
     codexHome: roots.codexHome,
   });
-  const summary = buildSummary(sourceReports, prompts);
-  const activity = enrichActivity(buildActivity(tokenTrackerActivity, prompts));
+  const activity = enrichActivity(buildActivity(tokenTrackerActivity, prompts, sourceReports));
+  const summary = buildSummary(sourceReports, prompts, activity);
   const vibe_profile = buildVibeProfile({
     categories: promptAnalysis.categories || {},
     env: environment?.codex || {},
@@ -51,14 +52,18 @@ async function inspectSources({ from, to, sources, roots = {}, injectedReports =
     promptAnalysis,
     activity,
   });
+  const word_cloud_records = wordCloudRecords(
+    wordPromptAnalysis.useful_for_stats || wordPromptAnalysis.useful_prompts,
+  );
 
-  return {
+  const report = {
     generated_at: new Date().toISOString(),
     range: { from: from || null, to: to || null },
     summary,
     sources: sourceReports,
     activity,
-    word_frequencies: wordFrequencies(wordPromptAnalysis.useful_for_stats || wordPromptAnalysis.useful_prompts),
+    word_frequencies: wordFrequenciesFromRecords(word_cloud_records),
+    word_cloud_records,
     profile_signals: {
       prompt_analysis: promptAnalysis,
       environment,
@@ -66,14 +71,16 @@ async function inspectSources({ from, to, sources, roots = {}, injectedReports =
     vibe_profile,
     prompts,
   };
+  report.roast_evidence = buildRoastEvidence(report);
+  return report;
 }
 
-function buildActivity(tokenTrackerActivity, prompts = []) {
+function buildActivity(tokenTrackerActivity, prompts = [], sourceReports = {}) {
   if (tokenTrackerActivity?.daily_rows?.length > 0) {
     return {
       source: "token-tracker",
       metric: "tokens",
-      daily_rows: tokenTrackerActivity.daily_rows,
+      daily_rows: attachContextBreakdown(tokenTrackerActivity.daily_rows, sourceReports),
       total_tokens: tokenTrackerActivity.token_totals?.total_tokens || 0,
       active_day_count: tokenTrackerActivity.active_day_count || 0,
       bucket_count: tokenTrackerActivity.bucket_count || 0,
@@ -122,6 +129,22 @@ function buildActivity(tokenTrackerActivity, prompts = []) {
   };
 }
 
+function attachContextBreakdown(dailyRows, sourceReports) {
+  const contextByDay = new Map();
+  for (const [source, report] of Object.entries(sourceReports || {})) {
+    for (const row of report?.context_breakdown_daily || []) {
+      if (!row?.day) continue;
+      const day = contextByDay.get(row.day) || {};
+      day[source] = row;
+      contextByDay.set(row.day, day);
+    }
+  }
+  return (dailyRows || []).map((row) => ({
+    ...row,
+    context_breakdown: contextByDay.get(row.day) || {},
+  }));
+}
+
 function enrichActivity(activity) {
   const { summarizeActivity } = require("./lib/activity-metrics");
   const stats = summarizeActivity(activity);
@@ -154,7 +177,7 @@ function stripPrompts(report) {
   return rest;
 }
 
-function buildSummary(sourceReports, prompts) {
+function buildSummary(sourceReports, prompts, activity) {
   const tokenTotals = emptyTotals();
   let filesScanned = 0;
   for (const report of Object.values(sourceReports)) {
@@ -163,15 +186,58 @@ function buildSummary(sourceReports, prompts) {
   }
 
   const timestampedPrompts = prompts.filter((prompt) => prompt.timestamp);
+  const activeSources = rankActiveSources(sourceReports, prompts, activity);
 
   return {
+    // Kept for CLI/API compatibility: this is the number of adapters inspected.
     source_count: Object.keys(sourceReports).length,
+    active_source_count: activeSources.length,
+    active_sources: activeSources,
     files_scanned: filesScanned,
     prompt_count: prompts.length,
     first_prompt_at: timestampedPrompts[0]?.timestamp || null,
     last_prompt_at: timestampedPrompts[timestampedPrompts.length - 1]?.timestamp || null,
     token_totals: tokenTotals,
   };
+}
+
+function rankActiveSources(sourceReports, prompts, activity) {
+  const scores = new Map();
+  const add = (source, value = 1) => {
+    const key = normalizeSourceId(source);
+    const amount = Number(value);
+    if (!key || !Number.isFinite(amount) || amount <= 0) return;
+    scores.set(key, (scores.get(key) || 0) + amount);
+  };
+
+  for (const prompt of prompts || []) add(prompt?.source);
+
+  for (const [key, report] of Object.entries(sourceReports || {})) {
+    const promptCount = Number(report?.prompt_count || 0);
+    const tokenCount = Number(report?.token_totals?.total_tokens || 0);
+    if (promptCount > 0 || tokenCount > 0) add(report?.source || key, promptCount || tokenCount);
+  }
+
+  for (const row of activity?.daily_rows || []) {
+    for (const [source, value] of Object.entries(row?.sources || {})) add(source, value);
+  }
+
+  return [...scores.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([source]) => source);
+}
+
+function normalizeSourceId(source) {
+  const key = String(source || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
+  if (!key || key === "unknown") return null;
+  const aliases = {
+    "claude-code": "claude",
+    "github-copilot": "copilot",
+    "amazon-q": "amazonq",
+    "gemini-cli": "gemini",
+    "roo-code": "roo",
+  };
+  return aliases[key] || key;
 }
 
 function emptyTotals() {

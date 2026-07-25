@@ -1,6 +1,6 @@
 # Feature Specs
 
-Last synchronized: 2026-07-23
+Last synchronized: 2026-07-24
 
 ## Current product line
 
@@ -10,6 +10,9 @@ Last synchronized: 2026-07-23
 | Profile signal extractor | completed | `profile-signal-extractor.md` |
 | TokenTracker queue activity adapter | completed | `token-tracker-queue-activity.md` |
 | Four-axis sixteen-type personality engine | completed | `vibe-type-personality-engine.md` |
+| Evidence-grounded optional AI roast writer | completed | `evidence-grounded-ai-roast.md` |
+| One-click GitHub OAuth identity session | completed | `github-oauth-session.md` |
+| Hosted Cloudflare Workers AI free roast | completed | `hosted-free-ai-roast.md` |
 | npm release entrypoint | completed | `../memory/npm-release-entrypoint.md` |
 
 ## Historical foundation

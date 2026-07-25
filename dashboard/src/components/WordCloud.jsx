@@ -6,6 +6,14 @@ const DEFAULT_PALETTE = [
   "#5b8cff", "#23d6a5", "#e07a3a", "#f0c14a", "#ff5a1f",
 ];
 
+function stableColor(term, palette) {
+  let hash = 0;
+  for (const character of String(term || "")) {
+    hash = ((hash << 5) - hash + character.codePointAt(0)) | 0;
+  }
+  return palette[Math.abs(hash) % palette.length];
+}
+
 /**
  * Word cloud via wordcloud2.
  * DPR note: enlarge the canvas buffer and scale gridSize/weightFactor —
@@ -67,7 +75,10 @@ export default function WordCloud({
     if (width < 2 || height < 2) return undefined;
 
     const list = words
-      .map(({ term, count }) => [String(term || "").trim(), Math.max(1, Number(count) || 1)])
+      .map(({ term, weight, count }) => [
+        String(term || "").trim(),
+        Math.max(1, Number(weight ?? count) || 1),
+      ])
       .filter(([term]) => term.length > 0);
     if (!list.length) return undefined;
 
@@ -96,18 +107,21 @@ export default function WordCloud({
       weightFactor,
       fontFamily,
       fontWeight: "700",
-      color: () => palette[Math.floor(Math.random() * palette.length)],
+      color: (term) => stableColor(term, palette),
       rotateRatio,
       minRotation,
       maxRotation,
       rotationSteps: 2,
       backgroundColor: "transparent",
-      shuffle: true,
+      shuffle: false,
       shape,
       ellipticity,
       minSize: Math.max(1, minSize * dpr),
       drawOutOfBound: false,
-      shrinkToFit: true,
+      // wordcloud2 recursively shrinks until placement succeeds. Our weight
+      // factor has a deliberate minimum, so an unplaceable long term can
+      // otherwise recurse forever in narrow mobile containers.
+      shrinkToFit: false,
       clearCanvas: true,
     });
 
@@ -139,6 +153,13 @@ export default function WordCloud({
       className={`relative flex h-full w-full min-h-[120px] items-center justify-center overflow-hidden ${className}`}
     >
       <canvas ref={canvasRef} className="block max-w-full" aria-hidden="true" />
+      <ul className="sr-only">
+        {words.map(({ term, prompt_count: promptCount, count }) => (
+          <li key={term}>
+            {term}: {promptCount ?? count}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

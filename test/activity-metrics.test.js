@@ -74,11 +74,11 @@ test("buildActivitySignals falls back without inventing token totals", () => {
       total_tokens: 0,
       daily_rows: [{ day: "2026-06-01", value: 3, sources: { cursor: 3 } }],
     },
-    summary: { source_count: 2 },
+    summary: { source_count: 12, active_source_count: 2 },
     categories: { debugging: { count: 4 } },
   });
   assert.equal(signals[0].label, "Active days");
-  assert.equal(signals[1].label, "Sources");
+  assert.equal(signals[1].label, "Agents found");
   assert.equal(signals[1].value, "2");
   assert.equal(signals[2].value, "debugging");
 });

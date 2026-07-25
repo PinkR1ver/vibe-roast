@@ -97,18 +97,18 @@ function buildHashtags(vibe, categories = {}, opts = {}) {
   if (ARCHETYPE_TAGS[archId]) {
     push(pickLocale(ARCHETYPE_TAGS[archId], zh));
   } else if (arch.title) {
-    push(zh ? arch.title : pascalCase(arch.title));
+    push(zh ? arch.titleZh || arch.title : pascalCase(arch.title));
   }
 
   if (arch.code && CODE_TAGS[arch.code]) {
     push(pickLocale(CODE_TAGS[arch.code], zh));
   } else if (arch.code) {
-    push(pascalCase(arch.code));
+    push(/^[MA][OP][VS][FX]$/.test(arch.code) ? arch.code : pascalCase(arch.code));
   }
 
   const tierId = vibe?.tier?.id;
-  if (tierId && TIER_TAGS[tierId]) push(pickLocale(TIER_TAGS[tierId], zh));
-  else if (tierId) push(tierId);
+  if (!vibe?.type_code && tierId && TIER_TAGS[tierId]) push(pickLocale(TIER_TAGS[tierId], zh));
+  else if (!vibe?.type_code && tierId) push(tierId);
 
   const ranked = Object.keys(CATEGORY_TAGS)
     .map((key) => [key, categoryCount(categories, key)])
@@ -131,4 +131,20 @@ function buildHashtags(vibe, categories = {}, opts = {}) {
   return tags.slice(0, limit);
 }
 
-module.exports = { buildHashtags, CODE_TAGS, ARCHETYPE_TAGS, CATEGORY_TAGS, TIER_TAGS };
+function mergeHashtags(generated = [], limit = 8) {
+  const tags = [];
+  const seen = new Set();
+  for (const raw of generated || []) {
+    const bare = String(raw || "")
+      .replace(/^#+/, "")
+      .replace(/[^A-Za-z0-9\u4e00-\u9fff]/g, "");
+    if (!bare) continue;
+    const key = bare.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    tags.push(`#${bare}`);
+  }
+  return tags.slice(0, limit);
+}
+
+module.exports = { buildHashtags, mergeHashtags, CODE_TAGS, ARCHETYPE_TAGS, CATEGORY_TAGS, TIER_TAGS };

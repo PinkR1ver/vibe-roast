@@ -12,5 +12,10 @@ test("roast i18n resolves Chinese and English labels with fallback", async () =>
   assert.equal(mod.t("profile.posterShare", "en"), "Share poster");
   assert.equal(mod.t("profile.posterShare", "zh"), "分享海报");
   assert.equal(mod.t("profile.posterDownload", "en"), "Download PNG");
+  assert.equal(mod.t("profile.activity", "en"), "Activity Heatmap");
+  assert.equal(mod.t("heatmap.less", "zh"), "少");
+  assert.equal(mod.t("theme.system", "zh"), "跟随系统");
+  assert.equal(mod.t("usage.trend", "en"), "Usage Trend");
+  assert.equal(mod.t("usage.allAgents", "zh"), "全部 Agent");
   assert.equal(mod.t("missing.key", "zh"), "missing.key");
 });

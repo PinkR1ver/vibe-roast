@@ -1,24 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Info, Maximize2, Pause, Play, RotateCcw, Terminal, X } from "lucide-react";
+import { Info, Maximize2, RotateCcw, X } from "lucide-react";
 import ActivityHeatmap3D, { PALETTES } from "./ActivityHeatmap3D.jsx";
 import ActivityHeatmap from "./ActivityHeatmap.jsx";
 import { buildActivityHeatmap } from "../lib/activity-heatmap.js";
 import { useTheme } from "../contexts/ThemeContext.jsx";
 import { useLocale } from "../contexts/LocaleContext.jsx";
 
-const PALETTE_LABELS = {
-  emerald: "Emerald",
-  ocean: "Ocean",
-  neon: "Neon",
-  amber: "Amber",
-};
-
 const PALETTE_ACCENTS = {
-  emerald: { rawColor: "#10b981", text: "text-emerald-400" },
-  ocean: { rawColor: "#3b82f6", text: "text-blue-400" },
-  neon: { rawColor: "#a855f7", text: "text-purple-400" },
-  amber: { rawColor: "#f59e0b", text: "text-amber-400" },
+  emerald: { rawColor: "#10b981" },
+  ocean: { rawColor: "#3b82f6" },
+  neon: { rawColor: "#a855f7" },
+  amber: { rawColor: "#f59e0b" },
 };
 
 function compactNumber(value) {
@@ -29,7 +22,7 @@ function compactNumber(value) {
   return `${(n / 1000000000).toFixed(n >= 10000000000 ? 0 : 2)}B`;
 }
 
-function calculateStats(weeks, metric, t) {
+function calculateStats(weeks) {
   const cells = [];
   for (const week of weeks) {
     for (const cell of Array.isArray(week) ? week : []) {
@@ -42,7 +35,7 @@ function calculateStats(weeks, metric, t) {
   let activeDays = 0;
   let maxStreak = 0;
   let currentStreak = 0;
-  let peakDay = { day: t("heatmap.noData"), value: 0 };
+  let peakDay = { day: "—", value: 0 };
 
   for (const cell of cells) {
     const value = Number(cell.value) || 0;
@@ -58,30 +51,7 @@ function calculateStats(weeks, metric, t) {
   }
 
   const activeRate = cells.length ? ((activeDays / cells.length) * 100).toFixed(1) : "0.0";
-  let title = metric === "tokens" ? t("heatmap.peakContributor") : t("heatmap.steadySignal");
-  let message = metric === "tokens"
-    ? t("heatmap.tokenMessage.default")
-    : t("heatmap.promptMessage.steady");
-  if (metric === "tokens") {
-    if (totalValue >= 1000000000) {
-      title = t("heatmap.peakContributor");
-      message = t("heatmap.tokenMessage.peak");
-    } else if (totalValue >= 100000000) {
-      title = t("heatmap.heavyTokenFlow");
-      message = t("heatmap.tokenMessage.heavy");
-    }
-  } else if (totalValue >= 1000) {
-    title = t("heatmap.heavyCadence");
-    message = t("heatmap.promptMessage.heavy");
-  } else if (totalValue >= 300) {
-    title = t("heatmap.coreWorkflow");
-    message = t("heatmap.promptMessage.core");
-  } else if (totalValue >= 80) {
-    title = t("heatmap.buildingMomentum");
-    message = t("heatmap.promptMessage.momentum");
-  }
-
-  return { totalValue, activeDays, activeRate, maxStreak, peakDay, title, message };
+  return { totalValue, activeDays, activeRate, maxStreak, peakDay };
 }
 
 export default function ActivityHeatmap3DPanel({
@@ -110,11 +80,10 @@ export default function ActivityHeatmap3DPanel({
     () => buildActivityHeatmap({ prompts, dailyRows, weeks: heatmapWeeks }),
     [prompts, dailyRows, heatmapWeeks],
   );
-  const stats = useMemo(() => calculateStats(heatmap.weeks || [], metric, t), [heatmap.weeks, metric, t]);
+  const stats = useMemo(() => calculateStats(heatmap.weeks || []), [heatmap.weeks]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [activePalette, setActivePalette] = useState(defaultPalette);
-  const [modalAutoRotate, setModalAutoRotate] = useState(false);
+  const activePalette = PALETTES[defaultPalette] ? defaultPalette : "emerald";
   const [viewMode, setViewMode] = useState(
     defaultViewMode ?? (showViewToggle || roastStyle ? "2d" : "3d"),
   );
@@ -123,11 +92,18 @@ export default function ActivityHeatmap3DPanel({
   const resetViewRef = useRef(null);
   const transitionTimerRef = useRef(null);
   const compactShell = roastStyle || showViewToggle;
-  const shellMin = compactShell ? "min-h-[220px]" : "min-h-[240px]";
+  const shellMin = compactShell ? "min-h-[190px]" : "min-h-[240px]";
   const shellMax = compactShell ? "max-h-[320px]" : "";
 
   const accent = PALETTE_ACCENTS[activePalette] || PALETTE_ACCENTS.emerald;
   const accentColors = isDark ? PALETTES[activePalette].dark : PALETTES[activePalette].light;
+  const timezoneLabel = useMemo(() => {
+    const offset = -new Date().getTimezoneOffset();
+    const sign = offset >= 0 ? "+" : "-";
+    const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, "0");
+    const minutes = String(Math.abs(offset) % 60).padStart(2, "0");
+    return `UTC${sign}${hours}:${minutes}`;
+  }, []);
 
   const closeModal = () => setIsClosing(true);
 
@@ -173,46 +149,52 @@ export default function ActivityHeatmap3DPanel({
             }`}
           >
             <div
-              className={`relative w-full max-w-6xl h-[88vh] backdrop-blur-2xl bg-white/90 dark:bg-oai-gray-900/90 border border-oai-gray-200/50 dark:border-white/10 shadow-2xl rounded-2xl flex flex-col md:flex-row overflow-hidden ${
+              className={`relative flex h-[88vh] w-full max-w-6xl flex-col overflow-hidden rounded-[22px] border border-black/[0.07] bg-[#fffcf7] shadow-[0_24px_70px_rgba(45,30,18,0.22)] dark:border-white/[0.08] dark:bg-[#171717] md:flex-row ${
                 isClosing ? "animate-tt-modal-exit" : "animate-tt-modal"
               }`}
             >
-              <button
-                type="button"
-                onClick={closeModal}
-                className="absolute top-4 right-4 z-50 p-2 rounded-full border border-oai-gray-200/60 dark:border-oai-gray-800/60 bg-white/50 dark:bg-oai-gray-900/50 text-oai-gray-500 dark:text-oai-gray-400 hover:text-oai-gray-900 dark:hover:text-white hover:rotate-90 hover:scale-105 active:scale-95 transition-all duration-300"
-                title={t("heatmap.close")}
-              >
-                <X size={16} />
-              </button>
+              <div className="absolute right-4 top-4 z-50 flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => resetViewRef.current?.reset()}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.07] bg-[#fffcf7] text-[#8b8680] hover:text-[#1a1a1a] dark:border-white/[0.08] dark:bg-[#171717] dark:text-[#8f8f8f] dark:hover:text-white"
+                  title={t("heatmap.reset")}
+                >
+                  <RotateCcw size={14} />
+                </button>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.07] bg-[#fffcf7] text-[#8b8680] hover:text-[#1a1a1a] dark:border-white/[0.08] dark:bg-[#171717] dark:text-[#8f8f8f] dark:hover:text-white"
+                  title={t("heatmap.close")}
+                >
+                  <X size={15} />
+                </button>
+              </div>
 
-              <aside className="w-full md:w-[340px] border-b md:border-b-0 md:border-r border-zinc-200/50 dark:border-zinc-800/40 p-5 md:p-6 flex flex-col gap-6 overflow-y-auto backdrop-blur-md bg-zinc-50/50 dark:bg-zinc-950/50">
+              <aside className="flex w-full flex-col gap-6 overflow-y-auto border-b border-black/[0.06] bg-[#f7f4ef] p-5 dark:border-white/[0.07] dark:bg-[#121212] md:w-[320px] md:border-b-0 md:border-r md:p-6">
                 <div>
                   <div className="flex items-center gap-1.5 select-none">
-                    <span className="relative flex h-1.5 w-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: accent.rawColor }} />
-                      <span className="relative inline-flex rounded-full h-1.5 w-1.5" style={{ backgroundColor: accent.rawColor }} />
-                    </span>
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest font-mono text-zinc-400 dark:text-zinc-500">
+                    <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: accent.rawColor }} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8b8680] dark:text-[#8f8f8f]">
                       {t("heatmap.insight")}
                     </span>
                   </div>
-                  <h4 className="text-xl font-black text-zinc-900 dark:text-zinc-50 tracking-tight leading-none mt-2 select-none">
+                  <h4 className="mt-2 text-xl font-extrabold leading-none tracking-tight text-[#1a1a1a] dark:text-[#fafafa]">
                     {metric === "tokens" ? t("heatmap.tokenTitle") : t("heatmap.promptTitle")}
                   </h4>
-                  <p className="text-[11px] leading-relaxed text-zinc-400 dark:text-zinc-500 mt-2 font-normal select-none">
+                  <p className="mt-2 text-xs leading-5 text-[#716b65] dark:text-[#aaa49e]">
                     {metric === "tokens"
                       ? t("heatmap.tokenDesc")
                       : t("heatmap.promptDesc")}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-5 gap-y-5 border-y border-zinc-200/50 dark:border-zinc-800/50 py-5 select-none">
+                <div className="grid grid-cols-2 gap-x-5 gap-y-5 border-y border-black/[0.07] py-5 dark:border-white/[0.08]">
                   <Metric
                     label={metric === "tokens" ? t("heatmap.totalTokens") : t("heatmap.totalPrompts")}
                     value={compactNumber(stats.totalValue)}
                     exact={`${stats.totalValue.toLocaleString()} ${unitLabel.toLowerCase()}`}
-                    accent={accent.rawColor}
                   />
                   <Metric
                     label={metric === "tokens" ? t("heatmap.activeRateDays") : t("heatmap.activeDays")}
@@ -220,43 +202,20 @@ export default function ActivityHeatmap3DPanel({
                     suffix={metric === "tokens" ? `(${stats.activeDays}D)` : undefined}
                     exact={t("heatmap.activeDayCount", { count: stats.activeDays })}
                   />
-                  <Metric label={metric === "tokens" ? t("heatmap.longestStreak") : t("heatmap.maxStreak")} value={stats.maxStreak} suffix={t("heatmap.days")} highlight />
-                  <Metric label={metric === "tokens" ? t("heatmap.tokenBuckets") : t("heatmap.sourceCount")} value={metric === "tokens" ? activity?.bucket_count || 0 : new Set(prompts.map((p) => p.source).filter(Boolean)).size || 0} />
-                  <div className="flex flex-col gap-1 col-span-2 relative group cursor-help">
-                    <Metric
-                      label={metric === "tokens" ? t("heatmap.peakBlowout") : t("heatmap.peakDay")}
-                      value={stats.peakDay.value > 0 ? compactNumber(stats.peakDay.value) : t("heatmap.noData")}
-                      suffix={stats.peakDay.day}
-                      exact={`${stats.peakDay.value.toLocaleString()} ${unitLabel.toLowerCase()}`}
-                    />
-                  </div>
+                  <Metric label={metric === "tokens" ? t("heatmap.longestStreak") : t("heatmap.maxStreak")} value={stats.maxStreak} suffix={t("heatmap.days")} />
+                  <Metric
+                    label={t("heatmap.peakDay")}
+                    value={stats.peakDay.value > 0 ? compactNumber(stats.peakDay.value) : t("heatmap.noData")}
+                    suffix={stats.peakDay.day}
+                    exact={`${stats.peakDay.value.toLocaleString()} ${unitLabel.toLowerCase()}`}
+                  />
                 </div>
 
-                <div className="flex flex-col gap-2.5 py-1">
-                  <div className="flex items-center gap-1.5 select-none">
-                    <Terminal size={11} style={{ color: accent.rawColor }} />
-                    <span className="text-[9px] font-extrabold uppercase tracking-widest font-mono" style={{ color: accent.rawColor }}>
-                      {stats.title}
-                    </span>
-                  </div>
-                  <div className="pl-3.5 border-l-2 relative transition-all duration-300" style={{ borderColor: accent.rawColor }}>
-                    <div className="absolute inset-y-0 left-0 w-[3px] blur-[2px] opacity-15 pointer-events-none rounded-full" style={{ backgroundColor: accent.rawColor }} />
-                    <p className="text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400 font-normal">
-                      {stats.message}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-auto border-t border-zinc-200/50 dark:border-zinc-800/50 pt-4 select-none">
+                <div className="mt-auto border-t border-black/[0.07] pt-4 dark:border-white/[0.08]">
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono">
-                        {metric === "tokens" ? t("heatmap.activityLevels") : t("heatmap.legend")}
-                      </span>
-                      <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
-                        {PALETTE_LABELS[activePalette]}
-                      </span>
-                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#8b8680] dark:text-[#8f8f8f]">
+                      {metric === "tokens" ? t("heatmap.activityLevels") : t("heatmap.legend")}
+                    </span>
                     <div className="flex gap-1">
                       {accentColors.map((color, idx) => (
                         <div key={idx} className="flex-1 h-1 rounded-[2px]" style={{ backgroundColor: color }} title={`Level ${idx}`} />
@@ -266,61 +225,13 @@ export default function ActivityHeatmap3DPanel({
                 </div>
               </aside>
 
-              <section className="flex-1 h-full relative flex items-center justify-center overflow-hidden p-4">
+              <section className="relative flex h-full flex-1 items-center justify-center overflow-hidden p-4">
                 <div
                   className="absolute inset-0 pointer-events-none transition-colors duration-500"
                   style={{
                     background: `linear-gradient(135deg, ${accent.rawColor}0f, transparent 42%)`,
                   }}
                 />
-                <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3 p-1.5 backdrop-blur-md bg-white/70 dark:bg-oai-gray-900/75 border border-oai-gray-200/60 dark:border-oai-gray-800/80 rounded-full shadow-lg z-30 select-none">
-                  <div className="flex items-center gap-1.5 px-2">
-                    {Object.keys(PALETTE_ACCENTS).map((key) => {
-                      const selected = activePalette === key;
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => setActivePalette(key)}
-                          title={PALETTE_LABELS[key]}
-                          className="w-3.5 h-3.5 rounded-full transition-all duration-200 relative hover:scale-125"
-                          style={{ backgroundColor: PALETTE_ACCENTS[key].rawColor }}
-                        >
-                          {selected && <span className="absolute inset-0 rounded-full ring-2 ring-offset-1 ring-offset-white dark:ring-offset-oai-gray-900 ring-oai-gray-900 dark:ring-white scale-110" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="w-[1px] h-4 bg-oai-gray-200 dark:bg-oai-gray-800" />
-                  <div className="flex items-center gap-1 pr-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const next = !modalAutoRotate;
-                        setModalAutoRotate(next);
-                        resetViewRef.current?.toggleAutoRotate(next);
-                      }}
-                      title={modalAutoRotate ? t("heatmap.pause") : t("heatmap.play")}
-                      className={`p-1.5 rounded-full transition-all duration-200 hover:bg-oai-gray-100 dark:hover:bg-oai-gray-800 ${
-                        modalAutoRotate ? accent.text : "text-oai-gray-400 hover:text-oai-gray-600 dark:hover:text-oai-gray-200"
-                      }`}
-                    >
-                      {modalAutoRotate ? <Pause size={12} /> : <Play size={12} />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setModalAutoRotate(false);
-                        resetViewRef.current?.reset();
-                      }}
-                      title={t("heatmap.reset")}
-                      className="p-1.5 rounded-full text-oai-gray-400 hover:text-oai-gray-600 dark:hover:text-oai-gray-200 hover:bg-oai-gray-100 dark:hover:bg-oai-gray-800 transition-all duration-200"
-                    >
-                      <RotateCcw size={12} />
-                    </button>
-                  </div>
-                </div>
-
                 <ActivityHeatmap3D
                   prompts={prompts}
                   dailyRows={dailyRows}
@@ -328,13 +239,13 @@ export default function ActivityHeatmap3DPanel({
                   isDark={isDark}
                   interactive
                   palette={activePalette}
-                  autoRotateInit={modalAutoRotate}
+                  autoRotateInit={false}
                   onResetViewRef={resetViewRef}
                   unitLabel={unitLabel}
                 />
 
                 <div className="absolute bottom-4 right-4 flex items-center gap-1.5 text-[9px] font-bold text-oai-gray-400 bg-white/80 dark:bg-oai-gray-900/80 border border-oai-gray-200/50 dark:border-oai-gray-800/80 rounded-md px-2.5 py-1.5 select-none pointer-events-none backdrop-blur-md shadow-sm">
-                  <Info size={10} className={accent.text} />
+                  <Info size={10} style={{ color: accent.rawColor }} />
                   <span>{t("heatmap.footerTip")}</span>
                 </div>
               </section>
@@ -347,32 +258,38 @@ export default function ActivityHeatmap3DPanel({
   return (
     <>
       <div className={`relative w-full h-full ${shellMin} ${shellMax} ${className}`}>
-        {showViewToggle && (
-          <div
-            className={`absolute top-1.5 right-1.5 z-20 flex items-center gap-0.5 rounded-full p-0.5 text-[10px] font-bold ${
-              roastStyle
-                ? "border border-black/5 bg-[#fffcf7]/95 text-[#6b6560]"
-                : "border border-oai-gray-200/70 bg-white/90 text-oai-gray-500 dark:border-oai-gray-800 dark:bg-oai-gray-900/90 dark:text-oai-gray-400"
-            }`}
-          >
+        <div className="mb-4 flex min-h-7 items-center justify-between gap-3">
+          <h2 className="m-0 text-sm font-semibold uppercase tracking-[0.03em] text-[#393633] dark:text-[#d4d4d4]">
+            {t("profile.activity")}
+          </h2>
+          <div className="flex items-center gap-2">
+            {showViewToggle && (
+              <div
+                role="tablist"
+                aria-label={t("heatmap.viewLabel")}
+                className="flex items-center rounded-lg border border-black/[0.07] bg-black/[0.02] p-0.5 text-[10px] font-medium text-[#8b8680] dark:border-white/[0.08] dark:bg-white/[0.02] dark:text-[#8f8f8f]"
+              >
             {["2d", "3d"].map((mode) => (
               <button
                 key={mode}
                 type="button"
+                role="tab"
+                aria-selected={viewMode === mode}
                 onClick={() => switchViewMode(mode)}
-                className={`rounded-full px-2.5 py-1 uppercase tracking-wide transition-colors ${
+                className={`rounded-md px-2 py-0.5 uppercase transition-colors ${
                   viewMode === mode
-                    ? roastStyle
-                      ? "bg-emerald-500 text-white"
-                      : "bg-emerald-500/90 text-white"
-                    : "hover:text-emerald-600"
+                    ? "bg-white text-[#1a1a1a] shadow-sm dark:bg-[#2a2a2a] dark:text-white"
+                    : "hover:text-[#1a1a1a] dark:hover:text-white"
                 }`}
               >
-                {mode}
+                {mode === "2d" ? t("heatmap.viewGrid") : t("heatmap.viewTerrain")}
               </button>
             ))}
+              </div>
+            )}
+            <span className="text-xs text-[#8b8680] dark:text-[#8f8f8f]">{timezoneLabel}</span>
           </div>
-        )}
+        </div>
 
         <div
           key={`${viewMode}-${viewAnimKey}`}
@@ -382,9 +299,7 @@ export default function ActivityHeatmap3DPanel({
         >
         {viewMode === "2d" ? (
           <div
-            className={`flex h-full ${shellMin} ${shellMax} items-center justify-center overflow-x-auto rounded-lg border ${
-              compactShell ? "p-0" : "px-3 py-4"
-            } ${roastStyle ? "border-black/[0.04] bg-[#f7f4ef]" : "border-transparent"}`}
+            className="flex w-full items-center justify-center overflow-hidden"
           >
             <ActivityHeatmap
               prompts={prompts}
@@ -392,7 +307,7 @@ export default function ActivityHeatmap3DPanel({
               weeks={heatmapWeeks}
               dark={isDark}
               compact={false}
-              dense={compactShell}
+              dense={false}
             />
           </div>
         ) : (
@@ -402,9 +317,9 @@ export default function ActivityHeatmap3DPanel({
               setIsClosing(false);
               setIsModalOpen(true);
             }}
-            className={`group relative w-full h-full ${shellMin} ${shellMax} overflow-hidden rounded-lg border transition-all cursor-pointer ${
+            className={`group relative w-full h-[170px] overflow-hidden rounded-lg border transition-all cursor-pointer ${
               roastStyle
-                ? "border-black/[0.04] bg-[#f7f4ef] hover:border-[color-mix(in_srgb,var(--roast-accent,#ff5a1f)_35%,#e4dfd6)]"
+                ? "border-black/[0.04] bg-[#f7f4ef] hover:border-emerald-500/30 dark:border-white/[0.06] dark:bg-[#121212]"
                 : "border-transparent hover:border-oai-gray-700"
             }`}
             title={t("heatmap.openTitle")}
@@ -444,7 +359,7 @@ export default function ActivityHeatmap3DPanel({
   );
 }
 
-function Metric({ label, value, suffix, exact, accent, highlight = false }) {
+function Metric({ label, value, suffix, exact }) {
   return (
     <div className="flex flex-col gap-1 relative group cursor-default">
       {exact && (
@@ -454,19 +369,14 @@ function Metric({ label, value, suffix, exact, accent, highlight = false }) {
           </div>
         </div>
       )}
-      <span className="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-mono">
+      <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8b8680] dark:text-[#8f8f8f]">
         {label}
       </span>
       <div className="flex items-baseline gap-1.5">
-        <span className={`text-xl font-black tracking-tight font-mono transition-transform duration-200 group-hover:-translate-y-[1px] ${highlight ? "text-amber-500" : "text-zinc-900 dark:text-zinc-50"}`}>
+        <span className="font-[JetBrains_Mono,ui-monospace,monospace] text-xl font-bold tracking-tight text-[#1a1a1a] transition-transform duration-200 group-hover:-translate-y-[1px] dark:text-[#fafafa]">
           {value}
         </span>
-        {suffix && <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 font-mono">{suffix}</span>}
-        {accent && (
-          <svg width="24" height="10" viewBox="0 0 24 10" fill="none" className="opacity-30 group-hover:opacity-60 transition-opacity">
-            <path d="M1 9C3 7 5 7 7 4C9 1 11 0 13 2C15 4 17 0 23 0" stroke={accent} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
+        {suffix && <span className="text-[10px] font-bold text-[#8b8680] dark:text-[#8f8f8f]">{suffix}</span>}
       </div>
     </div>
   );

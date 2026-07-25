@@ -1,9 +1,12 @@
 import React, { useMemo } from "react";
 import { buildActivityHeatmap } from "../lib/activity-heatmap.js";
+import { useLocale } from "../contexts/LocaleContext.jsx";
 
 const COLORS_LIGHT = ["#ebedf0", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981"];
-const COLORS_DARK = ["#1e293b", "#065f46", "#059669", "#10b981", "#34d399"];
-const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""];
+const COLORS_DARK = ["#121212", "#065f46", "#059669", "#10b981", "#34d399"];
+const CELL = 11;
+const GAP = 2;
+const LABEL_WIDTH = 26;
 
 export default function ActivityHeatmap({
   prompts = [],
@@ -13,51 +16,94 @@ export default function ActivityHeatmap({
   compact = false,
   dense = false,
 }) {
+  const { locale, t } = useLocale();
   const heatmap = useMemo(
     () => buildActivityHeatmap({ prompts, dailyRows, weeks }),
     [prompts, dailyRows, weeks],
   );
-  const gap = dense ? 2 : compact ? 2 : 3;
-  // Dense roast panels are tall (~220–300px); size cells to fill vertical budget.
-  const cell = dense ? 18 : compact ? 9 : 12;
-  const labelW = dense ? 16 : compact ? 22 : 28;
   const colors = dark ? COLORS_DARK : COLORS_LIGHT;
   const grid = heatmap.weeks || [];
-  const totalWidth = Math.max(grid.length * (cell + gap) + labelW, 120);
+  const totalWidth = Math.max(grid.length * (CELL + GAP) + LABEL_WIDTH, 120);
+  const dayLabels = locale === "zh"
+    ? ["日", "一", "二", "三", "四", "五", "六"]
+    : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthLabels = useMemo(() => {
+    const labels = [];
+    grid.forEach((week, index) => {
+      const monthStart = (week || []).find((cellDay) => cellDay?.day?.endsWith("-01"))?.day;
+      if (!monthStart) return;
+      const date = new Date(`${monthStart}T00:00:00Z`);
+      labels.push({
+        index,
+        text: new Intl.DateTimeFormat(locale === "zh" ? "zh-CN" : "en-US", {
+          month: "short",
+          timeZone: "UTC",
+        }).format(date),
+      });
+    });
+    return labels;
+  }, [grid, locale]);
 
   return (
-    <div className="overflow-x-auto">
-      <svg width={totalWidth} height={7 * (cell + gap) + (dense || compact ? 4 : 16)} className="block">
-        {DAY_LABELS.map((label, i) => (
-          <text
-            key={i}
-            x={0}
-            y={i * (cell + gap) + cell + 1}
-            className="text-[9px] fill-oai-gray-400"
-            textAnchor="start"
-          >
-            {label}
-          </text>
-        ))}
-        {grid.map((week, wi) =>
-          (week || []).map((cellDay, di) => {
-            if (!cellDay) return null;
-            return (
-              <rect
-                key={`${wi}-${di}`}
-                x={labelW + wi * (cell + gap)}
-                y={di * (cell + gap)}
-                width={cell}
-                height={cell}
-                rx={2}
-                fill={colors[cellDay.level] || colors[0]}
+    <div className="w-full">
+      <div className="activity-scroll overflow-x-auto overflow-y-hidden pb-1">
+        <div style={{ width: totalWidth }}>
+          <div className="relative mb-1 h-3 text-[10px] uppercase text-[#8b8680] dark:text-[#8f8f8f]">
+            {monthLabels.map((month) => (
+              <span
+                key={`${month.text}-${month.index}`}
+                className="absolute whitespace-nowrap"
+                style={{ left: LABEL_WIDTH + month.index * (CELL + GAP) }}
               >
-                <title>{`${cellDay.day}: ${Number(cellDay.value || 0).toLocaleString()}`}</title>
-              </rect>
-            );
-          }),
-        )}
-      </svg>
+                {month.text}
+              </span>
+            ))}
+          </div>
+          <div className="flex" style={{ gap: GAP }}>
+            <div
+              className="grid shrink-0 text-[10px] text-[#8b8680] dark:text-[#8f8f8f]"
+              style={{ width: LABEL_WIDTH, gridTemplateRows: `repeat(7, ${CELL}px)`, rowGap: GAP }}
+            >
+              {dayLabels.map((label) => <span key={label} className="leading-none">{label}</span>)}
+            </div>
+            <div
+              className="grid"
+              style={{
+                gridAutoFlow: "column",
+                gridTemplateRows: `repeat(7, ${CELL}px)`,
+                gap: GAP,
+              }}
+            >
+              {grid.map((week, wi) =>
+                (week || []).map((cellDay, di) => (
+                  cellDay ? (
+                    <span
+                      key={cellDay.day || `${wi}-${di}`}
+                      className="activity-cell cursor-pointer rounded-[2px] transition-transform hover:z-10 hover:scale-125"
+                      style={{
+                        width: CELL,
+                        height: CELL,
+                        background: colors[cellDay.level] || colors[0],
+                        ["--motion-delay"]: `${Math.min(420, wi * 7 + di * 5)}ms`,
+                      }}
+                      title={`${cellDay.day}: ${Number(cellDay.value || 0).toLocaleString()}`}
+                    />
+                  ) : <span key={`${wi}-${di}`} style={{ width: CELL, height: CELL }} />
+                )),
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center justify-center gap-2">
+        <span className="text-[10px] text-[#8b8680] dark:text-[#8f8f8f]">{t("heatmap.less")}</span>
+        <span className="flex gap-0.5">
+          {colors.map((color, index) => (
+            <span key={color} className="rounded-[1px]" style={{ width: 10, height: 10, background: color }} title={`Level ${index}`} />
+          ))}
+        </span>
+        <span className="text-[10px] text-[#8b8680] dark:text-[#8f8f8f]">{t("heatmap.more")}</span>
+      </div>
     </div>
   );
 }

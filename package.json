@@ -1,26 +1,58 @@
 {
-  "name": "vibe-wrapper",
-  "version": "0.1.0",
+  "name": "vibe-roast",
+  "version": "0.98.0",
+  "description": "Local-first AI coding personality profiler, usage dashboard, and evidence-grounded roast.",
   "type": "commonjs",
   "bin": {
+    "vibe-roast": "bin/vibe-roast.js",
     "vibe-wrapper": "bin/vibe-wrapper.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PinkR1ver/vibe-roast.git"
+  },
+  "homepage": "https://github.com/PinkR1ver/vibe-roast#readme",
+  "bugs": {
+    "url": "https://github.com/PinkR1ver/vibe-roast/issues"
+  },
+  "keywords": [
+    "ai",
+    "coding-agent",
+    "codex",
+    "claude-code",
+    "cursor",
+    "developer-tools",
+    "roast"
+  ],
   "files": [
     "bin/",
     "src/",
+    "worker/README.md",
+    "worker/package.json",
+    "worker/package-lock.json",
+    "worker/wrangler.jsonc",
+    "worker/src/",
     "dashboard/dist/",
     "assests/",
     "README.md"
   ],
   "scripts": {
     "test": "node --test test/*.test.js",
-    "inspect": "node bin/vibe-wrapper.js inspect",
-    "serve": "node bin/vibe-wrapper.js serve",
+    "inspect": "node bin/vibe-roast.js inspect",
+    "serve": "node bin/vibe-roast.js serve",
+    "worker:login": "npm --prefix worker run login",
+    "worker:dev": "npm --prefix worker run dev",
+    "worker:deploy": "npm --prefix worker run deploy",
+    "worker:secret:github": "npm --prefix worker run secret:github",
+    "worker:secret:session": "npm --prefix worker run secret:session",
     "build": "cd dashboard && npm install && npm run build",
     "dev": "cd dashboard && npm run dev",
     "prepack": "npm run build"
   },
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

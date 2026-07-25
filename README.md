@@ -1,127 +1,158 @@
-# Vibe Wrapper
+<a id="readme-top"></a>
 
-Local-first vibe coding session analysis: inspect Codex / Claude Code / Cursor / TokenTracker and other mainstream local agents, score an agent profile, and **roast** it with MBTI-style figures.
+<div align="center">
+  <img
+    src="./assests/characters-vibe-types/mpsf-builder/builder-figure.png"
+    width="190"
+    alt="Vibe Roaster Builder character"
+  />
 
-The only product UI is **Roast Result** (cream editorial page: 16-type figure · type axes · radar · roast · word cloud · activity heatmap · hashtags · share poster).
+  <h1>Vibe Roaster</h1>
+
+  <p>
+    Turn your local AI coding history into a 16-type personality profile—and let it roast the evidence.
+  </p>
+
+  <p>
+    <a href="https://www.npmjs.com/package/vibe-roast">
+      <img src="https://img.shields.io/npm/v/vibe-roast?color=25b985&label=npm" alt="npm version" />
+    </a>
+    <a href="https://www.npmjs.com/package/vibe-roast">
+      <img src="https://img.shields.io/npm/dm/vibe-roast?color=557fd8" alt="npm downloads" />
+    </a>
+    <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-171717" alt="Node.js 20 or newer" />
+    <img src="https://img.shields.io/badge/types-16-9a70cf" alt="16 coding personality types" />
+    <img src="https://img.shields.io/badge/raw_prompts-local_only-ef5b45" alt="Raw prompts stay local" />
+  </p>
+
+  <p>
+    <a href="#quick-start"><strong>Quick start</strong></a>
+    ·
+    <a href="#what-you-get">What you get</a>
+    ·
+    <a href="#how-the-profile-works">How it works</a>
+    ·
+    <a href="#privacy">Privacy</a>
+    ·
+    <a href="#development">Development</a>
+  </p>
+</div>
+
+---
+
+Vibe Roaster reads supported local coding-agent histories, separates real user intent from pasted code and tool noise, and turns the resulting behavior into:
+
+- a four-letter coding type;
+- one of 16 illustrated characters;
+- an evidence-grounded roast;
+- recurring project and domain themes;
+- Agent, provider, model, token, and activity analytics;
+- a 3:4 share card designed to travel beyond the dashboard.
+
+The personality calculation is deterministic and local. AI writing is optional.
 
 ## Quick start
 
-```bash
-npm install
-cd dashboard && npm install && cd ..
-npm run build          # builds Roast Result UI → dashboard/dist
-npm run serve          # http://localhost:7681
-```
+### Run from npm
 
-- **Roast Result**: `http://localhost:7681/`
-- Optional static export: `http://localhost:7681/assests/live-report.html`
-- Character figures / badges / banners: served under `/assests/characters`, `/assests/badges`, `/assests/banners`
-
-Dev mode (API + Vite HMR):
+Requires Node.js 20 or newer.
 
 ```bash
-# terminal 1
-VIBE_WRAPPER_NO_OPEN=1 npm run serve
-# terminal 2
-npm run dev            # http://localhost:5173 (proxies /api and /assests)
+npx vibe-roast
 ```
 
-## Inspect Local Sessions
-
-```bash
-npm run inspect -- --from 2026-06-01 --to 2026-06-08 --sources codex,claude,cursor
-```
-
-Multi-source (primary + best-effort mainstream agents):
-
-```bash
-npm run inspect -- --from 2026-06-01 --to 2026-06-08 \
-  --sources codex,claude,cursor,cline,roo,continue,gemini,aider,windsurf,copilot
-```
-
-The command prints JSON with source counts, prompt counts, token totals where available, TokenTracker-backed activity rows when available, word frequencies, and prompt records.
-It also includes:
-
-- `profile_signals` — useful vs reference prompts, categories, Codex skills/MCP/plugins
-- `vibe_profile` — four-letter vibe type, four evidence splits, confidence, six descriptive dimensions, figure path, and bilingual roast copy
-
-Missing roots are safe: empty directories (or absent agent installs) return zero counts and do not crash.
-
-## Preview Profile Signals
-
-```bash
-node - <<'NODE'
-const { inspectSources } = require('./src/inspect');
-(async () => {
-  const report = await inspectSources({
-    from: '2026-06-01',
-    to: '2026-06-08',
-    sources: ['codex', 'claude', 'cursor'],
-  });
-  console.log(JSON.stringify({
-    summary: report.summary,
-    vibe_profile: {
-      total: report.vibe_profile.total,
-      tier: report.vibe_profile.tier.id,
-      type: report.vibe_profile.type_code,
-    },
-    top_terms: report.word_frequencies.slice(0, 10),
-  }, null, 2));
-})();
-NODE
-```
-
-## How the roast works
-
-Vibe Roaster is an entertainment-oriented behavioral profile, not a psychological test. The engine is deterministic and local: it does not send prompt text to an LLM.
-
-The pipeline is:
+Vibe Roaster scans the supported local stores it can find, starts the local dashboard server, and opens:
 
 ```text
-local user prompts
-  → remove assistant / tool / system noise
-  → separate useful intent from pasted code and logs
-  → match every useful prompt to one or more intent categories
-  → split one prompt's weight equally across its matched categories
-  → resolve four behavioral dichotomies into a four-letter type
-  → calculate six descriptive radar dimensions
-  → assemble a bilingual roast from the selected letters and closest tension
+http://localhost:7681
 ```
 
-### Prompt categories
+Missing agents are ignored safely. You do not need to configure every source, create an account, or provide an API key to see the local result.
 
-Classification is multi-label. For example, “fix this login bug and add a regression test” contributes `0.5` to Debugging and `0.5` to Testing, so one verbose prompt cannot count as several prompts. Reference material stays outside the useful-intent denominator.
+### Choose how the roast is written
 
-| Category | Typical evidence |
-| --- | --- |
-| Planning | plans, design, architecture, brainstorming |
-| Debugging | bugs, failures, exceptions, root-cause work |
-| Testing | tests, specs, regression, assertions, coverage |
-| Refactor | restructuring, extraction, cleanup, abstraction |
-| Packaging | build, release, publish, npm, deployment work |
-| Explanation | explain, why, walkthrough requests |
-| Research | search, documentation, investigation |
-| UI design | pages, components, layout, interaction, CSS/UX |
-| Workflow | agents, hooks, MCP, skills, automation, instructions |
-| Implementation | useful requests that do not match a more specific category |
-| Reference | pasted code, logs, stack traces, system/tool noise; excluded from useful intent counts |
+On first launch, choose one of three paths:
 
-### Four type axes
+| Mode | What happens | Account or key |
+| --- | --- | --- |
+| Local roast | Uses deterministic bilingual copy | None |
+| Hosted roast | GitHub identifies the profile; Cloudflare Workers AI writes and caches the roast | GitHub sign-in |
+| Your provider | Sends aggregate roast evidence to your selected model | DeepSeek, OpenAI, Anthropic, Gemini, Groq, or OpenRouter key |
 
-The type is MBTI-like in presentation, but its letters describe observed coding-agent behavior rather than psychology. Each axis compares two evidence pools and exposes the percentage split in the UI.
+GitHub login is identity only; it does not use GitHub Models or your GitHub model quota.
 
-| Axis | Left pole | Right pole | Main evidence |
+## What you get
+
+<table>
+  <tr>
+    <td width="50%">
+      <strong>16 coding personalities</strong><br />
+      Four inspectable behavior axes resolve into one illustrated character—Builder, Debugger, Prompt Priest, Agent Commander, and twelve more.
+    </td>
+    <td width="50%">
+      <strong>Evidence-grounded roast</strong><br />
+      The type stays deterministic. Optional AI writing turns aggregate signals and contradictions into bilingual comedy without receiving raw prompts.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>Usage analytics</strong><br />
+      Explore activity heatmaps, trends, Agent share, provider/model usage, and available Codex or Claude context breakdowns.
+    </td>
+    <td width="50%">
+      <strong>Recurring themes</strong><br />
+      A time- and Agent-filtered cloud promotes repeated coding concepts and project-domain entities such as HIT, ONNX, or 前庭.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>Semantic Hashtags</strong><br />
+      AI reads coherent concept clusters and creates shareable character labels—<code>preflop + folds + river</code> can become <code>#HoldemPlayer</code>, not <code>#preflop</code>.
+    </td>
+    <td width="50%">
+      <strong>Shareable by design</strong><br />
+      Export a 1080 × 1440 personality card with the character, roast, axes, complete Hashtag set, repository URL, and one-command install path.
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="./assests/characters-vibe-types/movf-agent-engineer/agent-engineer-figure.png" width="145" alt="Agent Engineer" />
+  <img src="./assests/characters-vibe-types/mpvf-debugger/debugger-figure.png" width="145" alt="Debugger" />
+  <img src="./assests/characters-vibe-types/apvx-prompt-priest/prompt-priest-figure.png" width="145" alt="Prompt Priest" />
+  <img src="./assests/characters-vibe-types/mosf-yolo-shipper/yolo-shipper-figure.png" width="145" alt="YOLO Shipper" />
+</p>
+
+## How the profile works
+
+```mermaid
+flowchart LR
+    A["Local agent histories"] --> B["Keep real user intent"]
+    B --> C["Classify prompt behavior"]
+    C --> D["Resolve four type axes"]
+    D --> E["Choose one of 16 characters"]
+    C --> F["Build aggregate roast evidence"]
+    E --> G["Roast Result"]
+    F --> G
+    G --> H["3:4 share card"]
+```
+
+### The four axes
+
+This is MBTI-like presentation for observed coding-agent behavior—not psychology, ability, or code quality.
+
+| Axis | Left | Right | Main evidence |
 | --- | --- | --- | --- |
-| M / A | **Maker** — asks for runnable artifacts | **Architect** — asks for plans and explanations | implementation, packaging, testing, debugging vs planning, research, explanation |
-| O / P | **Orchestrator** — delegates through workflows | **Promptsmith** — directs one agent through crafted requests | workflow language vs explanation, UI direction, and direct implementation language |
-| V / S | **Verifier** — proves and repairs | **Shipper** — builds and releases | debugging, testing, refactor vs implementation and packaging |
-| F / X | **Focused** — keeps requests compact | **Max-context** — supplies broad context | useful/reference ratio and long-prompt ratio |
+| M / A | **Maker** · asks for runnable artifacts | **Architect** · asks for plans and explanations | implementation and repair vs planning and research |
+| O / P | **Orchestrator** · delegates through workflows | **Promptsmith** · directs one agent precisely | workflow language vs direct prompt craft |
+| V / S | **Verifier** · proves and repairs | **Shipper** · builds and releases | debugging, testing, refactor vs implementation and packaging |
+| F / X | **Focused** · keeps requests compact | **Max-context** · supplies broad context | useful/reference balance and long-prompt ratio |
 
-Codex skills, MCP servers, and plugin counts do **not** select a type. This avoids giving one agent application a built-in personality advantage.
+Every axis exposes its evidence split. The winning letters are concatenated—`MPSF`, for example—and mapped to a character.
 
-### The sixteen types
+### The 16 types
 
-| Type | Role | Type | Role |
+| Type | Character | Type | Character |
 | --- | --- | --- | --- |
 | MOVF | Agent Engineer | AOVF | Systems Architect |
 | MOVX | Systems Wrangler | AOVX | Context Cartographer |
@@ -132,84 +163,256 @@ Codex skills, MCP servers, and plugin counts do **not** select a type. This avoi
 | MPSF | Builder | APSF | Diagram Sprinter |
 | MPSX | Tab Hoarder | APSX | Infinite Planner |
 
-There is no primary/secondary persona. One four-letter result is built from four independently inspectable decisions. The six-axis radar remains descriptive detail—Agent orchestration, prompt craft, build drive, verification drive, context appetite, and shipping bias—and is not summed into a quality rank.
+There is no primary/secondary persona and no quality rank. Fewer than 20 useful prompts produces a provisional type; confidence grows with sample size and clearer axis separation.
 
-### Confidence and roast assembly
+<details>
+<summary><strong>Prompt categories and weighting</strong></summary>
 
-Confidence combines sample size (reaching full sample weight at 80 useful prompts) with separation between the two poles on each axis. Fewer than 20 useful prompts returns `insufficient_data` and explicitly calls the type provisional; empty input produces six zero radar values instead of invented points.
+Classification is multi-label. A request such as “fix this login bug and add a regression test” contributes half to Debugging and half to Testing, so one verbose prompt cannot count several times.
 
-Roast copy is modular. It selects one comic observation for each winning letter, then calls out the closest axis split as the main tension. Prompt text is never quoted in the roast. The 16 role hooks and visuals make the result memorable, while the percentages and confidence keep the joke traceable to evidence.
+| Category | Typical evidence |
+| --- | --- |
+| Planning | plans, architecture, brainstorming |
+| Debugging | failures, exceptions, root-cause work |
+| Testing | tests, regression, assertions, coverage |
+| Refactor | restructuring, extraction, cleanup |
+| Packaging | build, release, publish, deployment |
+| Explanation | explain, why, walkthrough |
+| Research | search, documentation, investigation |
+| UI design | pages, components, layout, CSS/UX |
+| Workflow | agents, hooks, MCP, skills, automation |
+| Implementation | useful requests without a more specific category |
+| Reference | pasted code, logs, stack traces, system/tool noise |
 
-### Activity identity is separate from personality
+Reference material is excluded from useful-intent counts.
 
-When TokenTracker data exists, the result also reports:
+</details>
 
-- **Top Agent** — the application/source with the most recorded tokens, such as Cursor or Codex.
-- **Top Provider** — the inferred model vendor, such as OpenAI, Anthropic, Google, DeepSeek, or xAI.
-- **Top Model** — the concrete model with the most recorded tokens.
+<details>
+<summary><strong>Word cloud and domain discovery</strong></summary>
 
-Generic model buckets such as `auto` and `unknown` count toward Top Agent but are excluded from Top Provider and Top Model. Activity totals, streaks, and these rankings remain result-card evidence; they do not select the four-letter type.
+The word cloud is not a raw token dump. It removes pasted code, paths, markup fragments, provider boilerplate, conversational filler, and stop words. English identifiers are split into readable terms; Chinese text uses `Intl.Segmenter` plus a compact developer vocabulary.
 
-### Current limitations
+Ranking favors the number of distinct prompts containing a concept, with a smaller logarithmic repetition bonus. Common bilingual variants are merged, lexical/category duplicates are collapsed, and recurring acronyms preserve their observed casing.
 
-- Category matching is keyword-based; it recognizes multiple intents but does not perform semantic task understanding.
-- Scores use prompt proportions, not task difficulty, code quality, outcome quality, or whether a suggested change was accepted.
-- Long-prompt length is a coarse proxy for context appetite; it does not know whether every included file was necessary.
-- Token totals and activity cadence do not currently change the type.
-- The result describes the selected date range and can change when the range changes.
+Project-domain entities do not need to be hardcoded. A candidate can be promoted when it:
+
+- recurs across independent prompts;
+- behaves like a project noun;
+- concentrates within a project period;
+- carries a distinctive acronym or entity signal.
+
+The same Day / Week / Month / Total / Custom and Agent filters apply to the cloud, token totals, usage trend, and model breakdown.
+
+</details>
+
+### AI roast and bilingual Hashtags
+
+Only a compact `roast_evidence` object is eligible to leave the machine. It contains aggregate type, axis, category, dimension, concept, and activity signals—never raw prompt text.
+
+The writer cannot change the deterministic type. In one model call it produces:
+
+- three-beat English and Chinese roasts;
+- bilingual TL;DR punchlines;
+- 4–5 paired Hashtags with `en`, `zh`, semantic `kind`, and a short shared `meaning`.
+
+Hashtags are interpretations rather than frequency labels. Chinese is localized from the intended joke, not translated from the English surface form: `CodeCult` should become `代码教团` or `代码邪教`, never `代码文化`. Proper names and meaningful acronyms such as GitHub, HIT, and ONNX may remain unchanged.
+
+## Privacy
+
+Vibe Roaster is local-first, but “local-first” does not mean every optional feature is offline.
+
+| Data | Local profile | Optional AI roast | Hosted profile cache |
+| --- | --- | --- | --- |
+| Raw user prompts | Used locally | Never sent | Never stored |
+| Local paths and configuration | Local only | Never sent | Never stored |
+| Aggregate categories and scores | Computed locally | Sent when explicitly enabled | Stored as a compact snapshot |
+| Generated roast and Hashtags | Local result | Returned by selected model | Stored for stable signed-in profiles |
+| API key | Not required | Used for that request only | Never stored by the local app |
+
+The UI opens through localhost, but the Node server is a local development service rather than a hardened public endpoint. Do not expose port `7681` to an untrusted network.
+
+Hosted GitHub sessions are stored outside the project under `~/.vibe-wrapper/` with owner-only permissions. A cached roast is reused until the profile changes materially, avoiding repeated model calls and unstable results.
 
 ## Supported sources
 
-| Source | `--sources` id | Default local path | Notes |
-| --- | --- | --- | --- |
-| Codex | `codex` | `~/.codex/sessions` | JSONL rollouts |
-| Claude Code | `claude` | `~/.claude/projects` | Project JSONL |
-| Cursor | `cursor` | Cursor `state.vscdb` (platform path) | Best-effort SQLite (`sqlite3`) |
-| Cline | `cline` | VS Code/Cursor `globalStorage/saoudrizwan.claude-dev/tasks` | `ui_messages.json` |
-| Roo Code | `roo` | VS Code/Cursor `globalStorage/rooveterinaryinc.roo-cline/tasks` | Same task layout as Cline |
-| Continue | `continue` | `~/.continue/sessions` | Session JSON |
-| Gemini CLI | `gemini` | `~/.gemini/tmp/*/chats` | Session JSON |
-| Aider | `aider` | `.aider.chat.history.md` under cwd / `~/projects`… | Markdown history |
-| Windsurf | `windsurf` | `~/.codeium/windsurf` | Plaintext JSON/JSONL only; Cascade `.pb` is encrypted |
-| Copilot Chat | `copilot` | VS Code/Cursor `globalStorage/github.copilot-chat` | Best-effort session JSON |
-| Amazon Q | `amazonq` | `~/.aws/amazonq/history` | LokiJS `chat-history-*.json` (`type: prompt`) |
-| Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` | Plaintext JSON exports only; conversation `.pb` is binary |
-| TokenTracker | _(activity)_ | `~/.tokentracker/tracker/queue.jsonl` | Heatmap tokens when present |
-| Vibe tracker | `vibe-tracker` | `~/.vibe-wrapper/sessions.jsonl` | Optional hook sink |
+Vibe Roaster inspects the sources it can find and treats missing roots as empty.
 
-Override roots with `--codex-root`, `--claude-root`, `--cursor-db`, `--cline-root`, `--roo-root`, `--continue-root`, `--gemini-root`, `--aider-root`, `--windsurf-root`, `--copilot-root`, `--amazonq-root`, `--antigravity-root`.
+| Source | ID | Default store |
+| --- | --- | --- |
+| Codex | `codex` | `~/.codex/sessions` |
+| Claude Code | `claude` | `~/.claude/projects` |
+| Cursor | `cursor` | platform `state.vscdb` |
+| Cline | `cline` | VS Code/Cursor global storage |
+| Roo Code | `roo` | VS Code/Cursor global storage |
+| Continue | `continue` | `~/.continue/sessions` |
+| Gemini CLI | `gemini` | `~/.gemini/tmp/*/chats` |
+| Aider | `aider` | `.aider.chat.history.md` |
+| Windsurf | `windsurf` | `~/.codeium/windsurf` plaintext exports |
+| Copilot Chat | `copilot` | VS Code/Cursor global storage |
+| Amazon Q | `amazonq` | `~/.aws/amazonq/history` |
+| Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` |
+| TokenTracker | activity only | `~/.tokentracker/tracker/queue.jsonl` |
+| Vibe tracker | `vibe-tracker` | `~/.vibe-wrapper/sessions.jsonl` |
 
-**Not supported (no reliable plaintext session store on this machine / formats):** JetBrains AI Assistant cloud history, ChatGPT desktop (encrypted), Cursor cloud-only threads without local bubbles, Antigravity / Windsurf Cascade protobuf trajectories without a JSON export.
+Cursor is best-effort and requires the local `sqlite3` command. Encrypted or binary histories are skipped rather than guessed.
 
-Cursor support is currently best-effort. It reads user `bubbleId` / composer / chat rows from `ItemTable` and `cursorDiskKV` (requires local `sqlite3`). Compact Cursor rows often omit token usage; prompts without timestamps are omitted from date-filtered views.
+<details>
+<summary><strong>Known source limitations</strong></summary>
 
-The Roast Result activity heatmap uses TokenTracker hourly token buckets when that queue exists. If it is missing, the heatmap falls back to prompt counts from the prompt adapters.
+- Windsurf Cascade and Antigravity protobuf trajectories are not parsed without a plaintext export.
+- ChatGPT desktop history is encrypted.
+- Cursor cloud-only threads may not have readable local bubbles.
+- Token availability differs by source; TokenTracker is preferred for complete activity totals.
+- Agent context categories are aggregate estimates. Codex tool attribution is turn-based; Claude content-block attribution is approximate.
 
-## Visual assets (`assests/`)
+</details>
 
-The legacy eight-figure pack remains as a runtime fallback. The complete sixteen-type PNG set lives under `assests/characters-vibe-types/`; its generation directions are documented in [`assests/source/vibe-types-visual-brief.md`](assests/source/vibe-types-visual-brief.md).
+## CLI
 
-## Testing
+### Inspect without the UI
+
+```bash
+npx vibe-roast inspect \
+  --from 2026-06-01 \
+  --to 2026-06-08 \
+  --sources codex,claude,cursor
+```
+
+The JSON report includes source summaries, activity, word frequencies, prompt analysis, the four-axis profile, aggregate roast evidence, and normalized prompt records.
+
+### Override local stores
+
+```bash
+npx vibe-roast inspect \
+  --codex-root /path/to/codex/sessions \
+  --claude-root /path/to/claude/projects \
+  --cursor-db /path/to/state.vscdb
+```
+
+Additional overrides:
+
+```text
+--home
+--cline-root
+--roo-root
+--continue-root
+--gemini-root
+--aider-root
+--windsurf-root
+--copilot-root
+--amazonq-root
+--antigravity-root
+--token-tracker-queue
+```
+
+### Optional hooks
+
+```bash
+npx vibe-roast install
+npx vibe-roast uninstall
+```
+
+Hooks are explicit; npm installation never silently changes Codex or Claude configuration.
+
+## Configuration
+
+Most users need no environment variables.
+
+| Variable | Purpose |
+| --- | --- |
+| `PORT` | Change the local server port from `7681` |
+| `VIBE_WRAPPER_NO_OPEN=1` | Start without opening the browser |
+| `VIBE_WRAPPER_AUTH_BROKER_URL` | Override the hosted OAuth/AI broker for development or self-hosting |
+| `DEEPSEEK_BASE_URL` | Override the default DeepSeek-compatible endpoint |
+| `DEEPSEEK_MODEL` | Override the default DeepSeek model |
+
+For local development, place ignored values in `.env.local`. Explicit shell environment variables take precedence.
+
+Never commit API keys, client secrets, session secrets, `.env.local`, or `worker/.dev.vars`.
+
+## Development
+
+### Install and build
+
+```bash
+git clone https://github.com/PinkR1ver/vibe-roast.git
+cd vibe-roast
+npm install
+npm run build
+npm run serve
+```
+
+### Vite development mode
+
+```bash
+# terminal 1: API and local assets
+VIBE_WRAPPER_NO_OPEN=1 npm run serve
+
+# terminal 2: Vite HMR
+npm run dev
+```
+
+Vite runs at `http://localhost:5173` and proxies `/api` plus `/assests` to the local Node server.
+
+### Tests
 
 ```bash
 npm test
+npm run build
 ```
 
-Coverage for primary + extra session sources:
+Tests cover adapters, fixture parsing, prompt hygiene, activity aggregation, type scoring, word-cloud entities, AI schema validation, OAuth/broker behavior, caching, Hashtags, and frontend helpers.
 
-| Source | Fixtures | What tests cover |
-| --- | --- | --- |
-| Codex | `test/fixtures/codex/sessions/**/*.jsonl` | JSONL prompt/token parse, date range, inspect + CLI |
-| Claude Code | `test/fixtures/claude/projects/**/*.jsonl` | user-message extract, tokens, inspect + CLI |
-| Cursor | `test/fixtures/cursor/state.vscdb` | SQLite row parse, path resolution, date filter, inspect + CLI |
-| Cline / Roo / Continue / Gemini / Aider / Windsurf / Copilot / Amazon Q / Antigravity | `test/fixtures/{cline,roo,continue,gemini,aider,windsurf,copilot,amazonq,antigravity}/…` | prompt extract, empty-root safety, multi-source merge |
+### Project map
 
-Multi-source `inspectSources` also asserts `profile_signals` and `vibe_profile` (agent score / figure paths) when Codex + Claude + Cursor fixtures are combined. TokenTracker activity uses `test/fixtures/tokentracker/queue.jsonl`.
-
-## Hooks (optional)
-
-```bash
-npm run inspect -- install    # or: node bin/vibe-wrapper.js install
+```text
+bin/                    CLI entrypoints
+src/sources/            local Agent adapters
+src/extract/            prompt and concept extraction
+src/lib/                scoring, activity, roast, cache snapshots
+dashboard/src/          React Roast Result UI
+worker/                 Cloudflare OAuth + hosted AI broker
+assests/                published visual pack (spelling is intentional)
+test/                   Node fixtures and tests
+.agents/                architecture, decisions, and feature specs
 ```
 
-Installs SessionEnd hooks for Claude Code / Codex so token usage lands in `~/.vibe-wrapper/sessions.jsonl`.
+For architecture details, see [the project architecture](https://github.com/PinkR1ver/vibe-roast/blob/main/.agents/docs/architecture.md). For the hosted OAuth and free-AI flow, see [the hosted-roast architecture](https://github.com/PinkR1ver/vibe-roast/blob/main/.agents/docs/hosted-roast-architecture.md).
+
+## Self-hosting the broker
+
+The public npm package defaults to `https://auth.pinktalk.online`. End users do not need a GitHub Client Secret.
+
+The included Cloudflare Worker uses:
+
+- GitHub OAuth with state and PKCE;
+- one-time broker tickets;
+- a SQLite Durable Object for sessions, quota, and cached profiles;
+- a fixed Workers AI model;
+- a nine-call UTC-day limit per signed-in account.
+
+Deployment and secret configuration live in [`worker/README.md`](worker/README.md).
+
+## Current limitations
+
+- Prompt classification is keyword-based rather than full semantic task analysis.
+- Scores describe prompt behavior, not task difficulty, code quality, or project outcomes.
+- Long prompts are only a proxy for context appetite.
+- Activity totals do not select the personality type.
+- Domain discovery is heuristic and needs repeated independent mentions.
+- The profile may change as new session evidence becomes materially different.
+
+## Contributing
+
+Issues and pull requests are welcome:
+
+1. Fork the repository.
+2. Create a focused branch.
+3. Add or update fixture-backed tests.
+4. Run `npm test` and `npm run build`.
+5. Open a pull request describing the user-visible change.
+
+Please keep adapters best-effort and never commit private session dumps, raw user histories, tokens, or credentials.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>

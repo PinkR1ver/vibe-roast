@@ -1,0 +1,40 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vibe-roast-auth",
+  "main": "src/index.mjs",
+  "compatibility_date": "2026-07-24",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "auth.pinktalk.online",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "GITHUB_CLIENT_ID": "Iv23li5jqHs7pMarqWPZ",
+    "AUTH_BROKER_PUBLIC_URL": "https://auth.pinktalk.online",
+    "FREE_AI_DAILY_CALLS": "9"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "OAUTH_STATE",
+        "class_name": "OAuthState"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "OAuthState"
+      ]
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

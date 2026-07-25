@@ -13,24 +13,40 @@ async function inspectCodex({ root, range } = {}) {
   );
   const prompts = [];
   const tokenTotals = emptyTotals();
+  const contextByDay = new Map();
 
   for (const file of files) {
+    let previousTotals = null;
+    let pendingTools = [];
     await readJsonl(file, (obj) => {
       const timestamp = obj.timestamp || obj.payload?.timestamp || null;
-      if (!isInRange(timestamp, range)) return;
+      const inRequestedRange = isInRange(timestamp, range);
 
-      const text = extractCodexPrompt(obj);
-      if (text) {
-        prompts.push({
-          source: "codex",
-          timestamp,
-          session_file: file,
-          text,
-        });
+      if (inRequestedRange) {
+        const text = extractCodexPrompt(obj);
+        if (text) {
+          prompts.push({
+            source: "codex",
+            timestamp,
+            session_file: file,
+            text,
+          });
+        }
+
+        const tokens = extractCodexTokens(obj);
+        if (tokens) addTotals(tokenTotals, tokens);
+
+        const tool = extractCodexTool(obj);
+        if (tool) pendingTools.push(tool);
       }
 
-      const tokens = extractCodexTokens(obj);
-      if (tokens) addTotals(tokenTotals, tokens);
+      const usage = extractCodexUsageEvent(obj);
+      if (usage) {
+        const delta = codexUsageDelta(usage, previousTotals);
+        if (usage.total) previousTotals = usage.total;
+        if (inRequestedRange) addCodexContext(contextByDay, timestamp, delta, pendingTools);
+        pendingTools = [];
+      }
     });
   }
 
@@ -40,6 +56,7 @@ async function inspectCodex({ root, range } = {}) {
     files_scanned: files.length,
     prompt_count: prompts.length,
     token_totals: tokenTotals,
+    context_breakdown_daily: [...contextByDay.values()].sort((a, b) => a.day.localeCompare(b.day)),
     prompts,
   };
 }
@@ -78,6 +95,99 @@ function extractCodexTokens(obj) {
   return normalizeTotals(info.total_token_usage || info);
 }
 
+function extractCodexUsageEvent(obj) {
+  const payload = obj?.payload || {};
+  const info =
+    payload.type === "token_count" ? payload.info
+    : payload.msg?.type === "token_count" ? payload.msg.info
+    : null;
+  if (!info) return null;
+  return {
+    last: info.last_token_usage && typeof info.last_token_usage === "object"
+      ? info.last_token_usage
+      : null,
+    total: info.total_token_usage && typeof info.total_token_usage === "object"
+      ? info.total_token_usage
+      : null,
+  };
+}
+
+function extractCodexTool(obj) {
+  if (obj?.type !== "response_item" || obj?.payload?.type !== "function_call") return "";
+  const payload = obj.payload;
+  if (typeof payload.namespace === "string" && payload.namespace.startsWith("mcp__")) {
+    return `${payload.namespace}${payload.name || ""}`;
+  }
+  return typeof payload.name === "string" ? payload.name : "";
+}
+
+function codexUsageDelta(usage, previousTotals) {
+  if (!usage) return null;
+  if (usage.total && previousTotals) {
+    const total = normalizeCodexUsage(usage.total);
+    const previous = normalizeCodexUsage(previousTotals);
+    if (total.total_tokens >= previous.total_tokens) {
+      return Object.fromEntries(
+        Object.keys(total).map((key) => [key, Math.max(0, total[key] - previous[key])]),
+      );
+    }
+  }
+  return normalizeCodexUsage(usage.last || usage.total || {});
+}
+
+function normalizeCodexUsage(raw) {
+  const totals = normalizeTotals(raw);
+  // Codex reports input inclusive of cache reads.
+  totals.input_tokens = Math.max(0, totals.input_tokens - totals.cached_input_tokens);
+  totals.total_tokens =
+    totals.input_tokens +
+    totals.cached_input_tokens +
+    totals.cache_creation_input_tokens +
+    totals.output_tokens;
+  return totals;
+}
+
+function addCodexContext(byDay, timestamp, delta, tools) {
+  if (!delta?.total_tokens || !timestamp) return;
+  const day = String(timestamp).slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return;
+  const row = byDay.get(day) || emptyContextRow(day, "turn_delta");
+  const uniqueTools = [...new Set((tools || []).filter(Boolean))];
+  const toolShare = uniqueTools.length > 0 ? 1 : 0;
+  const reasoning = Math.min(delta.total_tokens, number(delta.reasoning_output_tokens));
+  const attributable = Math.max(0, delta.total_tokens - reasoning);
+  row.categories.reasoning += reasoning;
+  row.categories.tool_calls += attributable * toolShare;
+  row.categories.messages += attributable * (1 - toolShare);
+  row.total_tokens += delta.total_tokens;
+  row.input_tokens += number(delta.input_tokens)
+    + number(delta.cached_input_tokens)
+    + number(delta.cache_creation_input_tokens);
+  row.cached_input_tokens += number(delta.cached_input_tokens);
+  row.tool_call_count += uniqueTools.length;
+  row.event_count += 1;
+  byDay.set(day, row);
+}
+
+function emptyContextRow(day, method) {
+  return {
+    day,
+    method,
+    categories: {
+      messages: 0,
+      tool_calls: 0,
+      reasoning: 0,
+      system_prompt: 0,
+      custom_agents: 0,
+    },
+    total_tokens: 0,
+    input_tokens: 0,
+    cached_input_tokens: 0,
+    tool_call_count: 0,
+    event_count: 0,
+  };
+}
+
 function normalizeTotals(raw) {
   return {
     input_tokens: number(raw.input_tokens),
@@ -102,4 +212,11 @@ function number(value) {
   return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
-module.exports = { inspectCodex, extractCodexPrompt, extractCodexTokens };
+module.exports = {
+  inspectCodex,
+  extractCodexPrompt,
+  extractCodexTokens,
+  extractCodexTool,
+  extractCodexUsageEvent,
+  codexUsageDelta,
+};
