@@ -46,7 +46,7 @@ https://auth.pinktalk.online/oauth/github/callback
 ```
 
 The public npm app uses `https://auth.pinktalk.online` automatically. Users do
-not need to configure `VIBE_WRAPPER_AUTH_BROKER_URL`; that variable is only an
+not need to configure `VIBE_ROAST_AUTH_BROKER_URL`; that variable is only an
 override for local development or a self-hosted broker.
 
 `AUTH_BROKER_PUBLIC_URL` pins OAuth redirects to the Custom Domain even when

@@ -590,7 +590,7 @@ test("wordFrequencies keeps natural language before inline code", () => {
 test("wordFrequencies strips local path fragments", () => {
   const words = wordFrequencies([
     {
-      text: "请检查 /Volumes/macOSexternal/Documents/proj/vibe-wrapper/dashboard/src/pages/Dashboard.jsx 里的发票页面",
+      text: "请检查 /Volumes/macOSexternal/Documents/proj/vibe-roast/dashboard/src/pages/Dashboard.jsx 里的发票页面",
     },
   ]).map((row) => row.term);
 

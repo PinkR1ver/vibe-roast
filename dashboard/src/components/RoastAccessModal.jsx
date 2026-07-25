@@ -96,7 +96,7 @@ export default function RoastAccessModal({ open, onGenerate, onLocal }) {
   useEffect(() => {
     if (!open) return undefined;
     async function handleGithubMessage(event) {
-      if (event.origin !== window.location.origin || event.data?.type !== "vibe-wrapper:github-auth") return;
+      if (event.origin !== window.location.origin || event.data?.type !== "vibe-roast:github-auth") return;
       if (event.data.status !== "connected") {
         setError(event.data.error || t("roastAccess.githubFailed"));
         setBusy(false);
@@ -157,7 +157,7 @@ export default function RoastAccessModal({ open, onGenerate, onLocal }) {
     if (githubUser) return;
     const popup = window.open(
       "/api/auth/github/start",
-      "vibe-wrapper-github-auth",
+      "vibe-roast-github-auth",
       "popup,width=720,height=760",
     );
     if (!popup) {

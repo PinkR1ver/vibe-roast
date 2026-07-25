@@ -16,26 +16,26 @@ test("env parser supports quotes and inline comments", () => {
 });
 
 test("fallback env loader does not overwrite explicit process variables", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-wrapper-env-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-roast-env-"));
   const file = path.join(root, ".env");
-  const original = process.env.VIBE_WRAPPER_ENV_TEST;
+  const original = process.env.VIBE_ROAST_ENV_TEST;
   try {
-    fs.writeFileSync(file, "VIBE_WRAPPER_ENV_TEST=from-file\nVIBE_WRAPPER_ENV_NEW=loaded\n");
-    process.env.VIBE_WRAPPER_ENV_TEST = "from-shell";
-    delete process.env.VIBE_WRAPPER_ENV_NEW;
+    fs.writeFileSync(file, "VIBE_ROAST_ENV_TEST=from-file\nVIBE_ROAST_ENV_NEW=loaded\n");
+    process.env.VIBE_ROAST_ENV_TEST = "from-shell";
+    delete process.env.VIBE_ROAST_ENV_NEW;
     loadEnvFallback(file);
-    assert.equal(process.env.VIBE_WRAPPER_ENV_TEST, "from-shell");
-    assert.equal(process.env.VIBE_WRAPPER_ENV_NEW, "loaded");
+    assert.equal(process.env.VIBE_ROAST_ENV_TEST, "from-shell");
+    assert.equal(process.env.VIBE_ROAST_ENV_NEW, "loaded");
   } finally {
-    if (original === undefined) delete process.env.VIBE_WRAPPER_ENV_TEST;
-    else process.env.VIBE_WRAPPER_ENV_TEST = original;
-    delete process.env.VIBE_WRAPPER_ENV_NEW;
+    if (original === undefined) delete process.env.VIBE_ROAST_ENV_TEST;
+    else process.env.VIBE_ROAST_ENV_TEST = original;
+    delete process.env.VIBE_ROAST_ENV_NEW;
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
 
 test("local env resolution prefers .env.local and ignores a .env directory", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-wrapper-env-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "vibe-roast-env-"));
   try {
     fs.mkdirSync(path.join(root, ".env"));
     fs.writeFileSync(path.join(root, ".env.local"), "VALUE=local\n");

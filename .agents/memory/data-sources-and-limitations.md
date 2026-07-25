@@ -37,7 +37,7 @@ Prompt adapters return a report shaped like:
 | Amazon Q | LokiJS chat-history JSON | Only prompt/user rows are profile input. |
 | Antigravity | plaintext JSON exports | Binary `.pb` conversations are skipped. |
 | TokenTracker | append-only `queue.jsonl` | Activity-only; latest `(source, model, hour_start)` wins before daily aggregation. |
-| Vibe tracker | `~/.vibe-wrapper/sessions.jsonl` | Optional explicit-hook sink; its synthetic session summaries must not be mistaken for authored prompts. |
+| Vibe tracker | `~/.vibe-roast/sessions.jsonl` | Optional explicit-hook sink; its synthetic session summaries must not be mistaken for authored prompts. |
 
 ## Token and activity semantics
 
@@ -57,4 +57,4 @@ Prompt adapters return a report shaped like:
 
 ## Privacy boundary
 
-The report includes raw prompt records and local environment metadata. The server is designed for localhost use; do not treat its API output as anonymized. The checked-in `assests/notes/live-inspect-summary.json` is a redacted product snapshot, not a template for storing live private data in `.agents/`.
+The report includes raw prompt records and local environment metadata. The server is designed for localhost use; do not treat its API output as anonymized.

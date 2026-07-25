@@ -26,14 +26,14 @@ function preserveEnv(keys) {
 
 test("GitHub OAuth defaults to the hosted broker and allows explicit development overrides", () => {
   const restore = preserveEnv([
-    "VIBE_WRAPPER_AUTH_BROKER_URL",
-    "VIBE_WRAPPER_GITHUB_CLIENT_ID",
-    "VIBE_WRAPPER_GITHUB_CLIENT_SECRET",
+    "VIBE_ROAST_AUTH_BROKER_URL",
+    "VIBE_ROAST_GITHUB_CLIENT_ID",
+    "VIBE_ROAST_GITHUB_CLIENT_SECRET",
   ]);
   try {
-    delete process.env.VIBE_WRAPPER_AUTH_BROKER_URL;
-    delete process.env.VIBE_WRAPPER_GITHUB_CLIENT_ID;
-    delete process.env.VIBE_WRAPPER_GITHUB_CLIENT_SECRET;
+    delete process.env.VIBE_ROAST_AUTH_BROKER_URL;
+    delete process.env.VIBE_ROAST_GITHUB_CLIENT_ID;
+    delete process.env.VIBE_ROAST_GITHUB_CLIENT_SECRET;
     assert.equal(DEFAULT_GITHUB_CLIENT_ID, "Iv23li5jqHs7pMarqWPZ");
     assert.equal(DEFAULT_GITHUB_AUTH_BROKER_URL, "https://auth.pinktalk.online");
     assert.equal(githubClientId(), DEFAULT_GITHUB_CLIENT_ID);
@@ -43,8 +43,8 @@ test("GitHub OAuth defaults to the hosted broker and allows explicit development
       brokerUrl: DEFAULT_GITHUB_AUTH_BROKER_URL,
     });
 
-    process.env.VIBE_WRAPPER_GITHUB_CLIENT_ID = "Iv1.test-override";
-    process.env.VIBE_WRAPPER_GITHUB_CLIENT_SECRET = "local-secret";
+    process.env.VIBE_ROAST_GITHUB_CLIENT_ID = "Iv1.test-override";
+    process.env.VIBE_ROAST_GITHUB_CLIENT_SECRET = "local-secret";
     assert.deepEqual(githubAuthConfig(), {
       configured: true,
       mode: "direct",
@@ -52,7 +52,7 @@ test("GitHub OAuth defaults to the hosted broker and allows explicit development
       clientSecret: "local-secret",
     });
 
-    process.env.VIBE_WRAPPER_AUTH_BROKER_URL = "https://auth.example.test/";
+    process.env.VIBE_ROAST_AUTH_BROKER_URL = "https://auth.example.test/";
     assert.deepEqual(githubAuthConfig(), {
       configured: true,
       mode: "broker",
@@ -75,22 +75,22 @@ test("GitHub OAuth derives only loopback callback origins", () => {
 
 test("one-click GitHub OAuth uses PKCE and persists an owner-only local session", async () => {
   const restore = preserveEnv([
-    "VIBE_WRAPPER_AUTH_BROKER_URL",
-    "VIBE_WRAPPER_GITHUB_CALLBACK_URL",
-    "VIBE_WRAPPER_GITHUB_CLIENT_ID",
-    "VIBE_WRAPPER_GITHUB_CLIENT_SECRET",
-    "VIBE_WRAPPER_GITHUB_SESSION_FILE",
+    "VIBE_ROAST_AUTH_BROKER_URL",
+    "VIBE_ROAST_GITHUB_CALLBACK_URL",
+    "VIBE_ROAST_GITHUB_CLIENT_ID",
+    "VIBE_ROAST_GITHUB_CLIENT_SECRET",
+    "VIBE_ROAST_GITHUB_SESSION_FILE",
   ]);
   const originalFetch = global.fetch;
-  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "vibe-wrapper-auth-"));
+  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "vibe-roast-auth-"));
   const sessionFile = path.join(tempRoot, "github-auth.json");
   const server = createServer();
   try {
-    delete process.env.VIBE_WRAPPER_AUTH_BROKER_URL;
-    delete process.env.VIBE_WRAPPER_GITHUB_CALLBACK_URL;
-    process.env.VIBE_WRAPPER_GITHUB_CLIENT_ID = "Iv1.oauth-test";
-    process.env.VIBE_WRAPPER_GITHUB_CLIENT_SECRET = "test-secret";
-    process.env.VIBE_WRAPPER_GITHUB_SESSION_FILE = sessionFile;
+    delete process.env.VIBE_ROAST_AUTH_BROKER_URL;
+    delete process.env.VIBE_ROAST_GITHUB_CALLBACK_URL;
+    process.env.VIBE_ROAST_GITHUB_CLIENT_ID = "Iv1.oauth-test";
+    process.env.VIBE_ROAST_GITHUB_CLIENT_SECRET = "test-secret";
+    process.env.VIBE_ROAST_GITHUB_SESSION_FILE = sessionFile;
 
     await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
     const { port } = server.address();
@@ -136,7 +136,7 @@ test("one-click GitHub OAuth uses PKCE and persists an owner-only local session"
     );
     assert.equal(callbackResponse.status, 200);
     const cookie = callbackResponse.headers.get("set-cookie").split(";")[0];
-    assert.match(cookie, /^vibe_wrapper_github_session=/);
+    assert.match(cookie, /^vibe_roast_github_session=/);
 
     const statusResponse = await originalFetch(`${baseUrl}/api/auth/github/session`, {
       headers: { Cookie: cookie },
@@ -158,11 +158,11 @@ test("one-click GitHub OAuth uses PKCE and persists an owner-only local session"
 
 test("GitHub broker sessions can generate through the hosted free AI endpoint", async () => {
   const restore = preserveEnv([
-    "VIBE_WRAPPER_AUTH_BROKER_URL",
-    "VIBE_WRAPPER_GITHUB_SESSION_FILE",
+    "VIBE_ROAST_AUTH_BROKER_URL",
+    "VIBE_ROAST_GITHUB_SESSION_FILE",
   ]);
   const originalFetch = global.fetch;
-  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "vibe-wrapper-hosted-ai-"));
+  const tempRoot = await fsp.mkdtemp(path.join(os.tmpdir(), "vibe-roast-hosted-ai-"));
   const sessionFile = path.join(tempRoot, "github-auth.json");
   const sessionId = "local-session-id";
   const brokerSessionToken = "signed-broker-session";
@@ -176,8 +176,8 @@ test("GitHub broker sessions can generate through the hosted free AI endpoint", 
     tldrZh: "像素已有项目计划，验证还只有日历邀请。",
   };
   try {
-    process.env.VIBE_WRAPPER_AUTH_BROKER_URL = "https://auth.example.test";
-    process.env.VIBE_WRAPPER_GITHUB_SESSION_FILE = sessionFile;
+    process.env.VIBE_ROAST_AUTH_BROKER_URL = "https://auth.example.test";
+    process.env.VIBE_ROAST_GITHUB_SESSION_FILE = sessionFile;
     await fsp.writeFile(sessionFile, JSON.stringify({
       sessionId,
       mode: "broker",
@@ -238,7 +238,7 @@ test("GitHub broker sessions can generate through the hosted free AI endpoint", 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Cookie: `vibe_wrapper_github_session=${sessionId}`,
+        Cookie: `vibe_roast_github_session=${sessionId}`,
       },
       body: JSON.stringify({
         mode: "hosted",
