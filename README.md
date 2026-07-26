@@ -18,11 +18,13 @@
       <img src="https://img.shields.io/npm/v/vibe-roast?color=25b985&label=npm" alt="npm version" />
     </a>
     <a href="https://www.npmjs.com/package/vibe-roast">
-      <img src="https://img.shields.io/npm/dm/vibe-roast?color=557fd8" alt="npm downloads" />
+      <img src="https://img.shields.io/npm/dm/vibe-roast?color=557fd8&label=npm%20downloads%2Fmonth" alt="npm Registry downloads in the last month" />
     </a>
     <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-171717" alt="Node.js 20 or newer" />
     <img src="https://img.shields.io/badge/types-16-9a70cf" alt="16 coding personality types" />
-    <img src="https://img.shields.io/badge/raw_prompts-local_only-ef5b45" alt="Raw prompts stay local" />
+    <a href="#privacy">
+      <img src="https://img.shields.io/badge/prompt_text-stays_local-ef5b45" alt="Your prompt text stays local" />
+    </a>
   </p>
 
   <p>
@@ -71,6 +73,8 @@ Interactive terminals get a short branded launch sequence with rotating English 
 
 Missing agents are ignored safely. You do not need to configure every source, create an account, or provide an API key to see the local result.
 
+The download badge reports npm Registry package fetches during the last month. A first-time `npx vibe-roast` fetch contributes to that number; a later run served from the local npm cache may not. It is a download count, not a unique-user or execution counter.
+
 ### Choose how the roast is written
 
 On first launch, choose one of three paths:
@@ -93,7 +97,7 @@ GitHub login is identity only; it does not use GitHub Models or your GitHub mode
     </td>
     <td width="50%">
       <strong>Evidence-grounded roast</strong><br />
-      The type stays deterministic. Optional AI writing turns aggregate signals and contradictions into bilingual comedy without receiving raw prompts.
+      The type stays deterministic. Optional AI writing turns aggregate signals and contradictions into bilingual comedy without receiving the exact requests you typed.
     </td>
   </tr>
   <tr>
@@ -103,13 +107,13 @@ GitHub login is identity only; it does not use GitHub Models or your GitHub mode
     </td>
     <td width="50%">
       <strong>Recurring themes</strong><br />
-      A time- and Agent-filtered cloud promotes repeated coding concepts and project-domain entities such as HIT, ONNX, or 前庭.
+      A time- and Agent-filtered cloud promotes repeated coding concepts, project nouns, frameworks, subsystems, and meaningful acronyms.
     </td>
   </tr>
   <tr>
     <td width="50%">
       <strong>Semantic Hashtags</strong><br />
-      AI reads coherent concept clusters and creates shareable character labels—<code>preflop + folds + river</code> can become <code>#HoldemPlayer</code>, not <code>#preflop</code>.
+      AI reads coherent concept clusters and turns them into shareable character labels instead of copying the highest-frequency token.
     </td>
     <td width="50%">
       <strong>Shareable by design</strong><br />
@@ -210,7 +214,7 @@ The same Day / Week / Month / Total / Custom and Agent filters apply to the clou
 
 ### AI roast and bilingual Hashtags
 
-Only a compact `roast_evidence` object is eligible to leave the machine. It contains aggregate type, axis, category, dimension, concept, and activity signals—never raw prompt text.
+Only a compact `roast_evidence` object is eligible to leave the machine. It contains aggregate type, axis, category, dimension, concept, and activity signals—never the text you typed into an Agent.
 
 The writer cannot change the deterministic type. In one model call it produces:
 
@@ -218,7 +222,7 @@ The writer cannot change the deterministic type. In one model call it produces:
 - bilingual TL;DR punchlines;
 - 4–5 paired Hashtags with `en`, `zh`, semantic `kind`, and a short shared `meaning`.
 
-Hashtags are interpretations rather than frequency labels. Chinese is localized from the intended joke, not translated from the English surface form: `CodeCult` should become `代码教团` or `代码邪教`, never `代码文化`. Proper names and meaningful acronyms such as GitHub, HIT, and ONNX may remain unchanged.
+Hashtags are interpretations rather than frequency labels. Chinese is localized from the intended joke instead of translated word for word. Proper names, framework names, and meaningful acronyms may remain unchanged when translation would lose their identity.
 
 ## Privacy
 
@@ -226,7 +230,7 @@ Vibe Roaster is local-first, but “local-first” does not mean every optional 
 
 | Data | Local profile | Optional AI roast | Hosted profile cache |
 | --- | --- | --- | --- |
-| Raw user prompts | Used locally | Never sent | Never stored |
+| Prompt text you typed | Used locally | Never sent | Never stored |
 | Local paths and configuration | Local only | Never sent | Never stored |
 | Aggregate categories and scores | Computed locally | Sent when explicitly enabled | Stored as a compact snapshot |
 | Generated roast and Hashtags | Local result | Returned by selected model | Stored for stable signed-in profiles |
