@@ -37,19 +37,21 @@
     <a href="#privacy">Privacy</a>
     ·
     <a href="#development">Development</a>
+    ·
+    <a href="README.zh-CN.md">中文</a>
   </p>
 </div>
 
 ---
 
-Vibe Roaster reads supported local coding-agent histories, separates real user intent from pasted code and tool noise, and turns the resulting behavior into:
+Vibe Roaster reads local coding-agent histories and builds:
 
 - a four-letter coding type;
 - one of 16 illustrated characters;
 - an evidence-grounded roast;
 - recurring project and domain themes;
 - Agent, provider, model, token, and activity analytics;
-- a 3:4 share card designed to travel beyond the dashboard.
+- a 3:4 share card.
 
 The personality calculation is deterministic and local. AI writing is optional.
 
@@ -91,22 +93,22 @@ Vibe Roaster scans the supported local stores it can find, starts the local dash
 http://localhost:7681
 ```
 
-`tokentracker-cli` ships as a runtime dependency. On first launch, Vibe Roaster
-initializes its local-only collectors and compatible Agent hooks; later launches
-sync the TokenTracker queue before opening the report. Activity therefore stays
-in Token mode instead of silently changing its unit to Prompt count. If the
-operating system blocks a source, the UI shows zero Token data for that source
-rather than presenting Prompt counts as Tokens.
+`tokentracker-cli` ships as a runtime dependency. The first launch initializes its
+local-only collectors and compatible hooks; later launches sync the queue before
+opening the report. Activity is always measured in Tokens. If TokenTracker cannot
+collect data for a source, the UI shows zero for that source.
 
 Vibe Roaster invokes TokenTracker in local-only, no-auth mode. TokenTracker's
-optional account, GitHub OAuth, leaderboard, and cloud sync are not required or
-opened by `vibe-roast`.
+account, OAuth, leaderboard, and cloud sync features are not used.
 
-Interactive terminals get a short branded launch sequence with rotating English humour. Piped output, CI, and `NO_COLOR` environments automatically use stable plain text.
+Interactive terminals show a short branded launch animation. Piped output, CI,
+and `NO_COLOR` environments use plain text.
 
-Missing agents are ignored safely. You do not need to configure every source, create an account, or provide an API key to see the local result.
+Missing agents are skipped. You don't need to configure every source, create an
+account, or provide an API key to see the local result.
 
-The download badge reports npm Registry package fetches during the last month. A first-time `npx vibe-roast` fetch contributes to that number; a later run served from the local npm cache may not. It is a download count, not a unique-user or execution counter.
+The download badge reports npm Registry fetches per month. `npx vibe-roast` counts
+when npm needs to download the package; cached runs may not.
 
 ### Choose how the roast is written
 
@@ -118,7 +120,7 @@ On first launch, choose one of three paths:
 | Hosted roast | GitHub identifies the profile; Cloudflare Workers AI writes and caches the roast | GitHub sign-in |
 | Your provider | Sends aggregate roast evidence to your selected model | DeepSeek, OpenAI, Anthropic, Gemini, Groq, or OpenRouter key |
 
-GitHub login is identity only; it does not use GitHub Models or your GitHub model quota.
+GitHub login is for identity only. It does not use GitHub Models.
 
 ## What you get
 
@@ -247,7 +249,9 @@ The same Day / Week / Month / Total / Custom and Agent filters apply to the clou
 
 ### AI roast and bilingual Hashtags
 
-Only a compact `roast_evidence` object is eligible to leave the machine. It contains aggregate type, axis, category, dimension, concept, and activity signals—never the text you typed into an Agent.
+Only a compact `roast_evidence` object is ever sent over the network. It contains
+aggregate type, axis, category, dimension, concept, and activity signals—never
+the text you typed into an Agent.
 
 The writer cannot change the deterministic type. In one model call it produces:
 
@@ -255,11 +259,13 @@ The writer cannot change the deterministic type. In one model call it produces:
 - bilingual TL;DR punchlines;
 - five paired Hashtags with `en`, `zh`, semantic `kind`, and a short shared `meaning`.
 
-Hashtags are interpretations rather than frequency labels. Chinese is localized from the intended joke instead of translated word for word. Proper names, framework names, and meaningful acronyms may remain unchanged when translation would lose their identity.
+Hashtags are semantic interpretations, not frequency labels. Chinese is localized
+from the intended joke rather than translated literally. Proper names, framework
+names, and meaningful acronyms may stay unchanged.
 
 ## Privacy
 
-Vibe Roaster is local-first, but “local-first” does not mean every optional feature is offline.
+Vibe Roaster is local-first. The AI roast and hosted profile cache are optional network features.
 
 | Data | Local profile | Optional AI roast | Hosted profile cache |
 | --- | --- | --- | --- |
@@ -269,9 +275,11 @@ Vibe Roaster is local-first, but “local-first” does not mean every optional 
 | Generated roast and Hashtags | Local result | Returned by selected model | Stored for stable signed-in profiles |
 | API key | Not required | Used for that request only | Never stored by the local app |
 
-The UI opens through localhost, but the Node server is a local development service rather than a hardened public endpoint. Do not expose port `7681` to an untrusted network.
+The UI runs on localhost. The Node server is not hardened for public exposure—don't
+expose port `7681` to untrusted networks.
 
-Hosted GitHub sessions are stored outside the project under `~/.vibe-roast/` with owner-only permissions. A cached roast is reused until the profile changes materially, avoiding repeated model calls and unstable results.
+GitHub sessions are stored under `~/.vibe-roast/` with owner-only permissions. A
+cached roast is reused until the profile changes materially.
 
 ## Supported sources
 
@@ -294,7 +302,7 @@ Vibe Roaster inspects the sources it can find and treats missing roots as empty.
 | TokenTracker (bundled) | activity only | `~/.tokentracker/tracker/queue.jsonl` |
 | Vibe tracker | `vibe-tracker` | `~/.vibe-roast/sessions.jsonl` |
 
-Cursor is best-effort and requires the local `sqlite3` command. Encrypted or binary histories are skipped rather than guessed.
+Cursor is best-effort and requires the local `sqlite3` command. Encrypted or binary histories are skipped.
 
 <details>
 <summary><strong>Known source limitations</strong></summary>
@@ -352,9 +360,9 @@ npx tokentracker-cli status
 npx tokentracker-cli doctor
 ```
 
-Installing the npm package does not edit Agent configuration. The first
-`vibe-roast` execution announces and performs TokenTracker initialization;
-TokenTracker owns its compatible hooks and local queue from that point onward.
+Installing the npm package does not modify Agent configuration. The first
+`vibe-roast` run initializes TokenTracker; TokenTracker manages its own hooks and
+local queue from that point on.
 
 ## Configuration
 
@@ -438,12 +446,12 @@ Deployment and secret configuration live in [`worker/README.md`](worker/README.m
 
 ## Current limitations
 
-- Prompt classification is keyword-based rather than full semantic task analysis.
-- Scores describe prompt behavior, not task difficulty, code quality, or project outcomes.
-- Long prompts are only a proxy for context appetite.
-- Activity totals do not select the personality type.
-- Domain discovery is heuristic and needs repeated independent mentions.
-- The profile may change as new session evidence becomes materially different.
+- Prompt classification is keyword-based.
+- Scores reflect prompt behavior, not task difficulty or code quality.
+- Long prompts are a proxy for context appetite.
+- Activity totals do not influence the personality type.
+- Domain discovery is heuristic and needs repeated mentions.
+- The profile can change as new session evidence shifts meaningfully.
 
 ## Contributing
 
@@ -455,6 +463,7 @@ Issues and pull requests are welcome:
 4. Run `npm test` and `npm run build`.
 5. Open a pull request describing the user-visible change.
 
-Please keep adapters best-effort and never commit private session dumps, raw user histories, tokens, or credentials.
+Keep adapters best-effort (missing sources must not crash inspection). Never commit
+private session dumps, user histories, tokens, or credentials.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
