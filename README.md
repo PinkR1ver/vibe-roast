@@ -53,6 +53,14 @@ Vibe Roaster reads supported local coding-agent histories, separates real user i
 
 The personality calculation is deterministic and local. AI writing is optional.
 
+<p align="center">
+  <img
+    src="./assests/screenshots/roast-result-hero.jpg"
+    width="1100"
+    alt="Vibe Roaster result showing the Debugger coding personality, behavioral radar, and type axes"
+  />
+</p>
+
 ## Quick start
 
 ### Run from npm
@@ -68,6 +76,13 @@ Vibe Roaster scans the supported local stores it can find, starts the local dash
 ```text
 http://localhost:7681
 ```
+
+`tokentracker-cli` ships as a runtime dependency. On first launch, Vibe Roaster
+initializes its local-only collectors and compatible Agent hooks; later launches
+sync the TokenTracker queue before opening the report. Activity therefore stays
+in Token mode instead of silently changing its unit to Prompt count. If the
+operating system blocks a source, the UI shows zero Token data for that source
+rather than presenting Prompt counts as Tokens.
 
 Interactive terminals get a short branded launch sequence with rotating English humour. Piped output, CI, and `NO_COLOR` environments automatically use stable plain text.
 
@@ -258,7 +273,7 @@ Vibe Roaster inspects the sources it can find and treats missing roots as empty.
 | Copilot Chat | `copilot` | VS Code/Cursor global storage |
 | Amazon Q | `amazonq` | `~/.aws/amazonq/history` |
 | Antigravity | `antigravity` | `~/.gemini/antigravity(-ide)/conversations` |
-| TokenTracker | activity only | `~/.tokentracker/tracker/queue.jsonl` |
+| TokenTracker (bundled) | activity only | `~/.tokentracker/tracker/queue.jsonl` |
 | Vibe tracker | `vibe-tracker` | `~/.vibe-roast/sessions.jsonl` |
 
 Cursor is best-effort and requires the local `sqlite3` command. Encrypted or binary histories are skipped rather than guessed.
@@ -269,7 +284,7 @@ Cursor is best-effort and requires the local `sqlite3` command. Encrypted or bin
 - Windsurf Cascade and Antigravity protobuf trajectories are not parsed without a plaintext export.
 - ChatGPT desktop history is encrypted.
 - Cursor cloud-only threads may not have readable local bubbles.
-- Token availability differs by source; TokenTracker is preferred for complete activity totals.
+- TokenTracker covers supported local histories and keeps the Activity unit in Tokens. Platform permissions and upstream log formats can still leave an individual source at zero.
 - Agent context categories are aggregate estimates. Codex tool attribution is turn-based; Claude content-block attribution is approximate.
 
 </details>
@@ -312,14 +327,16 @@ Additional overrides:
 --token-tracker-queue
 ```
 
-### Optional hooks
+### Token collection diagnostics
 
 ```bash
-npx vibe-roast install
-npx vibe-roast uninstall
+npx tokentracker-cli status
+npx tokentracker-cli doctor
 ```
 
-Hooks are explicit; npm installation never silently changes Codex or Claude configuration.
+Installing the npm package does not edit Agent configuration. The first
+`vibe-roast` execution announces and performs TokenTracker initialization;
+TokenTracker owns its compatible hooks and local queue from that point onward.
 
 ## Configuration
 

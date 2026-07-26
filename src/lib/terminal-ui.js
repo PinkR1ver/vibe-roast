@@ -92,7 +92,16 @@ function createTerminalLaunch({
     );
   }
 
-  return { intro, ready, rich };
+  async function tokenTrackerSync() {
+    await animateStatus("Teaching TokenTracker where the evidence lives");
+  }
+
+  function tokenTrackerWarning(message) {
+    if (!rich) return;
+    write(`  ${ANSI.orange}◇${ANSI.reset} ${ANSI.dim}Token totals unavailable: ${message}${ANSI.reset}\n`);
+  }
+
+  return { intro, ready, rich, tokenTrackerSync, tokenTrackerWarning };
 }
 
 module.exports = {

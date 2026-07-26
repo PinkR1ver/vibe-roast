@@ -29,6 +29,7 @@ assests/
 │   └── *.sbti-archive.svg    # old SBTI diamond cards
 ├── badges/01-builder … 08-yolo-shipper/
 ├── banners/  home-hero.*  share-strip.*  result-header.*
+├── screenshots/             # anonymized product screenshots used in README
 ├── scripts/score-engine.js   # type and behavior-dimension reference helpers
 ├── scripts/vibe-types.json   # 16-type figure manifest
 ├── source/design-system.md

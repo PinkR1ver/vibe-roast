@@ -11,7 +11,7 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 
 ## Runtime and commands
 
-- Root runtime: Node.js 20+, CommonJS, no production npm dependencies.
+- Root runtime: Node.js 20+, CommonJS. `tokentracker-cli` is the production dependency that provides normalized local token collection.
 - UI runtime: React 18 + Vite + Tailwind; dashboard code is ESM.
 - `npm test`: run all Node fixture/unit tests.
 - `npm run build`: install dashboard dependencies and build `dashboard/dist`.
@@ -24,7 +24,7 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 - `src/inspect.js` is the aggregation boundary. Source adapters return normalized reports; profile scoring and the UI consume that aggregate rather than reading local stores directly.
 - Source adapters must be best-effort: a missing root or unsupported local format returns an empty report instead of crashing the full inspect.
 - Only real user-authored prompt text belongs in `prompts`, prompt classification, scoring, or word frequencies. Exclude assistant, system, tool-result, encrypted/binary, and synthetic activity content.
-- TokenTracker data is activity-only. Prefer its daily token buckets when present; otherwise use timestamped prompt counts and keep the metric labeled `prompts`.
+- TokenTracker data is activity-only. Vibe Roaster initializes/syncs the bundled collector before normal runs and keeps Activity in Token mode; an unavailable collector yields zero Token data, never relabeled Prompt counts.
 - Undated prompts may contribute to all-time prompt totals, but date-derived views and word-cloud input should prefer timestamped prompts.
 - Keep scoring logic in `src/lib/agent-score.js` aligned with the visual reference implementation in `assests/scripts/score-engine.js` when the profile model changes.
 - `assests/` is intentionally misspelled and is part of the published package and public URL contract (`/assests/...`). Do not rename it as a cleanup.
@@ -34,7 +34,7 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 
 - The app is local-first, but `/api/inspect` returns prompt records and the local server currently sends permissive CORS headers. Do not expose the server beyond localhost without an explicit privacy/security design.
 - Never commit raw private session dumps, credentials, tokens, or machine-specific inspect snapshots into `.agents/`.
-- Hook installation is explicit (`install`/`uninstall`); npm install and `npx` must not silently change Codex or Claude configuration.
+- `npm install` remains side-effect free. The first interactive `vibe-roast` run visibly initializes bundled TokenTracker collectors and compatible hooks; later runs sync them before inspection.
 - The root `files` whitelist and `prepack` build define the npm artifact. Keep CLI, backend, built UI, `assests/`, and README available to the published package.
 
 ## Verification expectations

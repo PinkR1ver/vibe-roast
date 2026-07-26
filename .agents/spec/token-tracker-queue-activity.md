@@ -2,7 +2,7 @@
 
 Status: completed
 Created: 2026-06-09
-Last updated: 2026-07-23
+Last updated: 2026-07-26
 
 ## Goal
 
@@ -16,8 +16,9 @@ Use TokenTracker's local hourly queue as the preferred activity metric while kee
 - Apply the inspect date range before aggregation.
 - Expose the result through `report.activity` with `metric: "tokens"` and derived streak, peak-day, active-rate, and top-provider values.
 - Keep Agent, model provider, and concrete model semantics separate: `top_agent` ranks source applications, `top_provider` ranks inferred model vendors, and `top_model` ranks concrete models. Exclude generic `auto`/`unknown` buckets from the latter two.
-- When no TokenTracker rows exist, build timestamped daily prompt counts with `metric: "prompts"` and keep `total_tokens` at zero.
-- UI labels and scoring signals must respect the metric; never present prompt counts as tokens.
+- Bundle `tokentracker-cli` as a production dependency. Initialize its local collectors and compatible hooks on first Vibe Roaster launch, then sync before later reports.
+- When no TokenTracker rows exist, keep `metric: "tokens"` with an empty daily series and `total_tokens: 0`; never present Prompt counts as Tokens.
+- Disable TokenTracker telemetry by default when Vibe Roaster invokes it.
 
 ## UI consumption
 
@@ -25,8 +26,8 @@ The current Roast Result page shows a TokenTracker-style annual activity card: m
 
 ## Testing notes
 
-Fixture-backed tests cover queue aggregation, deduplication, daily rows, date filtering, model/source breakdown, prompt-count fallback, activity summaries, inspect integration, usage-range filtering, source totals, model counts, context scaling/filtering, Codex cumulative deltas, Claude streaming-snapshot merging, and trend bucketing.
+Fixture-backed tests cover dependency initialization/sync/error handling, queue aggregation, deduplication, daily rows, date filtering, empty-token behavior, activity summaries, inspect integration, usage-range filtering, source totals, model counts, context scaling/filtering, Codex cumulative deltas, Claude streaming-snapshot merging, and trend bucketing.
 
 ## Completion summary
 
-Implemented in `src/sources/token-tracker.js`, enriched in `src/inspect.js` and `src/lib/activity-metrics.js`, and consumed by the Roast Result activity components and `dashboard/src/lib/profile-viz.js`.
+Implemented in `src/lib/token-tracker-runtime.js` and `src/sources/token-tracker.js`, enriched in `src/inspect.js` and `src/lib/activity-metrics.js`, and consumed by the Roast Result activity components and `dashboard/src/lib/profile-viz.js`.

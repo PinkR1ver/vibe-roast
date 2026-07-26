@@ -1,6 +1,6 @@
 # Data sources and limitations
 
-Last updated: 2026-07-23
+Last updated: 2026-07-26
 
 ## Normalized source contract
 
@@ -42,9 +42,10 @@ Prompt adapters return a report shaped like:
 ## Token and activity semantics
 
 - Local Codex/Claude logs do not provide reliable per-message token attribution. Their token totals must not be presented as token usage for an individual prompt.
-- If TokenTracker has rows in range, `report.activity.metric` is `tokens` and the heatmap/model breakdown use daily TokenTracker totals.
+- `tokentracker-cli` is a runtime dependency. Normal Vibe Roaster launches initialize it once and sync it before serving or inspecting; package installation itself remains side-effect free.
+- `report.activity.metric` is always `tokens`. When TokenTracker has rows in range, the heatmap/model breakdown use its daily totals.
 - Token activity distinguishes three rankings: `top_agent` comes from TokenTracker source totals (Cursor/Codex/etc.); `top_provider` is inferred from concrete model names (OpenAI/Anthropic/etc.); `top_model` is the highest-token concrete model. Generic `auto`/`unknown` model buckets count toward Agent totals but are excluded from Provider and Model rankings.
-- Otherwise `report.activity.metric` is `prompts`; daily values come only from prompts with timestamps, `total_tokens` remains zero, and UI copy must say prompts rather than tokens.
+- If TokenTracker cannot produce rows, Activity remains an empty Token dataset with `total_tokens: 0`; Prompt counts are not relabeled as Token usage.
 - Date filters apply to both adapter prompts and TokenTracker buckets. Cursor rows without timestamps can appear in all-time prompt totals but cannot be placed on a day.
 - Codex/Claude context breakdown rows are attached to matching TokenTracker activity days. The UI rescales their category proportions to the authoritative TokenTracker source total for the selected time range.
 - Codex Messages/Tool calls attribution is heuristic: each non-overlapping turn delta goes to the distinct tools observed in that turn, or Messages when no tool was observed; reported reasoning tokens stay separate. Claude output is approximately distributed by merged text/thinking/tool-use content-block size, while message input/cache tokens remain Messages or the first-session System prompt.

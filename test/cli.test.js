@@ -12,6 +12,7 @@ test("CLI starts the dashboard when no command is provided", async () => {
       ...process.env,
       PORT: "0",
       VIBE_ROAST_NO_OPEN: "1",
+      VIBE_ROAST_SKIP_TOKEN_TRACKER: "1",
     },
     stdio: ["ignore", "pipe", "pipe"],
   });

@@ -166,7 +166,7 @@ function buildActivitySignals({ activity = {}, summary = {}, categories = {} } =
     .filter(([, count]) => count > 0)
     .sort((a, b) => b[1] - a[1])[0];
 
-  if (stats.metric === "tokens" && stats.totalValue > 0) {
+  if (stats.metric === "tokens") {
     const signals = [
       { label: "Total tokens", labelZh: "总 Tokens", value: compactNumber(stats.totalValue) },
       {
@@ -198,6 +198,13 @@ function buildActivitySignals({ activity = {}, summary = {}, categories = {} } =
         label: "Top model",
         labelZh: "主模型",
         value: formatModelName(stats.topModel),
+      });
+    }
+    if (!stats.topAgent && (summary.active_source_count ?? summary.source_count ?? 0) > 0) {
+      signals.push({
+        label: "Agents found",
+        labelZh: "检测到 Agent",
+        value: String(summary.active_source_count ?? summary.source_count ?? 0),
       });
     }
     if (signals.length === 2) {

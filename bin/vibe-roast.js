@@ -6,6 +6,7 @@ loadLocalEnv();
 const { inspectSources } = require("../src/inspect");
 const { start } = require("../src/server");
 const { install, uninstall } = require("../src/hooks/install");
+const { ensureTokenTracker } = require("../src/lib/token-tracker-runtime");
 const { KNOWN_SOURCES } = require("../src/sources");
 
 async function main(argv) {
@@ -38,6 +39,9 @@ async function main(argv) {
   }
 
   const opts = parseArgs(rest);
+  if (!opts.tokenTrackerQueue && !hasFixtureRoots(opts)) {
+    await ensureTokenTracker();
+  }
   const report = await inspectSources({
     from: opts.from,
     to: opts.to,
@@ -62,6 +66,24 @@ async function main(argv) {
   });
 
   process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
+}
+
+function hasFixtureRoots(opts) {
+  return [
+    "home",
+    "codexRoot",
+    "claudeRoot",
+    "cursorDb",
+    "clineRoot",
+    "rooRoot",
+    "continueRoot",
+    "geminiRoot",
+    "aiderRoot",
+    "windsurfRoot",
+    "copilotRoot",
+    "amazonqRoot",
+    "antigravityRoot",
+  ].some((key) => opts[key]);
 }
 
 function parseArgs(args) {

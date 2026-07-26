@@ -6,6 +6,7 @@ const path = require("node:path");
 const { createHash, randomBytes, randomUUID } = require("node:crypto");
 const { exec } = require("node:child_process");
 const { createTerminalLaunch } = require("./lib/terminal-ui");
+const { ensureTokenTracker } = require("./lib/token-tracker-runtime");
 const { inspectSources } = require("./inspect");
 const { generateAiRoast, PROVIDERS } = require("./lib/ai-roast");
 const { encodeRoastSnapshot } = require("./lib/roast-snapshot");
@@ -617,8 +618,15 @@ function openBrowser(url) {
   exec(cmd, () => {});
 }
 
-function start({ terminal = createTerminalLaunch() } = {}) {
+async function start({ terminal = createTerminalLaunch(), prepareTokens = ensureTokenTracker } = {}) {
   terminal.intro();
+  await terminal.tokenTrackerSync?.();
+  const tracker = await prepareTokens();
+  if (tracker.status === "error") {
+    terminal.tokenTrackerWarning?.(tracker.error);
+  } else if (tracker.status === "empty") {
+    terminal.tokenTrackerWarning?.("the first sync produced no readable token history");
+  }
   const server = createServer();
   return new Promise((resolve) => {
     server.listen(PORT, async () => {

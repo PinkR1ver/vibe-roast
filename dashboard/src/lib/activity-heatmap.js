@@ -44,7 +44,7 @@ export function buildActivityHeatmap({ prompts = [], dailyRows = null, weeks = 5
 
   // Aggregate either TokenTracker daily token rows or prompt counts by day.
   const valuesByDay = new Map();
-  if (Array.isArray(dailyRows) && dailyRows.length > 0) {
+  if (Array.isArray(dailyRows)) {
     for (const row of dailyRows) {
       if (!row?.day) continue;
       const value = number(row.billable_total_tokens ?? row.total_tokens ?? row.value);

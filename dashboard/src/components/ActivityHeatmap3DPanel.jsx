@@ -72,8 +72,10 @@ export default function ActivityHeatmap3DPanel({
     : theme === "dark" ||
       (theme === "system" && typeof window !== "undefined" && window.matchMedia?.("(prefers-color-scheme: dark)").matches);
   const hasDaily = Array.isArray(activity?.daily_rows) && activity.daily_rows.length > 0;
-  const metric = hasDaily ? activity.metric || "tokens" : "prompts";
-  const dailyRows = hasDaily ? activity.daily_rows : null;
+  const metric = activity?.metric || "tokens";
+  const dailyRows = metric === "tokens"
+    ? (Array.isArray(activity?.daily_rows) ? activity.daily_rows : [])
+    : (hasDaily ? activity.daily_rows : null);
   const heatmapWeeks = metric === "tokens" ? Math.max(weeks, 52) : weeks;
   const unitLabel = metric === "tokens" ? t("heatmap.tokens") : t("heatmap.prompts");
   const heatmap = useMemo(

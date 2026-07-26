@@ -67,6 +67,23 @@ test("buildActivitySignals prefers token KPIs over useful prompts", () => {
   ]);
 });
 
+test("buildActivitySignals keeps an explicit zero-token KPI when collection is empty", () => {
+  const signals = buildActivitySignals({
+    activity: {
+      metric: "tokens",
+      total_tokens: 0,
+      daily_rows: [],
+    },
+    summary: { active_source_count: 2 },
+    categories: { debugging: { count: 4 } },
+  });
+
+  assert.equal(signals[0].label, "Total tokens");
+  assert.equal(signals[0].value, "0");
+  assert.equal(signals[1].label, "Active days");
+  assert.equal(signals[1].value, "0");
+});
+
 test("buildActivitySignals falls back without inventing token totals", () => {
   const signals = buildActivitySignals({
     activity: {

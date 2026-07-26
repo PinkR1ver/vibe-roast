@@ -326,7 +326,7 @@ test("inspectSources filters TokenTracker activity by date range", async () => {
   assert.equal(report.activity.daily_rows[0].models["claude/sonnet"], 750);
 });
 
-test("inspectSources builds prompt daily_rows when TokenTracker is absent", async () => {
+test("inspectSources keeps the activity metric in token mode when TokenTracker is empty", async () => {
   const report = await inspectSources({
     from: "2026-06-07",
     to: "2026-06-07",
@@ -338,11 +338,10 @@ test("inspectSources builds prompt daily_rows when TokenTracker is absent", asyn
     },
   });
 
-  assert.equal(report.activity.source, "prompts");
-  assert.equal(report.activity.metric, "prompts");
-  assert.ok(report.activity.daily_rows.length >= 1);
-  assert.equal(report.activity.daily_rows[0].day, "2026-06-07");
-  assert.ok(report.activity.daily_rows[0].value >= 1);
+  assert.equal(report.activity.source, "token-tracker");
+  assert.equal(report.activity.metric, "tokens");
+  assert.deepEqual(report.activity.daily_rows, []);
+  assert.equal(report.activity.total_tokens, 0);
 });
 
 test("inspectSources computes useful high-frequency terms", async () => {

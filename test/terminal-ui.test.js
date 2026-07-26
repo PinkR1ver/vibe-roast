@@ -34,12 +34,14 @@ test("rich terminal launch renders brand, humour, progress, and privacy note", a
   const launch = createTerminalLaunch({ stream, env: {}, random: () => 0, frameDelay: 0 });
 
   launch.intro();
+  await launch.tokenTrackerSync();
   await launch.ready("http://localhost:7681");
 
   assert.equal(launch.rich, true);
   assert.match(read(), /VIBE ROAST/);
   assert.match(read(), new RegExp(HUMOUR_LINES[0].replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.match(read(), /ROAST LAB OPEN/);
+  assert.match(read(), /Teaching TokenTracker/);
   assert.match(read(), /Your prompts stay on this machine/);
 });
 

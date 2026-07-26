@@ -33,3 +33,22 @@ test("buildModelBreakdown aggregates TokenTracker model usage", async () => {
   assert.deepEqual(breakdown.sources[0].models.map((item) => item.key), ["codex/gpt-5"]);
   assert.deepEqual(breakdown.sources[1].models.map((item) => item.key), ["cursor/claude-4"]);
 });
+
+test("an explicitly empty token series never falls back to counting prompts", async () => {
+  const mod = await import(pathToFileURL(path.join(__dirname, "..", "dashboard", "src", "lib", "activity-heatmap.js")));
+  const heatmap = mod.buildActivityHeatmap({
+    dailyRows: [],
+    prompts: [
+      {
+        source: "codex",
+        timestamp: new Date().toISOString(),
+        text: "This prompt must not become a fake token.",
+      },
+    ],
+    weeks: 2,
+  });
+
+  const values = heatmap.weeks.flat().filter(Boolean).map((day) => day.value);
+  assert.ok(values.length > 0);
+  assert.ok(values.every((value) => value === 0));
+});
