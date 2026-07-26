@@ -25,7 +25,7 @@ test("ensureTokenTracker initializes a new local tracker and detects its queue",
     },
   });
 
-  assert.deepEqual(calls, [["init", "--yes", "--no-open"]]);
+  assert.deepEqual(calls, [["init", "--yes", "--no-open", "--no-auth"]]);
   assert.equal(result.status, "ready");
   assert.equal(result.command, "init");
 });

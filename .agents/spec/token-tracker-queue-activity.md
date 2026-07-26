@@ -17,6 +17,7 @@ Use TokenTracker's local hourly queue as the preferred activity metric while kee
 - Expose the result through `report.activity` with `metric: "tokens"` and derived streak, peak-day, active-rate, and top-provider values.
 - Keep Agent, model provider, and concrete model semantics separate: `top_agent` ranks source applications, `top_provider` ranks inferred model vendors, and `top_model` ranks concrete models. Exclude generic `auto`/`unknown` buckets from the latter two.
 - Bundle `tokentracker-cli` as a production dependency. Initialize its local collectors and compatible hooks on first Vibe Roaster launch, then sync before later reports.
+- Initialize with `--no-auth`; TokenTracker OAuth/account/leaderboard functionality must not participate in the Vibe Roaster path.
 - When no TokenTracker rows exist, keep `metric: "tokens"` with an empty daily series and `total_tokens: 0`; never present Prompt counts as Tokens.
 - Disable TokenTracker telemetry by default when Vibe Roaster invokes it.
 

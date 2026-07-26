@@ -84,6 +84,10 @@ in Token mode instead of silently changing its unit to Prompt count. If the
 operating system blocks a source, the UI shows zero Token data for that source
 rather than presenting Prompt counts as Tokens.
 
+Vibe Roaster invokes TokenTracker in local-only, no-auth mode. TokenTracker's
+optional account, GitHub OAuth, leaderboard, and cloud sync are not required or
+opened by `vibe-roast`.
+
 Interactive terminals get a short branded launch sequence with rotating English humour. Piped output, CI, and `NO_COLOR` environments automatically use stable plain text.
 
 Missing agents are ignored safely. You do not need to configure every source, create an account, or provide an API key to see the local result.

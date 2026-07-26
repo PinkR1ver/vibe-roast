@@ -42,7 +42,7 @@ Prompt adapters return a report shaped like:
 ## Token and activity semantics
 
 - Local Codex/Claude logs do not provide reliable per-message token attribution. Their token totals must not be presented as token usage for an individual prompt.
-- `tokentracker-cli` is a runtime dependency. Normal Vibe Roaster launches initialize it once and sync it before serving or inspecting; package installation itself remains side-effect free.
+- `tokentracker-cli` is a runtime dependency. Normal Vibe Roaster launches initialize it once with `--no-auth` and sync it before serving or inspecting; package installation itself remains side-effect free. TokenTracker account/OAuth/leaderboard features are outside the Vibe Roaster data path.
 - `report.activity.metric` is always `tokens`. When TokenTracker has rows in range, the heatmap/model breakdown use its daily totals.
 - Token activity distinguishes three rankings: `top_agent` comes from TokenTracker source totals (Cursor/Codex/etc.); `top_provider` is inferred from concrete model names (OpenAI/Anthropic/etc.); `top_model` is the highest-token concrete model. Generic `auto`/`unknown` model buckets count toward Agent totals but are excluded from Provider and Model rankings.
 - If TokenTracker cannot produce rows, Activity remains an empty Token dataset with `total_tokens: 0`; Prompt counts are not relabeled as Token usage.

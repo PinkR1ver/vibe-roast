@@ -80,7 +80,7 @@ async function ensureTokenTracker({
   const initialized = await isFile(paths.initializedPath);
   const command = initialized
     ? ["sync"]
-    : ["init", "--yes", "--no-open"];
+    : ["init", "--yes", "--no-open", "--no-auth"];
 
   try {
     await runner(command, { env });
