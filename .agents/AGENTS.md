@@ -19,11 +19,21 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 - `npm run dev`: run Vite at `http://localhost:5173`; the API server must run separately.
 - `npm run inspect -- --from YYYY-MM-DD --to YYYY-MM-DD --sources ...`: emit the full local report as JSON.
 
+## Motion and launch media
+
+- Start product promo or launch-film work with
+  `.agents/skills/product-launch-video/SKILL.md`; its required HyperFrames core,
+  animation, keyframe, creative, CLI, and media skills are vendored beside it.
+- Use `.agents/skills/remotion-best-practices/SKILL.md` when the deliverable is
+  better maintained as a React/Remotion composition rather than HyperFrames.
+- Existing launch-film sources and masters live under `media/promo/`. Preserve
+  the repository's canonical character and README-banner artwork when iterating.
+
 ## Architectural invariants
 
 - `src/inspect.js` is the aggregation boundary. Source adapters return normalized reports; profile scoring and the UI consume that aggregate rather than reading local stores directly.
 - Source adapters must be best-effort: a missing root or unsupported local format returns an empty report instead of crashing the full inspect.
-- Only real user-authored prompt text belongs in `prompts`, prompt classification, scoring, or word frequencies. Exclude assistant, system, tool-result, encrypted/binary, and synthetic activity content.
+- Only real user-authored prompt text belongs in `prompts`, prompt classification, scoring, word frequencies, or roast topic clusters. Exclude assistant, system, tool-result, encrypted/binary, synthetic activity content, and app-owned envelopes such as ambient browser state, attachment metadata, recommended-plugin lists, and environment context.
 - TokenTracker data is activity-only. Vibe Roaster initializes/syncs the bundled collector before normal runs and keeps Activity in Token mode; an unavailable collector yields zero Token data, never relabeled Prompt counts.
 - Undated prompts may contribute to all-time prompt totals, but date-derived views and word-cloud input should prefer timestamped prompts.
 - Keep scoring logic in `src/lib/agent-score.js` aligned with the visual reference implementation in `assests/scripts/score-engine.js` when the profile model changes.

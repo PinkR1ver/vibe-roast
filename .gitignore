@@ -8,3 +8,11 @@ worker/.dev.vars
 worker/.wrangler/
 *.log
 .DS_Store
+media/promo/hyperframes/.thumbnails/
+media/promo/hyperframes/.waveform-cache/
+media/promo/hyperframes/capture/
+media/promo/hyperframes/renders/
+media/promo/hyperframes/snapshots/
+media/promo/hyperframes/node_modules/
+media/promo/hyperframes/assets/
+media/promo/output/

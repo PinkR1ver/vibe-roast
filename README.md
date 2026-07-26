@@ -2,9 +2,9 @@
 
 <div align="center">
   <img
-    src="./assests/characters-vibe-types/mpsf-builder/builder-figure.png"
-    width="190"
-    alt="Vibe Roaster Builder character"
+    src="./assests/readme/vibe-roast-16-types-banner.webp"
+    width="1100"
+    alt="All sixteen Vibe Roaster coding personalities gathered around the Vibe Roast title"
   />
 
   <h1>Vibe Roaster</h1>
@@ -54,10 +54,24 @@ Vibe Roaster reads supported local coding-agent histories, separates real user i
 The personality calculation is deterministic and local. AI writing is optional.
 
 <p align="center">
+  <a href="./media/promo/masters/landscape.mp4">
+    <img
+      src="./assests/readme/vibe-roast-promo-landscape.gif"
+      width="1100"
+      alt="Vibe Roaster turns prompt fragments into a four-axis personality verdict, one of sixteen characters, and a shareable roast"
+    />
+  </a>
+</p>
+
+<p align="center">
+  <sub>Watch the 15-second launch film · click for the 1080p version</sub>
+</p>
+
+<p align="center">
   <img
     src="./assests/screenshots/roast-result-hero.jpg"
     width="1100"
-    alt="Vibe Roaster result showing the Debugger coding personality, behavioral radar, and type axes"
+    alt="Vibe Roaster result showing the Builder personality, topic-aware hashtags, token statistics, behavioral radar, and type axes"
   />
 </p>
 
@@ -239,7 +253,7 @@ The writer cannot change the deterministic type. In one model call it produces:
 
 - three-beat English and Chinese roasts;
 - bilingual TL;DR punchlines;
-- 4–5 paired Hashtags with `en`, `zh`, semantic `kind`, and a short shared `meaning`.
+- five paired Hashtags with `en`, `zh`, semantic `kind`, and a short shared `meaning`.
 
 Hashtags are interpretations rather than frequency labels. Chinese is localized from the intended joke instead of translated word for word. Proper names, framework names, and meaningful acronyms may remain unchanged when translation would lose their identity.
 

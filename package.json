@@ -1,6 +1,6 @@
 {
   "name": "vibe-roast",
-  "version": "0.98.3",
+  "version": "0.98.4",
   "description": "Local-first AI coding personality profiler, usage dashboard, and evidence-grounded roast.",
   "type": "commonjs",
   "bin": {
@@ -32,7 +32,10 @@
     "worker/wrangler.jsonc",
     "worker/src/",
     "dashboard/dist/",
-    "assests/",
+    "assests/characters/",
+    "assests/characters-vibe-types/",
+    "assests/readme/",
+    "assests/screenshots/",
     "README.md"
   ],
   "scripts": {

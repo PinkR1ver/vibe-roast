@@ -2,7 +2,12 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
 
-const { inspectCodex, extractCodexPrompt, extractCodexTokens } = require("../src/sources/codex");
+const {
+  inspectCodex,
+  extractCodexPrompt,
+  extractCodexTokens,
+  stripCodexInjectedContext,
+} = require("../src/sources/codex");
 const { inspectClaude, extractClaudePrompt, extractClaudeTokens } = require("../src/sources/claude");
 const { inspectCursor, resolveCursorDbPath } = require("../src/sources/cursor");
 const { dayBounds } = require("../src/lib/dates");
@@ -34,6 +39,32 @@ test("extractCodexPrompt reads payload.message and nested msg.message", () => {
       payload: { type: "assistant", message: "xerophyte done" },
     }),
     "",
+  );
+});
+
+test("Codex prompt extraction removes app-owned context envelopes", () => {
+  const wrapped = `<in-app-browser-context source="ambient-ui-state">
+Current URL: https://example.com/private
+</in-app-browser-context>
+
+# Files mentioned by the user:
+## screenshot.png
+
+## My request for Codex:
+把分享卡片的 hashtag 写得更有趣`;
+  assert.equal(
+    extractCodexPrompt({ payload: { type: "user_message", message: wrapped } }),
+    "把分享卡片的 hashtag 写得更有趣",
+  );
+  assert.equal(
+    stripCodexInjectedContext(`<recommended_plugins>plugin noise</recommended_plugins>
+保留真正的用户请求`),
+    "保留真正的用户请求",
+  );
+  assert.equal(
+    stripCodexInjectedContext(`<environment_context>machine state</environment_context>
+检查主题词算法`),
+    "检查主题词算法",
   );
 });
 

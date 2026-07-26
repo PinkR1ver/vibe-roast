@@ -1,0 +1,13 @@
+{
+  "name": "vibe-roast-promo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare:assets": "node tools/sync-assets.mjs",
+    "dev": "npm run prepare:assets && npx --yes hyperframes@0.7.72 preview",
+    "check": "npm run prepare:assets && npx --yes hyperframes@0.7.72 check",
+    "render": "npm run prepare:assets && npx --yes hyperframes@0.7.72 render -o ../masters/landscape.mp4",
+    "render:portrait": "npm run prepare:assets && npx --yes hyperframes@0.7.72 render -c variants/portrait/index.html -o ../masters/portrait.mp4",
+    "publish": "npx --yes hyperframes@0.7.72 publish"
+  }
+}

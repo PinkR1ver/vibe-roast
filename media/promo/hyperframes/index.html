@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js" integrity="sha384-sG0Hv1tP1lZCk9KQmrIbY/XNwi+OY84GQqhMscbnsoBFqAz8KNCil1kvfL3Hbbk2" crossorigin="anonymous"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #F5F0E5;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="15"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div
+        id="el-01-prompt-intake"
+        class="scene"
+        data-composition-id="01-prompt-intake"
+        data-composition-src="compositions/landscape/01-prompt-intake.html"
+        data-start="0"
+        data-duration="3"
+        data-track-index="0"
+      ></div>
+
+      <div
+        id="el-02-four-axis-verdict"
+        class="scene"
+        data-composition-id="02-four-axis-verdict"
+        data-composition-src="compositions/landscape/02-four-axis-verdict.html"
+        data-start="2.6"
+        data-duration="3.6"
+        data-track-index="1"
+      ></div>
+
+      <div
+        id="el-03-builder-materializes"
+        class="scene"
+        data-composition-id="03-builder-materializes"
+        data-composition-src="compositions/landscape/03-builder-materializes.html"
+        data-start="5.800000000000001"
+        data-duration="3.7"
+        data-track-index="0"
+      ></div>
+
+      <div
+        id="el-04-sixteen-type-collision"
+        class="scene"
+        data-composition-id="04-sixteen-type-collision"
+        data-composition-src="compositions/landscape/04-sixteen-type-collision.html"
+        data-start="9"
+        data-duration="3.45"
+        data-track-index="1"
+      ></div>
+
+      <div
+        id="el-05-run-the-roast"
+        class="scene"
+        data-composition-id="05-run-the-roast"
+        data-composition-src="compositions/landscape/05-run-the-roast.html"
+        data-start="12.2"
+        data-duration="2.8"
+        data-track-index="0"
+      ></div>
+
+      <!-- BGM -->
+      <audio
+        id="el-bgm"
+        src=".media/audio/bgm/bgm_001.wav"
+        data-start="0"
+        data-duration="15"
+        data-track-index="11"
+        data-volume="0.78"
+      ></audio>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      // ── frame transitions (injected by transitions.mjs) ──
+      (function () { var tl = window.__timelines["main"];
+        tl.to("#el-01-prompt-intake", { filter: "blur(10px)", scale: 1.03, opacity: 0, duration: 0.4, ease: "power2.inOut" }, 2.6);
+        tl.fromTo("#el-02-four-axis-verdict", { filter: "blur(10px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.4, ease: "power2.inOut" }, 2.6);
+        tl.to("#el-02-four-axis-verdict", { scale: 2.5, opacity: 0, filter: "blur(8px)", duration: 0.4, ease: "power3.in" }, 5.8);
+        tl.fromTo("#el-03-builder-materializes", { scale: 0.5, opacity: 0, filter: "blur(8px)" }, { scale: 1, opacity: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, 5.8);
+        tl.to("#el-03-builder-materializes", { y: -1920, duration: 0.5, ease: "power3.inOut" }, 9);
+        tl.fromTo("#el-04-sixteen-type-collision", { y: 1920, opacity: 1 }, { y: 0, duration: 0.5, ease: "power3.inOut" }, 9);
+        tl.to("#el-04-sixteen-type-collision", { filter: "blur(10px)", scale: 1.03, opacity: 0, duration: 0.25, ease: "power2.inOut" }, 12.2);
+        tl.fromTo("#el-05-run-the-roast", { filter: "blur(10px)", scale: 0.97, opacity: 0 }, { filter: "blur(0px)", scale: 1, opacity: 1, duration: 0.25, ease: "power2.inOut" }, 12.2);
+        tl.to({}, { duration: 15 }, 0); // full-span anchor — main.duration() == composition total (Studio master duration)
+      })();
+    </script>
+  </body>
+</html>

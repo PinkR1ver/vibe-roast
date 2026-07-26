@@ -1,6 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { buildRoastEvidence } = require("../src/lib/roast-evidence");
+const { wordCloudRecords } = require("../src/extract/phrase-stats");
+const { buildRoastEvidence, domainClusterRows } = require("../src/lib/roast-evidence");
 const { buildRoastSnapshot, encodeRoastSnapshot } = require("../src/lib/roast-snapshot");
 const {
   generateAiRoast,
@@ -70,6 +71,8 @@ test("roast evidence includes distinctive concepts but excludes raw prompts and 
   assert.match(serialized, /前庭/);
   assert.match(serialized, /HIT/);
   assert.match(serialized, /occurrence_count/);
+  assert.deepEqual(evidence.prompt_behavior.recurring_domain_clusters[0].terms, ["HIT", "前庭"]);
+  assert.equal(evidence.prompt_behavior.recurring_domain_clusters[0].prompt_coverage, 3);
   assert.doesNotMatch(serialized, /raw private prompt/);
   assert.doesNotMatch(serialized, /private prompt must not escape/);
   assert.equal(evidence.guardrails.raw_prompts_included, false);
@@ -80,8 +83,8 @@ test("roast snapshot keeps behavioral state but omits growing activity totals", 
   const snapshot = buildRoastSnapshot(evidence);
   const serialized = JSON.stringify(snapshot);
   assert.equal(snapshot.type_code, "MPSF");
-  assert.equal(snapshot.writer_prompt_version, 3);
-  assert.deepEqual(snapshot.concepts.slice(0, 2), ["前庭", "hit"]);
+  assert.equal(snapshot.writer_prompt_version, 6);
+  assert.deepEqual(new Set(snapshot.concepts.slice(0, 2)), new Set(["前庭", "hit"]));
   assert.equal("total_tokens" in snapshot, false);
   assert.equal("active_days" in snapshot, false);
   assert.deepEqual(
@@ -89,6 +92,35 @@ test("roast snapshot keeps behavioral state but omits growing activity totals", 
     snapshot,
   );
   assert.doesNotMatch(serialized, /raw private prompt/);
+});
+
+test("domain clusters preserve recurring same-prompt relationships without raw prompt text", () => {
+  const rawPrompt = "定时查询三角洲 bullet 价格和市场行情";
+  const records = wordCloudRecords(Array.from({ length: 4 }, (_, index) => ({
+    source: "codex",
+    timestamp: `2026-07-${20 + index}T08:00:00Z`,
+    text: rawPrompt,
+    categories: [],
+  })));
+  const clusters = domainClusterRows(records);
+  const terms = new Set(clusters[0].terms);
+  for (const term of ["三角洲", "bullet", "价格", "市场"]) assert.ok(terms.has(term));
+  assert.equal(clusters[0].prompt_coverage, 4);
+  assert.equal(clusters[0].cohesion, 1);
+  assert.doesNotMatch(JSON.stringify(clusters), new RegExp(rawPrompt));
+});
+
+test("two repeated topic prompts are enough to expose a playful domain cluster", () => {
+  const records = wordCloudRecords(Array.from({ length: 2 }, (_, index) => ({
+    source: "codex",
+    timestamp: `2026-07-${20 + index}T08:00:00Z`,
+    text: "查询三角洲 bullet 价格和市场",
+    categories: [],
+  })));
+  const clusters = domainClusterRows(records);
+  assert.ok(clusters.length > 0);
+  assert.equal(clusters[0].prompt_coverage, 2);
+  assert.ok(clusters[0].cohesion >= 0.45);
 });
 
 test("AI writer sends only evidence and validates bilingual JSON", async () => {
@@ -161,10 +193,18 @@ test("hashtag prompt turns concept clusters into shareable character labels", ()
   assert.match(SYSTEM_PROMPT, /Hashtags are interpretations, not a frequency table/);
   assert.match(SYSTEM_PROMPT, /preflop \+ folds \+ raises \+ river/);
   assert.match(SYSTEM_PROMPT, /HoldemPlayer/);
-  assert.match(SYSTEM_PROMPT, /CodeCult/);
-  assert.match(SYSTEM_PROMPT, /代码教团/);
-  assert.match(SYSTEM_PROMPT, /Never fuse unrelated concepts/);
-  assert.match(USER_INSTRUCTIONS, /inferred domain\/scene character/);
+  assert.match(SYSTEM_PROMPT, /ArmsDealer/);
+  assert.match(SYSTEM_PROMPT, /武器贩子/);
+  assert.match(SYSTEM_PROMPT, /obviously fictional scene role/);
+  assert.match(SYSTEM_PROMPT, /stage names from a comedy writer's room/);
+  assert.match(SYSTEM_PROMPT, /Bold exaggeration, slang, puns/);
+  assert.match(SYSTEM_PROMPT, /distinctive standalone recurring concept/);
+  assert.match(SYSTEM_PROMPT, /nobody would want to screenshot it/);
+  assert.match(SYSTEM_PROMPT, /Never fuse unrelated concepts|Never combine separate concepts/);
+  assert.match(USER_INSTRUCTIONS, /most shareable tag/);
+  assert.match(USER_INSTRUCTIONS, /most distinctive semantically credible cluster/);
+  assert.match(USER_INSTRUCTIONS, /exactly 5 hashtagPairs/);
+  assert.match(USER_INSTRUCTIONS, /Do not force a rigid order/);
   assert.match(USER_INSTRUCTIONS, /not copied high-frequency words/);
   assert.match(USER_INSTRUCTIONS, /culturally natural localization/);
 });

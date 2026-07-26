@@ -1,0 +1,612 @@
+<template>
+  <div data-hf-id="hf-puux" id="root" data-composition-id="01-prompt-intake" data-start="0" data-duration="3" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-5jla" id="frame-01-prompt-intake-ground" class="clip" data-start="0" data-duration="3" data-track-index="0"></div>
+
+    <div data-hf-id="hf-j1t2" id="frame-01-prompt-intake-stage" class="clip" data-start="0" data-duration="3" data-track-index="1">
+      <div data-hf-id="hf-65ns" id="frame-01-prompt-intake-reg-tl" class="frame-01-prompt-intake-reg frame-01-prompt-intake-reg-tl"></div>
+      <div data-hf-id="hf-pv8k" id="frame-01-prompt-intake-reg-tr" class="frame-01-prompt-intake-reg frame-01-prompt-intake-reg-tr"></div>
+      <div data-hf-id="hf-zq5s" id="frame-01-prompt-intake-reg-bl" class="frame-01-prompt-intake-reg frame-01-prompt-intake-reg-bl"></div>
+      <div data-hf-id="hf-17gs" id="frame-01-prompt-intake-reg-br" class="frame-01-prompt-intake-reg frame-01-prompt-intake-reg-br"></div>
+
+      <div data-hf-id="hf-k8qs" id="frame-01-prompt-intake-type-row" class="frame-01-prompt-intake-type-row">
+        <span data-hf-id="hf-w5xv" id="frame-01-prompt-intake-typed" class="frame-01-prompt-intake-typed"></span><span data-hf-id="hf-ykav" id="frame-01-prompt-intake-caret" class="frame-01-prompt-intake-caret"></span>
+      </div>
+
+      <div data-hf-id="hf-1qgk" id="frame-01-prompt-intake-prompt-a" class="frame-01-prompt-intake-fragment" data-base-x="116" data-base-y="690" data-lane-x="-520" data-lane-y="-20" data-index="0">
+        <span data-hf-id="hf-w8n9" class="frame-01-prompt-intake-echo" data-echo="2">make it work</span>
+        <span data-hf-id="hf-hik6" class="frame-01-prompt-intake-echo" data-echo="1">make it work</span>
+        <span data-hf-id="hf-4dcr" class="frame-01-prompt-intake-lead">make it work</span>
+      </div>
+
+      <div data-hf-id="hf-0nnl" id="frame-01-prompt-intake-prompt-b" class="frame-01-prompt-intake-fragment" data-base-x="545" data-base-y="828" data-lane-x="520" data-lane-y="-12" data-index="1">
+        <span data-hf-id="hf-7kto" class="frame-01-prompt-intake-echo" data-echo="2">fix this</span>
+        <span data-hf-id="hf-459f" class="frame-01-prompt-intake-echo" data-echo="1">fix this</span>
+        <span data-hf-id="hf-6j66" class="frame-01-prompt-intake-lead">fix this</span>
+      </div>
+
+      <div data-hf-id="hf-e6b3" id="frame-01-prompt-intake-prompt-c" class="frame-01-prompt-intake-fragment" data-base-x="210" data-base-y="975" data-lane-x="-40" data-lane-y="420" data-index="2">
+        <span data-hf-id="hf-rltk" class="frame-01-prompt-intake-echo" data-echo="2">ship it</span>
+        <span data-hf-id="hf-smh5" class="frame-01-prompt-intake-echo" data-echo="1">ship it</span>
+        <span data-hf-id="hf-plbe" class="frame-01-prompt-intake-lead">ship it</span>
+      </div>
+
+      <div data-hf-id="hf-trui" id="frame-01-prompt-intake-intake" class="frame-01-prompt-intake-intake">
+        <div data-hf-id="hf-07ii" id="frame-01-prompt-intake-jaw-top" class="frame-01-prompt-intake-jaw frame-01-prompt-intake-jaw-top"></div>
+        <div data-hf-id="hf-memg" id="frame-01-prompt-intake-core" class="frame-01-prompt-intake-core"></div>
+        <div data-hf-id="hf-zpse" id="frame-01-prompt-intake-jaw-bottom" class="frame-01-prompt-intake-jaw frame-01-prompt-intake-jaw-bottom"></div>
+      </div>
+
+      <div data-hf-id="hf-c4ff" id="frame-01-prompt-intake-headline" class="frame-01-prompt-intake-headline" aria-label="You thought they were just prompts">
+        <div data-hf-id="hf-8z94" id="frame-01-prompt-intake-line-1" class="frame-01-prompt-intake-headline-line">
+          <span data-hf-id="hf-71e8">You</span> thought
+        </div>
+        <div data-hf-id="hf-31bz" id="frame-01-prompt-intake-line-2" class="frame-01-prompt-intake-headline-line">
+          They were
+        </div>
+        <div data-hf-id="hf-xc7k" id="frame-01-prompt-intake-line-3" class="frame-01-prompt-intake-headline-line">
+          Just prompts
+        </div>
+      </div>
+
+      <div data-hf-id="hf-xmki" id="frame-01-prompt-intake-question" class="frame-01-prompt-intake-question">
+        <span data-hf-id="hf-q04b">Just</span>
+        <span data-hf-id="hf-0lyp">prompts?</span>
+      </div>
+
+      <div data-hf-id="hf-sypi" id="frame-01-prompt-intake-spike" class="frame-01-prompt-intake-spike" aria-hidden="true">✱</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    #root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      container-type: size;
+      color: #f5f0e5;
+    }
+
+    #frame-01-prompt-intake-ground {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #181615;
+    }
+
+    #frame-01-prompt-intake-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    .frame-01-prompt-intake-reg {
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      color: #f5f0e5;
+      opacity: 0.58;
+    }
+
+    .frame-01-prompt-intake-reg::before,
+    .frame-01-prompt-intake-reg::after {
+      content: "";
+      position: absolute;
+      background: currentColor;
+    }
+
+    .frame-01-prompt-intake-reg::before {
+      width: 54px;
+      height: 1px;
+      top: 26px;
+      left: 0;
+    }
+
+    .frame-01-prompt-intake-reg::after {
+      width: 1px;
+      height: 54px;
+      left: 26px;
+      top: 0;
+    }
+
+    .frame-01-prompt-intake-reg-tl {
+      left: 54px;
+      top: 62px;
+    }
+
+    .frame-01-prompt-intake-reg-tr {
+      right: 54px;
+      top: 62px;
+    }
+
+    .frame-01-prompt-intake-reg-bl {
+      left: 54px;
+      top: 1500px;
+    }
+
+    .frame-01-prompt-intake-reg-br {
+      right: 54px;
+      top: 1500px;
+    }
+
+    .frame-01-prompt-intake-type-row {
+      position: absolute;
+      left: 98px;
+      top: 414px;
+      display: flex;
+      align-items: baseline;
+      width: 860px;
+      min-height: 114px;
+      white-space: pre;
+      font-family: monospace;
+      font-size: 78px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.045em;
+    }
+
+    .frame-01-prompt-intake-typed {
+      white-space: pre;
+    }
+
+    .frame-01-prompt-intake-caret {
+      display: inline-block;
+      width: 17px;
+      height: 72px;
+      margin-left: 10px;
+      vertical-align: -7px;
+      background: #18b98b;
+    }
+
+    .frame-01-prompt-intake-fragment {
+      position: absolute;
+      width: max-content;
+      min-height: 112px;
+      font-family: monospace;
+      font-size: 72px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      white-space: nowrap;
+      color: #f5f0e5;
+      will-change: transform, opacity;
+    }
+
+    #frame-01-prompt-intake-prompt-a {
+      left: 116px;
+      top: 690px;
+    }
+
+    #frame-01-prompt-intake-prompt-b {
+      left: 545px;
+      top: 828px;
+    }
+
+    #frame-01-prompt-intake-prompt-c {
+      left: 210px;
+      top: 975px;
+    }
+
+    .frame-01-prompt-intake-lead,
+    .frame-01-prompt-intake-echo {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .frame-01-prompt-intake-lead {
+      z-index: 3;
+    }
+
+    .frame-01-prompt-intake-echo {
+      z-index: 1;
+      color: #d4f9ef;
+      opacity: 0;
+    }
+
+    .frame-01-prompt-intake-intake {
+      position: absolute;
+      left: 462px;
+      top: 1090px;
+      width: 156px;
+      height: 126px;
+      border: 1px solid rgba(245, 240, 229, 0.32);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #0b1113;
+      box-shadow: 0 1px 3px rgba(11, 17, 19, 0.08), 0 4px 16px rgba(11, 17, 19, 0.04);
+    }
+
+    .frame-01-prompt-intake-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 58px;
+      height: 9px;
+      margin-left: -29px;
+      margin-top: -5px;
+      border-radius: 9999px;
+      background: #f5f0e5;
+      opacity: 0.52;
+    }
+
+    .frame-01-prompt-intake-jaw {
+      position: absolute;
+      left: 18px;
+      width: 120px;
+      height: 38px;
+      border: 1px solid rgba(245, 240, 229, 0.22);
+      background: #252120;
+    }
+
+    .frame-01-prompt-intake-jaw-top {
+      top: 13px;
+      border-radius: 6px 6px 2px 2px;
+    }
+
+    .frame-01-prompt-intake-jaw-bottom {
+      bottom: 13px;
+      border-radius: 2px 2px 6px 6px;
+    }
+
+    .frame-01-prompt-intake-headline {
+      position: absolute;
+      left: 108px;
+      top: 426px;
+      width: 864px;
+      color: #0b1113;
+      font-size: 111px;
+      font-weight: 400;
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+      text-transform: uppercase;
+    }
+
+    .frame-01-prompt-intake-headline-line {
+      min-height: 116px;
+      white-space: nowrap;
+      will-change: transform, opacity, filter;
+    }
+
+    .frame-01-prompt-intake-headline-line span {
+      font-style: italic;
+    }
+
+    #frame-01-prompt-intake-line-2 {
+      margin-left: 94px;
+    }
+
+    #frame-01-prompt-intake-line-3 {
+      margin-left: 182px;
+    }
+
+    .frame-01-prompt-intake-question {
+      position: absolute;
+      left: 82px;
+      top: 404px;
+      width: 916px;
+      color: #0b1113;
+      font-size: 176px;
+      font-weight: 400;
+      line-height: 0.88;
+      letter-spacing: -0.065em;
+      text-transform: uppercase;
+      opacity: 0;
+      will-change: transform, opacity, filter;
+    }
+
+    .frame-01-prompt-intake-question span {
+      display: block;
+    }
+
+    .frame-01-prompt-intake-question span:last-child {
+      margin-left: 92px;
+      font-style: italic;
+    }
+
+    .frame-01-prompt-intake-spike {
+      position: absolute;
+      left: 800px;
+      top: 782px;
+      color: #ef6b4a;
+      font-family: sans-serif;
+      font-size: 118px;
+      line-height: 1;
+      will-change: transform, opacity;
+    }
+
+    /* Native 16:9 editorial re-layout. */
+    .frame-01-prompt-intake-reg-bl,
+    .frame-01-prompt-intake-reg-br { top: 964px; }
+    .frame-01-prompt-intake-type-row {
+      left: 116px;
+      top: 224px;
+      width: 900px;
+      font-size: 82px;
+    }
+    #frame-01-prompt-intake-prompt-a { left: 154px; top: 474px; }
+    #frame-01-prompt-intake-prompt-b { left: 642px; top: 604px; }
+    #frame-01-prompt-intake-prompt-c { left: 302px; top: 744px; }
+    .frame-01-prompt-intake-intake { left: 930px; top: 672px; }
+    .frame-01-prompt-intake-headline {
+      left: 1050px;
+      top: 194px;
+      width: 760px;
+      font-size: 92px;
+    }
+    .frame-01-prompt-intake-headline-line { min-height: 96px; }
+    #frame-01-prompt-intake-line-2 { margin-left: 0; }
+    #frame-01-prompt-intake-line-3 { margin-left: 76px; }
+    .frame-01-prompt-intake-question {
+      left: 1048px;
+      top: 268px;
+      width: 770px;
+      font-size: 144px;
+    }
+    .frame-01-prompt-intake-spike { left: 1692px; top: 674px; }
+  </style>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+
+    const duration = 2.6;
+    const intakeX = 540;
+    const intakeY = 1148;
+    const typeSequence = [
+      { t: 0.0, text: "", segment: "idle", color: "#d4f9ef" },
+      { t: 0.08, text: "one", segment: "main", color: "#d4f9ef" },
+      { t: 0.17, text: "one mo", segment: "main", color: "#d4f9ef" },
+      { t: 0.28, text: "one more", segment: "main", color: "#d4f9ef" },
+      { t: 0.36, text: "one more tw", segment: "edit", color: "#18b98b" },
+      { t: 0.43, text: "one more t", segment: "edit", color: "#18b98b" },
+      { t: 0.52, text: "one more tweak_", segment: "done", color: "#18b98b" }
+    ];
+    const typeChanges = typeSequence
+      .filter((entry, index) => index > 0 && entry.text !== typeSequence[index - 1].text)
+      .map((entry) => entry.t);
+    const typeDriver = { t: 0 };
+    const blinkDriver = { p: 0 };
+    const typedEl = document.getElementById("frame-01-prompt-intake-typed");
+    const caretEl = document.getElementById("frame-01-prompt-intake-caret");
+
+    const typeEntryAt = (time) => {
+      for (let index = typeSequence.length - 1; index >= 0; index -= 1) {
+        if (time >= typeSequence[index].t) return typeSequence[index];
+      }
+      return typeSequence[0];
+    };
+
+    tl.to(
+      typeDriver,
+      {
+        t: duration,
+        duration,
+        ease: "none",
+        onUpdate: () => {
+          const entry = typeEntryAt(typeDriver.t);
+          typedEl.textContent = entry.text;
+          caretEl.style.background = entry.color;
+          const isTyping = typeChanges.some(
+            (changeTime) => changeTime <= typeDriver.t && typeDriver.t - changeTime < 0.07
+          );
+          caretEl.style.opacity = isTyping || Math.sin(blinkDriver.p) > 0 ? "1" : "0";
+        }
+      },
+      0
+    );
+
+    tl.to(
+      blinkDriver,
+      {
+        p: Math.PI * 2 * 4,
+        duration,
+        ease: "none"
+      },
+      0
+    );
+
+    const promptContent = [
+      { id: "#frame-01-prompt-intake-prompt-a", text: "make it work" },
+      { id: "#frame-01-prompt-intake-prompt-b", text: "fix this" },
+      { id: "#frame-01-prompt-intake-prompt-c", text: "ship it" }
+    ];
+    let promptCursor = 0.55;
+    const promptSchedule = promptContent.map((entry) => {
+      const start = promptCursor;
+      promptCursor += 0.19 + entry.text.length * 0.006;
+      return { ...entry, start };
+    });
+
+    promptSchedule.forEach((entry, index) => {
+      const fragment = document.querySelector(entry.id);
+      const laneX = Number(fragment.dataset.laneX);
+      const laneY = Number(fragment.dataset.laneY);
+      const baseX = Number(fragment.dataset.baseX);
+      const baseY = Number(fragment.dataset.baseY);
+      const targetX = intakeX - baseX;
+      const targetY = intakeY - baseY;
+      const moveDuration = 0.38;
+
+      tl.fromTo(
+        fragment,
+        { x: laneX, y: laneY, opacity: 0 },
+        {
+          x: 0,
+          y: 0,
+          opacity: 1,
+          duration: moveDuration,
+          ease: index === 0 ? "power4.out" : index === 1 ? "expo.out" : "circ.out"
+        },
+        entry.start
+      );
+
+      fragment.querySelectorAll(".frame-01-prompt-intake-echo").forEach((echo) => {
+        const echoIndex = Number(echo.dataset.echo);
+        tl.fromTo(
+          echo,
+          {
+            x: laneX < 0 ? -echoIndex * 28 : laneX > 0 ? echoIndex * 28 : 0,
+            y: laneY > 100 ? echoIndex * 28 : 0,
+            opacity: 0.42 / echoIndex
+          },
+          {
+            x: 0,
+            y: 0,
+            opacity: 0,
+            duration: moveDuration,
+            ease: "power4.out"
+          },
+          entry.start
+        );
+      });
+
+      tl.to(
+        fragment,
+        {
+          x: targetX * 0.09,
+          y: targetY * 0.09,
+          duration: Math.max(0.18, 1.45 - entry.start - moveDuration),
+          ease: "power1.inOut"
+        },
+        entry.start + moveDuration
+      );
+
+      tl.to(
+        fragment,
+        {
+          x: targetX,
+          y: targetY,
+          scale: 0.08,
+          opacity: 0,
+          duration: 0.43,
+          ease: "power3.in"
+        },
+        1.45 + index * 0.045
+      );
+    });
+
+    tl.to(
+      "#frame-01-prompt-intake-type-row",
+      {
+        x: intakeX - 98,
+        y: intakeY - 414,
+        scale: 0.08,
+        opacity: 0,
+        duration: 0.48,
+        ease: "power3.in"
+      },
+      1.45
+    );
+
+    tl.fromTo(
+      "#frame-01-prompt-intake-intake",
+      { scale: 0.72, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.38, ease: "power3.out" },
+      0.82
+    );
+
+    tl.to(
+      "#frame-01-prompt-intake-ground",
+      { backgroundColor: "#f5f0e5", duration: 0.13, ease: "none" },
+      1.61
+    );
+    tl.to(
+      ".frame-01-prompt-intake-reg",
+      { color: "#0b1113", opacity: 0.28, duration: 0.13, ease: "none" },
+      1.61
+    );
+
+    const pulse = 0.2;
+    const beats = [pulse * 8.2, pulse * 9.15, pulse * 10.1];
+    tl.fromTo(
+      "#frame-01-prompt-intake-line-1",
+      { scale: 1.45, filter: "blur(10px)", opacity: 0 },
+      {
+        scale: 1,
+        filter: "blur(0px)",
+        opacity: 1,
+        duration: 0.32,
+        ease: "power4.out"
+      },
+      beats[0]
+    );
+    tl.fromTo(
+      "#frame-01-prompt-intake-line-2",
+      { x: 260, opacity: 0 },
+      { x: 0, opacity: 1, duration: 0.3, ease: "expo.out" },
+      beats[1]
+    );
+    tl.fromTo(
+      "#frame-01-prompt-intake-line-3",
+      { y: 88, rotation: 4, opacity: 0 },
+      { y: 0, rotation: 0, opacity: 1, duration: 0.3, ease: "circ.out" },
+      beats[2]
+    );
+
+    tl.to(
+      "#frame-01-prompt-intake-jaw-top",
+      { y: 31, duration: 0.14, ease: "power4.in" },
+      2.18
+    );
+    tl.to(
+      "#frame-01-prompt-intake-jaw-bottom",
+      { y: -31, duration: 0.14, ease: "power4.in" },
+      2.18
+    );
+    tl.to(
+      "#frame-01-prompt-intake-intake",
+      { scaleY: 0.1, opacity: 0, duration: 0.14, ease: "power4.in" },
+      2.18
+    );
+
+    tl.to(
+      "#frame-01-prompt-intake-headline",
+      {
+        scale: 0.8,
+        filter: "blur(10px)",
+        opacity: 0.15,
+        duration: 0.16,
+        ease: "power3.in"
+      },
+      2.09
+    );
+    tl.set("#frame-01-prompt-intake-headline", { opacity: 0 }, 2.25);
+    tl.set(
+      "#frame-01-prompt-intake-question",
+      { opacity: 0.15, scale: 1.25, filter: "blur(10px)" },
+      2.25
+    );
+    tl.to(
+      "#frame-01-prompt-intake-question",
+      {
+        opacity: 1,
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 0.22,
+        ease: "expo.out"
+      },
+      2.25
+    );
+
+    tl.fromTo(
+      "#frame-01-prompt-intake-spike",
+      { opacity: 0, scale: 0.92 },
+      { opacity: 1, scale: 1, duration: 0.07, ease: "power4.out" },
+      2.25
+    );
+    tl.to(
+      "#frame-01-prompt-intake-spike",
+      { opacity: 0, duration: 0.08, ease: "none" },
+      2.34
+    );
+
+    window.__timelines["01-prompt-intake"] = tl;
+  </script>
+</template>

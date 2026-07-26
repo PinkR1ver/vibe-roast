@@ -1,5 +1,5 @@
 const SNAPSHOT_VERSION = 1;
-const WRITER_PROMPT_VERSION = 3;
+const WRITER_PROMPT_VERSION = 6;
 
 function finite(value) {
   const number = Number(value);
@@ -15,6 +15,8 @@ function buildRoastSnapshot(evidence = {}) {
   const categories = evidence.prompt_behavior?.categories || [];
   const categoryTotal = categories.reduce((total, row) => total + Math.max(0, finite(row?.count)), 0);
   const concepts = [
+    ...(evidence.prompt_behavior?.recurring_domain_clusters || [])
+      .flatMap((cluster) => (cluster?.terms || []).map((term) => ({ term }))),
     ...(evidence.prompt_behavior?.recurring_domain_concepts || []),
     ...(evidence.prompt_behavior?.recurring_behavior_terms || []),
   ];

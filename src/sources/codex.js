@@ -79,10 +79,38 @@ function extractCodexPrompt(obj) {
     nested?.content,
   ];
   for (const candidate of candidates) {
-    const text = normalizeWhitespace(textFromContent(candidate));
+    const text = normalizeWhitespace(stripCodexInjectedContext(textFromContent(candidate)));
     if (text) return text;
   }
   return "";
+}
+
+function stripCodexInjectedContext(value) {
+  let text = String(value || "");
+
+  // Desktop attachment/browser envelopes place the authored request after
+  // this marker. Prefer that explicit boundary so filenames, screenshots, and
+  // ambient browser state never become personality evidence.
+  const requestMarker = /^## My request for Codex:\s*$/gim;
+  const markers = [...text.matchAll(requestMarker)];
+  if (markers.length > 0) {
+    const marker = markers[markers.length - 1];
+    return text.slice((marker.index || 0) + marker[0].length).trim();
+  }
+
+  // Some client versions inject the same context blocks without the request
+  // marker. Strip only known machine-owned envelopes; preserve ordinary XML,
+  // Markdown, and user-authored instructions.
+  const injectedTags = [
+    "in-app-browser-context",
+    "recommended_plugins",
+    "environment_context",
+  ];
+  for (const tag of injectedTags) {
+    const block = new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, "gi");
+    text = text.replace(block, " ");
+  }
+  return text.trim();
 }
 
 function extractCodexTokens(obj) {
@@ -215,6 +243,7 @@ function number(value) {
 module.exports = {
   inspectCodex,
   extractCodexPrompt,
+  stripCodexInjectedContext,
   extractCodexTokens,
   extractCodexTool,
   extractCodexUsageEvent,

@@ -1,6 +1,6 @@
 # Feature Specs
 
-Last synchronized: 2026-07-26
+Last synchronized: 2026-07-27
 
 ## Current product line
 
@@ -13,6 +13,7 @@ Last synchronized: 2026-07-26
 | Evidence-grounded optional AI roast writer | completed | `evidence-grounded-ai-roast.md` |
 | One-click GitHub OAuth identity session | completed | `github-oauth-session.md` |
 | Hosted Cloudflare Workers AI free roast | completed | `hosted-free-ai-roast.md` |
+| Reproducible launch promo video | completed | `promo-motion-video.md` |
 | npm release entrypoint | completed | `../memory/npm-release-entrypoint.md` |
 
 ## Historical foundation

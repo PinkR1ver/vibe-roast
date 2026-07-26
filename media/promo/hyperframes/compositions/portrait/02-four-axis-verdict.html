@@ -1,0 +1,753 @@
+<template>
+  <style>
+    #root {
+      position: relative;
+      width: 1080px;
+      height: 1920px;
+      overflow: hidden;
+      container-type: size;
+      color: #0b1113;
+    }
+
+    #f02-four-axis-verdict-ground {
+      position: absolute;
+      inset: 0;
+      background: #f5f0e5;
+    }
+
+    #f02-four-axis-verdict-field {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      perspective: 1500px;
+    }
+
+    .f02-four-axis-verdict-paper-grid {
+      position: absolute;
+      inset: 0;
+      opacity: 0.28;
+      background-image:
+        linear-gradient(rgba(11, 17, 19, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(11, 17, 19, 0.035) 1px, transparent 1px);
+      background-size: 100% 96px, 90px 100%;
+      mask-image: linear-gradient(to bottom, #000 0%, #000 78%, transparent 92%);
+    }
+
+    .f02-four-axis-verdict-header {
+      position: absolute;
+      top: 112px;
+      left: 72px;
+      right: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .f02-four-axis-verdict-status {
+      min-width: 610px;
+      font-family: ui-monospace, monospace;
+      font-size: 28px;
+      line-height: 1;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .f02-four-axis-verdict-status-cursor {
+      display: inline-block;
+      width: 18px;
+      margin-left: 4px;
+      color: #18b98b;
+    }
+
+    .f02-four-axis-verdict-spinner {
+      width: 68px;
+      height: 68px;
+      overflow: visible;
+    }
+
+    .f02-four-axis-verdict-spinner line {
+      stroke: #0b1113;
+      stroke-width: 5;
+      stroke-linecap: round;
+    }
+
+    .f02-four-axis-verdict-spinner circle {
+      fill: #18b98b;
+    }
+
+    .f02-four-axis-verdict-scan-svg {
+      position: absolute;
+      top: 212px;
+      left: 72px;
+      width: 936px;
+      height: 96px;
+      overflow: visible;
+    }
+
+    #f02-four-axis-verdict-scan-path {
+      fill: none;
+      stroke: #18b98b;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .f02-four-axis-verdict-scan-node {
+      fill: #f5f0e5;
+      stroke: #18b98b;
+      stroke-width: 3;
+    }
+
+    .f02-four-axis-verdict-pulses {
+      position: absolute;
+      top: 240px;
+      left: 96px;
+      width: 888px;
+      height: 28px;
+      pointer-events: none;
+    }
+
+    .f02-four-axis-verdict-pulse {
+      position: absolute;
+      top: 5px;
+      width: 18px;
+      height: 18px;
+      margin-left: -9px;
+      border: 2px solid #18b98b;
+      border-radius: 50%;
+      background: #f5f0e5;
+      opacity: 0;
+      box-shadow: 0 0 0 0 rgba(24, 185, 139, 0.24);
+      will-change: transform, opacity, box-shadow;
+    }
+
+    .f02-four-axis-verdict-pulse:nth-child(1) { left: 2%; }
+    .f02-four-axis-verdict-pulse:nth-child(2) { left: 34%; }
+    .f02-four-axis-verdict-pulse:nth-child(3) {
+      left: 66%;
+      border-color: #ef6b4a;
+      box-shadow: 0 0 0 0 rgba(239, 107, 74, 0.24);
+    }
+    .f02-four-axis-verdict-pulse:nth-child(4) { left: 98%; }
+
+    .f02-four-axis-verdict-lanes {
+      position: absolute;
+      inset: 0;
+    }
+
+    .f02-four-axis-verdict-lane {
+      position: absolute;
+      left: 72px;
+      top: 352px;
+      width: 936px;
+      height: 154px;
+      border: 1px solid rgba(11, 17, 19, 0.16);
+      border-left: 6px solid #18b98b;
+      border-radius: 18px;
+      background: rgba(245, 240, 229, 0.94);
+      box-shadow: 0 18px 54px rgba(11, 17, 19, 0.08), 0 2px 8px rgba(11, 17, 19, 0.06);
+      transform-origin: center center;
+      transform-style: preserve-3d;
+      will-change: transform, opacity, filter, background-color;
+    }
+
+    #f02-four-axis-verdict-lane-s {
+      border-left-color: #ef6b4a;
+    }
+
+    .f02-four-axis-verdict-lane-index {
+      position: absolute;
+      top: 23px;
+      right: 26px;
+      font-family: ui-monospace, monospace;
+      font-size: 18px;
+      letter-spacing: 0.08em;
+      opacity: 0.52;
+    }
+
+    .f02-four-axis-verdict-letter {
+      position: absolute;
+      top: 13px;
+      left: 28px;
+      width: 132px;
+      height: 132px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: ui-monospace, monospace;
+      font-size: 108px;
+      line-height: 1;
+      font-weight: 400;
+      letter-spacing: -0.08em;
+      transform-style: preserve-3d;
+      transform-origin: bottom center;
+      will-change: transform, opacity;
+    }
+
+    .f02-four-axis-verdict-letter-ghost {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .f02-four-axis-verdict-letter-live {
+      display: inline-block;
+      transform-style: preserve-3d;
+      transform-origin: bottom center;
+    }
+
+    .f02-four-axis-verdict-track {
+      position: absolute;
+      left: 188px;
+      right: 28px;
+      bottom: 34px;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 9999px;
+      background: rgba(11, 17, 19, 0.1);
+    }
+
+    .f02-four-axis-verdict-fill {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: #18b98b;
+      transform-origin: left center;
+      will-change: transform;
+    }
+
+    #f02-four-axis-verdict-lane-s .f02-four-axis-verdict-fill {
+      background: #ef6b4a;
+    }
+
+    .f02-four-axis-verdict-lane-state {
+      position: absolute;
+      left: 190px;
+      top: 27px;
+      font-family: ui-monospace, monospace;
+      font-size: 23px;
+      line-height: 1;
+      letter-spacing: 0.08em;
+    }
+
+    .f02-four-axis-verdict-receipt {
+      position: absolute;
+      top: 328px;
+      left: 126px;
+      width: 828px;
+      height: 760px;
+      border: 1px solid rgba(11, 17, 19, 0.12);
+      border-radius: 12px;
+      opacity: 0;
+    }
+
+    .f02-four-axis-verdict-receipt::before,
+    .f02-four-axis-verdict-receipt::after {
+      content: "";
+      position: absolute;
+      left: 36px;
+      right: 36px;
+      height: 1px;
+      background: rgba(11, 17, 19, 0.1);
+    }
+
+    .f02-four-axis-verdict-receipt::before {
+      top: 32%;
+    }
+
+    .f02-four-axis-verdict-receipt::after {
+      top: 66%;
+    }
+
+    .f02-four-axis-verdict-connectors {
+      position: absolute;
+      top: 330px;
+      left: 72px;
+      width: 936px;
+      height: 590px;
+      overflow: visible;
+      opacity: 0;
+    }
+
+    .f02-four-axis-verdict-connector {
+      fill: none;
+      stroke: rgba(11, 17, 19, 0.28);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+    }
+
+    .f02-four-axis-verdict-lockup-frame {
+      position: absolute;
+      top: 575px;
+      left: 154px;
+      width: 772px;
+      height: 230px;
+      border-top: 1px solid rgba(11, 17, 19, 0.18);
+      border-bottom: 1px solid rgba(11, 17, 19, 0.18);
+      opacity: 0;
+    }
+
+    .f02-four-axis-verdict-lockup-frame::before,
+    .f02-four-axis-verdict-lockup-frame::after {
+      content: "";
+      position: absolute;
+      top: -5px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #18b98b;
+    }
+
+    .f02-four-axis-verdict-lockup-frame::before {
+      left: -4px;
+    }
+
+    .f02-four-axis-verdict-lockup-frame::after {
+      right: -4px;
+    }
+
+    .f02-four-axis-verdict-copy {
+      position: absolute;
+      top: 1020px;
+      left: 72px;
+      width: 936px;
+      opacity: 0;
+    }
+
+    .f02-four-axis-verdict-copy-top {
+      font-family: ui-monospace, monospace;
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .f02-four-axis-verdict-copy-rule {
+      width: 100%;
+      height: 1px;
+      margin: 32px 0 38px;
+      background: rgba(11, 17, 19, 0.18);
+      transform-origin: left center;
+    }
+
+    .f02-four-axis-verdict-copy-main {
+      max-width: 900px;
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 112px;
+      font-weight: 400;
+      line-height: 0.98;
+      letter-spacing: -0.028em;
+    }
+  </style>
+
+  <div data-hf-id="hf-gc5x" id="root" data-composition-id="02-four-axis-verdict" data-duration="3.6" data-width="1080" data-height="1920">
+    <div data-hf-id="hf-15cw" id="f02-four-axis-verdict-ground" class="clip" data-start="0" data-duration="3.6" data-track-index="0"></div>
+
+    <div data-hf-id="hf-9pqc" id="f02-four-axis-verdict-field" class="clip" data-start="0" data-duration="3.6" data-track-index="1">
+      <div data-hf-id="hf-xv1p" class="f02-four-axis-verdict-paper-grid"></div>
+
+      <div data-hf-id="hf-92i9" class="f02-four-axis-verdict-header">
+        <div data-hf-id="hf-dn70" class="f02-four-axis-verdict-status">
+          <span data-hf-id="hf-2bq6" id="f02-four-axis-verdict-status-text">CLASSIFYING BEHAVIOR</span><span data-hf-id="hf-s7zi" id="f02-four-axis-verdict-status-cursor" class="f02-four-axis-verdict-status-cursor">_</span>
+        </div>
+
+        <svg data-hf-id="hf-ffxj" id="f02-four-axis-verdict-spinner" class="f02-four-axis-verdict-spinner" viewBox="0 0 80 80" aria-hidden="true">
+          <g data-hf-id="hf-qe0s" id="f02-four-axis-verdict-spinner-core">
+            <line data-hf-id="hf-jnj3" x1="40" y1="9" x2="40" y2="71" />
+            <line data-hf-id="hf-c15c" x1="13" y1="24" x2="67" y2="56" />
+            <line data-hf-id="hf-tnj0" x1="13" y1="56" x2="67" y2="24" />
+            <circle data-hf-id="hf-0csc" cx="40" cy="40" r="6" />
+          </g>
+        </svg>
+      </div>
+
+      <svg data-hf-id="hf-oqy6" class="f02-four-axis-verdict-scan-svg" viewBox="0 0 936 96" aria-hidden="true">
+        <path data-hf-id="hf-qe7x" id="f02-four-axis-verdict-scan-path" d="M 2 48 L 178 48 L 214 18 L 254 78 L 296 48 L 934 48" />
+        <circle data-hf-id="hf-nmh4" class="f02-four-axis-verdict-scan-node" cx="2" cy="48" r="7" />
+        <circle data-hf-id="hf-kia6" class="f02-four-axis-verdict-scan-node" cx="934" cy="48" r="7" />
+      </svg>
+
+      <div class="f02-four-axis-verdict-pulses" aria-hidden="true">
+        <span class="f02-four-axis-verdict-pulse"></span>
+        <span class="f02-four-axis-verdict-pulse"></span>
+        <span class="f02-four-axis-verdict-pulse"></span>
+        <span class="f02-four-axis-verdict-pulse"></span>
+      </div>
+
+      <div data-hf-id="hf-18f6" id="f02-four-axis-verdict-receipt" class="f02-four-axis-verdict-receipt"></div>
+
+      <div data-hf-id="hf-8x3f" class="f02-four-axis-verdict-lanes">
+        <div data-hf-id="hf-6blk" id="f02-four-axis-verdict-lane-m" class="f02-four-axis-verdict-lane">
+          <div data-hf-id="hf-2jgs" id="f02-four-axis-verdict-letter-m" class="f02-four-axis-verdict-letter">
+            <span data-hf-id="hf-fwxo" class="f02-four-axis-verdict-letter-ghost">M</span>
+            <span data-hf-id="hf-fpnt" class="f02-four-axis-verdict-letter-live" data-target="M">M</span>
+          </div>
+          <div data-hf-id="hf-digm" class="f02-four-axis-verdict-lane-state">MODE / RESOLVED</div>
+          <div data-hf-id="hf-a6ss" class="f02-four-axis-verdict-lane-index">01</div>
+          <div data-hf-id="hf-bq6z" class="f02-four-axis-verdict-track">
+            <div data-hf-id="hf-ufzs" id="f02-four-axis-verdict-fill-m" class="f02-four-axis-verdict-fill"></div>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-hyv1" id="f02-four-axis-verdict-lane-p" class="f02-four-axis-verdict-lane">
+          <div data-hf-id="hf-9kbt" id="f02-four-axis-verdict-letter-p" class="f02-four-axis-verdict-letter">
+            <span data-hf-id="hf-kaaz" class="f02-four-axis-verdict-letter-ghost">P</span>
+            <span data-hf-id="hf-lyhl" class="f02-four-axis-verdict-letter-live" data-target="P">P</span>
+          </div>
+          <div data-hf-id="hf-mqoi" class="f02-four-axis-verdict-lane-state">PACE / RESOLVED</div>
+          <div data-hf-id="hf-8zvp" class="f02-four-axis-verdict-lane-index">02</div>
+          <div data-hf-id="hf-osrf" class="f02-four-axis-verdict-track">
+            <div data-hf-id="hf-6399" id="f02-four-axis-verdict-fill-p" class="f02-four-axis-verdict-fill"></div>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-lwz2" id="f02-four-axis-verdict-lane-s" class="f02-four-axis-verdict-lane">
+          <div data-hf-id="hf-difu" id="f02-four-axis-verdict-letter-s" class="f02-four-axis-verdict-letter">
+            <span data-hf-id="hf-jvzy" class="f02-four-axis-verdict-letter-ghost">S</span>
+            <span data-hf-id="hf-43gh" class="f02-four-axis-verdict-letter-live" data-target="S">S</span>
+          </div>
+          <div data-hf-id="hf-x7i0" class="f02-four-axis-verdict-lane-state">STRATEGY / RESOLVED</div>
+          <div data-hf-id="hf-9e6q" class="f02-four-axis-verdict-lane-index">03</div>
+          <div data-hf-id="hf-oege" class="f02-four-axis-verdict-track">
+            <div data-hf-id="hf-a1da" id="f02-four-axis-verdict-fill-s" class="f02-four-axis-verdict-fill"></div>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-njvv" id="f02-four-axis-verdict-lane-f" class="f02-four-axis-verdict-lane">
+          <div data-hf-id="hf-jrr3" id="f02-four-axis-verdict-letter-f" class="f02-four-axis-verdict-letter">
+            <span data-hf-id="hf-bjkd" class="f02-four-axis-verdict-letter-ghost">F</span>
+            <span data-hf-id="hf-irkp" class="f02-four-axis-verdict-letter-live" data-target="F">F</span>
+          </div>
+          <div data-hf-id="hf-hrdj" class="f02-four-axis-verdict-lane-state">FOCUS / RESOLVED</div>
+          <div data-hf-id="hf-bdpv" class="f02-four-axis-verdict-lane-index">04</div>
+          <div data-hf-id="hf-o05d" class="f02-four-axis-verdict-track">
+            <div data-hf-id="hf-boa3" id="f02-four-axis-verdict-fill-f" class="f02-four-axis-verdict-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <svg data-hf-id="hf-8jsh" id="f02-four-axis-verdict-connectors" class="f02-four-axis-verdict-connectors" viewBox="0 0 936 590" aria-hidden="true">
+        <path data-hf-id="hf-lf6h" class="f02-four-axis-verdict-connector" d="M 105 485 C 105 405 176 350 268 300" />
+        <path data-hf-id="hf-cmge" class="f02-four-axis-verdict-connector" d="M 105 295 C 206 285 326 285 402 300" />
+        <path data-hf-id="hf-aia0" class="f02-four-axis-verdict-connector" d="M 105 105 C 240 150 420 230 536 300" />
+        <path data-hf-id="hf-b37z" class="f02-four-axis-verdict-connector" d="M 105 -85 C 320 60 560 210 670 300" />
+      </svg>
+
+      <div data-hf-id="hf-sdqe" id="f02-four-axis-verdict-lockup-frame" class="f02-four-axis-verdict-lockup-frame"></div>
+
+      <div data-hf-id="hf-m606" id="f02-four-axis-verdict-copy" class="f02-four-axis-verdict-copy">
+        <div data-hf-id="hf-dvoz" class="f02-four-axis-verdict-copy-top">Your prompts leave a</div>
+        <div data-hf-id="hf-lxsi" id="f02-four-axis-verdict-copy-rule" class="f02-four-axis-verdict-copy-rule"></div>
+        <div data-hf-id="hf-ceym" class="f02-four-axis-verdict-copy-main">behavioral fingerprint</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <script>
+    (() => {
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["02-four-axis-verdict"] = tl;
+
+      const scanPath = document.getElementById("f02-four-axis-verdict-scan-path");
+      const scanLength = scanPath.getTotalLength();
+      scanPath.style.strokeDasharray = String(scanLength);
+      scanPath.style.strokeDashoffset = String(scanLength);
+
+      const connectorPaths = Array.from(
+        document.querySelectorAll(".f02-four-axis-verdict-connector"),
+      );
+      connectorPaths.forEach((path) => {
+        const length = path.getTotalLength();
+        path.style.strokeDasharray = String(length);
+        path.style.strokeDashoffset = String(length);
+      });
+
+      const lanes = ["m", "p", "s", "f"].map((key) => ({
+        key,
+        lane: document.getElementById(`f02-four-axis-verdict-lane-${key}`),
+        letter: document.getElementById(`f02-four-axis-verdict-letter-${key}`),
+        live: document.querySelector(
+          `#f02-four-axis-verdict-letter-${key} .f02-four-axis-verdict-letter-live`,
+        ),
+        fill: document.getElementById(`f02-four-axis-verdict-fill-${key}`),
+      }));
+
+      const verdictBeats = [
+        { key: "m", at: 0.5 },
+        { key: "p", at: 0.86 },
+        { key: "s", at: 1.22 },
+        { key: "f", at: 1.58 },
+      ];
+      const pulseNodes = Array.from(
+        document.querySelectorAll(".f02-four-axis-verdict-pulse"),
+      );
+      gsap.set(lanes.map((item) => item.lane), { opacity: 0 });
+      gsap.set(lanes.map((item) => item.fill), { scaleX: 0 });
+
+      tl.fromTo(
+        "#f02-four-axis-verdict-status-text",
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.24, ease: "power2.out" },
+        0.02,
+      );
+      tl.fromTo(
+        "#f02-four-axis-verdict-spinner",
+        { opacity: 0, scale: 0.92 },
+        { opacity: 1, scale: 1, duration: 0.24, ease: "power2.out" },
+        0.04,
+      );
+      tl.to(
+        scanPath,
+        { strokeDashoffset: 0, duration: 0.44, ease: "power2.out" },
+        0.05,
+      );
+
+      const spinnerState = { degrees: 0 };
+      tl.to(
+        spinnerState,
+        {
+          degrees: 702,
+          duration: 2.65,
+          ease: "none",
+          onUpdate: () => {
+            document
+              .getElementById("f02-four-axis-verdict-spinner-core")
+              .setAttribute("transform", `rotate(${spinnerState.degrees} 40 40)`);
+          },
+        },
+        0.05,
+      );
+
+      const cursorState = { phase: 0 };
+      tl.to(
+        cursorState,
+        {
+          phase: Math.PI * 10,
+          duration: 2.65,
+          ease: "none",
+          onUpdate: () => {
+            document.getElementById("f02-four-axis-verdict-status-cursor").style.opacity =
+              Math.sin(cursorState.phase) > 0 ? "1" : "0";
+          },
+        },
+        0.05,
+      );
+
+      verdictBeats.forEach((beat, beatIndex) => {
+        const item = lanes.find((candidate) => candidate.key === beat.key);
+        const previous = lanes.slice(0, beatIndex);
+        const direction = beatIndex % 2 === 0 ? -1 : 1;
+
+        tl.fromTo(
+          pulseNodes[beatIndex],
+          {
+            opacity: 0.9,
+            scale: 0.45,
+            boxShadow: beat.key === "s"
+              ? "0 0 0 0 rgba(239, 107, 74, 0.28)"
+              : "0 0 0 0 rgba(24, 185, 139, 0.28)",
+          },
+          {
+            opacity: 0,
+            scale: 2.8,
+            boxShadow: beat.key === "s"
+              ? "0 0 0 34px rgba(239, 107, 74, 0)"
+              : "0 0 0 34px rgba(24, 185, 139, 0)",
+            duration: 0.32,
+            ease: "power2.out",
+          },
+          beat.at - 0.03,
+        );
+
+        if (previous.length) {
+          tl.to(
+            previous.map((candidate) => candidate.lane),
+            {
+              y: "+=176",
+              scale: 0.975,
+              rotationZ: direction * 0.35,
+              duration: 0.34,
+              ease: "power3.inOut",
+            },
+            beat.at,
+          );
+        }
+
+        tl.fromTo(
+          item.lane,
+          {
+            opacity: 0,
+            x: direction * 118,
+            y: -82,
+            z: -180,
+            scale: 0.84,
+            rotationX: -18,
+            rotationZ: direction * 2.5,
+            filter: "blur(10px)",
+          },
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            z: 0,
+            scale: 1,
+            rotationX: 0,
+            rotationZ: 0,
+            filter: "blur(0px)",
+            backgroundColor: beat.key === "s" ? "#fbe2d9" : "#d4f9ef",
+            duration: 0.42,
+            ease: "back.out(1.45)",
+          },
+          beat.at,
+        );
+
+        const decodeState = { progress: 0 };
+        tl.to(
+          decodeState,
+          {
+            progress: 1,
+            duration: 0.26,
+            ease: "power3.out",
+            onUpdate: () => {
+              item.live.textContent = item.live.dataset.target;
+              item.live.style.transform = `rotateX(${90 - decodeState.progress * 90}deg)`;
+              item.live.style.opacity = String(Math.min(1, decodeState.progress * 2));
+              item.live.style.filter = `blur(${(1 - decodeState.progress) * 5}px)`;
+            },
+          },
+          beat.at,
+        );
+        tl.to(
+          item.fill,
+          { scaleX: 1, duration: 0.46, ease: "expo.out" },
+          beat.at,
+        );
+      });
+
+      tl.fromTo(
+        "#f02-four-axis-verdict-receipt",
+        { opacity: 0 },
+        { opacity: 0.32, duration: 0.2, ease: "power1.out" },
+        1.82,
+      );
+
+      const shellTargets = lanes.map((item) =>
+        item.lane.querySelectorAll(
+          ".f02-four-axis-verdict-lane-state, .f02-four-axis-verdict-lane-index, .f02-four-axis-verdict-track",
+        ),
+      );
+      tl.to(
+        shellTargets.flatMap((nodeList) => Array.from(nodeList)),
+        { opacity: 0, duration: 0.2, ease: "power1.in" },
+        1.95,
+      );
+      tl.to(
+        lanes.map((item) => item.lane),
+        {
+          backgroundColor: "rgba(212, 249, 239, 0)",
+          borderColor: "rgba(11, 17, 19, 0)",
+          boxShadow: "0 0 0 rgba(11,17,19,0)",
+          duration: 0.28,
+          ease: "power2.inOut",
+        },
+        1.95,
+      );
+
+      const receiptY = { m: 570, p: 380, s: 190, f: 0 };
+      const lockupX = { m: 135, p: 325, s: 515, f: 705 };
+      lanes.forEach((item) => {
+        tl.to(
+          item.letter,
+          {
+            x: lockupX[item.key],
+            y: 250 - receiptY[item.key],
+            scale: 1.25,
+            duration: 0.58,
+            ease: "expo.inOut",
+          },
+          1.98,
+        );
+      });
+
+      tl.fromTo(
+        "#f02-four-axis-verdict-connectors",
+        { opacity: 0 },
+        { opacity: 1, duration: 0.18, ease: "power1.out" },
+        2.04,
+      );
+      connectorPaths.forEach((path, index) => {
+        tl.to(
+          path,
+          { strokeDashoffset: 0, duration: 0.36, ease: "power2.out" },
+          2.04 + index * 0.04,
+        );
+      });
+      tl.fromTo(
+        "#f02-four-axis-verdict-lockup-frame",
+        { opacity: 0, scaleX: 0.82 },
+        { opacity: 1, scaleX: 1, duration: 0.4, ease: "expo.out" },
+        2.18,
+      );
+
+      const statusStates = [
+        { t: 0, text: "CLASSIFYING BEHAVIOR" },
+        { t: 1.82, text: "CLASSIFYING" },
+        { t: 2.3, text: "FINGERPRINT FOUND" },
+      ];
+      const statusDriver = { time: 0 };
+      let lastStatus = "";
+      tl.to(
+        statusDriver,
+        {
+          time: 3.2,
+          duration: 3.2,
+          ease: "none",
+          onUpdate: () => {
+            let next = statusStates[0].text;
+            for (let i = statusStates.length - 1; i >= 0; i -= 1) {
+              if (statusDriver.time >= statusStates[i].t) {
+                next = statusStates[i].text;
+                break;
+              }
+            }
+            if (next !== lastStatus) {
+              document.getElementById("f02-four-axis-verdict-status-text").textContent = next;
+              lastStatus = next;
+            }
+          },
+        },
+        0,
+      );
+
+      tl.to(
+        "#f02-four-axis-verdict-connectors",
+        { opacity: 0.34, duration: 0.24, ease: "power1.out" },
+        2.48,
+      );
+      tl.to(
+        "#f02-four-axis-verdict-receipt",
+        { opacity: 0.12, duration: 0.24, ease: "power1.out" },
+        2.48,
+      );
+
+      tl.fromTo(
+        "#f02-four-axis-verdict-copy",
+        { opacity: 0, y: 46 },
+        { opacity: 1, y: 0, duration: 0.38, ease: "power4.out" },
+        2.7,
+      );
+      tl.fromTo(
+        "#f02-four-axis-verdict-copy-rule",
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.32, ease: "power2.out" },
+        2.78,
+      );
+    })();
+  </script>
+</template>

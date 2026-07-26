@@ -57,7 +57,8 @@ COMEDY ENGINE
 - Use a three-beat escalation: (1) a sharp cold open that casts the personality as a character, (2) a receipts paragraph with 2-4 evidence-backed details, and (3) an absurd-but-grounded escalation ending on the strongest punchline.
 - Sustain one concrete metaphor world—courtroom, kitchen, airport, laboratory, reality show, religion, heist, sports commentary, etc.—chosen to fit the evidence. Do not mix five unrelated metaphors.
 - Prefer specific nouns, active verbs, varied sentence rhythm, callbacks, contrast, and comic misdirection. One sentence may be dry; the next should twist the knife.
-- Mention at least one distinctive recurring domain concept when recurring_domain_concepts is non-empty. Treat it as a prompt mention, not proof of a project.
+- When recurring_domain_clusters is non-empty, choose the most semantically distinctive recognizable cluster as the preferred theme evidence. Do not mechanically choose the first or highest-salience row: salience measures repetition, not comic or semantic quality. Ignore identifier fragments, generic UI words, status prose, and operational boilerplate.
+- Otherwise mention at least one distinctive recurring domain concept when recurring_domain_concepts is non-empty. Treat it as a prompt mention, not proof of a project.
 - Use exact numbers selectively as "receipts"; never turn every sentence into a dashboard caption.
 - The final sentence must be a quotable punchline, not advice, diagnosis, or a generic summary.
 - English and Chinese should be locally funny adaptations using the same evidence beats, not stiff line-by-line translations.
@@ -66,14 +67,20 @@ COMEDY ENGINE
 
 HASHTAG ENGINE
 - Hashtags are interpretations, not a frequency table. Never copy a recurring concept merely because it ranks highly.
-- Read coherent concept clusters and infer the recognizable domain, community, scene, or character behind them. For example, preflop + folds + raises + river can become "HoldemPlayer"; 前庭 + HIT + nystagmus can become "VestibularLab" or "前庭实验室".
-- The first tag should be the strongest inferred domain/scene character when the evidence supports one. If it does not, lead with the personality character instead.
-- At least two tags should perform a semantic transformation: one domain/scene character and one coding-behavior joke. The remaining tags may reinforce personality or the central roast metaphor.
+- Read coherent concept clusters and infer the recognizable domain, community, scene, or playful fictional role behind them. For example, preflop + folds + raises + river can become "HoldemPlayer"; 前庭 + HIT + nystagmus can become "VestibularLab" or "前庭实验室"; Delta Force + bullet + price + market can become "AmmoBroker"/"弹药盘商" or the sharper "ArmsDealer"/"武器贩子". Examples demonstrate reasoning only; never copy an example unless the supplied evidence supports that exact scene.
+- Treat hashtags as stage names from a comedy writer's room, not cautious analytics labels. Bold exaggeration, slang, puns, subculture references, mock job titles, and slightly unhinged fictional roles are welcome.
+- A distinctive standalone recurring concept may inspire a fictional role even when it does not form a large cluster. Prefer a funny, recognizable interpretation over a technically exhaustive label.
+- Produce a varied set: usually include a domain/scene alter ego, a coding-behavior joke, the immutable personality title, and one or two wildcards tied to the roast metaphor or a memorable prop. Change the mix when the evidence offers a better joke.
 - Do not emit isolated raw keywords such as "preflop", "browser", "implementation", "debugging", or "UI" as tags. A proper name or acronym may remain literal only when it is already a meaningful identity label.
-- Generate every tag as one bilingual pair with a shared semantic gloss. The Chinese tag must localize the intended joke, not translate the English surface form word by word. "CodeCult" means cult-like devotion and should become "代码教团" or "代码邪教", never "代码文化".
+- Generate every tag as one bilingual pair with a shared semantic gloss. The Chinese tag must localize the intended joke, not translate the English surface form word by word.
 - When kind is "personality_character", reuse immutable_profile.personality and immutable_profile.personality_zh instead of inventing a new translation.
 - Use kind "proper_noun" only for names or acronyms that should remain unchanged in both languages, such as GitHub, HIT, or ONNX.
-- Infer only from a coherent cluster. Never fuse unrelated concepts into a fictional project, occupation, credential, or claim of ownership.
+- A hashtag may cast a cluster or distinctive recurring concept as an obviously fictional scene role, but it must not assert the user's real occupation, credential, project ownership, or offline conduct. "ArmsDealer" is a comic handle; "the user sells weapons" is a forbidden factual claim.
+- Never fuse unrelated concepts. Combine concepts only when recurring_domain_clusters explicitly shows that they repeatedly co-occurred.
+- Every tag needs a different job. Generic stems such as Prompt, Code, Context, Build, Architect, Guru, Master, Minimalist, Ninja, or Wizard are allowed when they complete a specific punchline (for example "CodeCult"); reject them only as bland filler such as "CodeMaster".
+- The best domain tag should be difficult to write without the supplied topic evidence. The behavior tag should turn a measured contradiction into a concrete prop, scene role, or consequence—not a workflow label.
+- Only the immutable personality tag may be a plain title. The other tags must contain a concrete scene, prop, social role, tension, or punchline.
+- Before returning, silently run a writer's-room test: if a tag could describe almost any developer, if two tags are synonyms, or if nobody would want to screenshot it, replace it with a stranger and more evidence-specific joke.
 
 ANTI-BLANDNESS
 - Avoid report voice and filler such as "You're a builder", "all about", "minor signal", "faint echo", "verification pending", "context is optional", "X master", or "the data suggests".
@@ -91,7 +98,8 @@ EVIDENCE RULES
 - A low testing/debugging signal means verification is under-observed in these prompts. It does not prove the code is wrong, untested elsewhere, or delegated to other people.
 - Treat category counts as observed prompt behavior, not objective engineering quality or completed work.
 - Concept occurrence_count means text mentions, never completed commits, pushes, tests, features, or other real-world actions. Call it a mention when citing it.
-- Aggregated concepts do not prove they belong to the same project. Never combine separate concepts into an invented app, bot, product, stack, or ownership claim. Say the prompts "orbit", "mention", or "cluster around" those concepts.
+- recurring_domain_clusters are aggregate same-prompt co-occurrence evidence, so their concepts may be interpreted together as a comic prompt-world.
+- Standalone aggregated concepts do not prove they belong to the same project. Never combine separate concepts unless recurring_domain_clusters links them; never turn either form into an invented app, bot, product, stack, real occupation, or ownership claim. Say the prompts "orbit", "mention", or "cluster around" those concepts.
 - Category ratios do not reveal execution order. Never say code shipped before verification, entered production, broke, contained bugs, or failed to run.
 - Do not turn implementation/testing/debugging prompt categories into completed implementation, shipping, testing, or debugging actions. Say "implementation-classified prompts", "testing signal", or "debugging mentions".
 - Do not quote or reconstruct raw prompts.
@@ -119,8 +127,9 @@ Before writing, silently select:
 2. the metaphor world;
 3. three evidence receipts;
 4. the closing callback.
+Then silently verify that every non-personality hashtag is specific, distinct, and entertaining.
 
-Return 4-5 hashtagPairs. Order them as: inferred domain/scene character, coding-behavior joke, personality character, then optional metaphor/callback tags.
+Return exactly 5 hashtagPairs. Do not force a rigid order. Lead with the most shareable tag. When recurring_domain_clusters is non-empty, at least one tag should transform its most distinctive semantically credible cluster into a recognizable scene character or clearly fictional role rather than repeat one of its terms. When only recurring_domain_concepts are available, a distinctive recurring concept may still inspire a playful alter ego.
 Each pair must express the same meaning in both languages. Tags must be compact semantic labels, not copied high-frequency words. English tags must be English except proper names/acronyms. Chinese tags must be a culturally natural localization of the meaning, not a dictionary translation of the English word shape.`;
 
 function endpoint(baseUrl) {
@@ -274,8 +283,8 @@ function cleanHashtagPairs(value) {
   const seenEn = new Set();
   const seenZh = new Set();
   for (const raw of value) {
-    const en = cleanTags([raw?.en], 24)[0];
-    const zh = cleanTags([raw?.zh], 12)[0];
+    const en = cleanTags([raw?.en], 32)[0];
+    const zh = cleanTags([raw?.zh], 16)[0];
     if (!en || !zh) continue;
     const enKey = en.toLowerCase();
     const zhKey = zh.toLowerCase();
@@ -291,7 +300,7 @@ function cleanHashtagPairs(value) {
       kind,
       meaning: cleanText(raw?.meaning, 80, { short: true }),
     });
-    if (pairs.length >= 5) break;
+    if (pairs.length >= 6) break;
   }
   return pairs;
 }
@@ -349,8 +358,8 @@ function validateRoastPayload(raw) {
   const paired = hashtagPairs.length >= 3;
   const result = {
     ...(paired ? { hashtagPairs } : {}),
-    hashtags: paired ? hashtagPairs.map((pair) => pair.en) : cleanTags(parsed?.hashtags, 24),
-    hashtagsZh: paired ? hashtagPairs.map((pair) => pair.zh) : cleanTags(parsed?.hashtagsZh, 12),
+    hashtags: paired ? hashtagPairs.map((pair) => pair.en) : cleanTags(parsed?.hashtags, 32),
+    hashtagsZh: paired ? hashtagPairs.map((pair) => pair.zh) : cleanTags(parsed?.hashtagsZh, 16),
     roast: paragraphize(cleanText(parsed?.roast, 1100)),
     roastZh: paragraphize(cleanText(parsed?.roastZh, 700)),
     tldr: cleanText(parsed?.tldr, 150, { short: true }),
@@ -392,7 +401,7 @@ async function generateAiRoast(evidence, {
     const request = requestForProvider(config, {
       apiKey,
       messages,
-      temperature: 0.9,
+      temperature: 1.05,
       maxTokens: 1800,
     });
     const response = await fetchImpl(request.url, {
