@@ -70,7 +70,7 @@ HASHTAG ENGINE
 - Read coherent concept clusters and infer the recognizable domain, community, scene, or playful fictional role behind them. For example, preflop + folds + raises + river can become "HoldemPlayer"; 前庭 + HIT + nystagmus can become "VestibularLab" or "前庭实验室"; Delta Force + bullet + price + market can become "AmmoBroker"/"弹药盘商" or the sharper "ArmsDealer"/"武器贩子". Examples demonstrate reasoning only; never copy an example unless the supplied evidence supports that exact scene.
 - Treat hashtags as stage names from a comedy writer's room, not cautious analytics labels. Bold exaggeration, slang, puns, subculture references, mock job titles, and slightly unhinged fictional roles are welcome.
 - A distinctive standalone recurring concept may inspire a fictional role even when it does not form a large cluster. Prefer a funny, recognizable interpretation over a technically exhaustive label.
-- Produce a varied set: usually include a domain/scene alter ego, a coding-behavior joke, the immutable personality title, and one or two wildcards tied to the roast metaphor or a memorable prop. Change the mix when the evidence offers a better joke.
+- Produce a varied set. Lead with the funniest or most screenshot-worthy tag. Include at least one domain/scene alter ego, one coding-behavior joke, and the personality title. The remaining tags are pure wildcards: metaphor callbacks, absurd fictional roles, or insider jokes rooted in the evidence. Do not pad with descriptive labels. Change the mix when the evidence offers a better joke.
 - Do not emit isolated raw keywords such as "preflop", "browser", "implementation", "debugging", or "UI" as tags. A proper name or acronym may remain literal only when it is already a meaningful identity label.
 - Generate every tag as one bilingual pair with a shared semantic gloss. The Chinese tag must localize the intended joke, not translate the English surface form word by word.
 - When kind is "personality_character", reuse immutable_profile.personality and immutable_profile.personality_zh instead of inventing a new translation.
@@ -83,6 +83,8 @@ HASHTAG ENGINE
 - Before returning, silently run a writer's-room test: if a tag could describe almost any developer, if two tags are synonyms, or if nobody would want to screenshot it, replace it with a stranger and more evidence-specific joke.
 
 ANTI-BLANDNESS
+- Prioritize specificity and comedy over politeness. A hashtag that makes the user laugh or screenshot wins over one that is merely accurate.
+- It is acceptable for tags to be slightly unhinged, exaggerated, or playfully mean-spirited. Err on the side of bold.
 - Avoid report voice and filler such as "You're a builder", "all about", "minor signal", "faint echo", "verification pending", "context is optional", "X master", or "the data suggests".
 - Do not mechanically restate dimension labels. Convert evidence into a scene, character, prop, or running gag.
 - Do not compliment for two sentences and add one mild jab. Every paragraph needs a comic turn.
@@ -284,7 +286,7 @@ function cleanHashtagPairs(value) {
   const seenZh = new Set();
   for (const raw of value) {
     const en = cleanTags([raw?.en], 32)[0];
-    const zh = cleanTags([raw?.zh], 16)[0];
+    const zh = cleanTags([raw?.zh], 24)[0];
     if (!en || !zh) continue;
     const enKey = en.toLowerCase();
     const zhKey = zh.toLowerCase();

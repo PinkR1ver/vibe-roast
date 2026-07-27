@@ -13,12 +13,19 @@ function AppBody() {
   const restoreAttempted = useRef(false);
   const range = buildTimeRange("total", { from: "", to: "" });
   const { data, loading, error } = useApi(range);
+  const [roasting, setRoasting] = useState(false);
+  const [roastVersion, setRoastVersion] = useState(0);
+  const [roastError, setRoastError] = useState("");
 
   useEffect(() => {
     if (data) setProfileData(data);
   }, [data]);
 
   async function generateRoast(config) {
+    setAccessOpen(false);
+    setRoasting(true);
+    setRoastVersion((v) => v + 1);
+    setRoastError("");
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 45_000);
     try {
@@ -45,8 +52,11 @@ function AppBody() {
           roast_source: "ai",
         },
       }));
-      setAccessOpen(false);
+      setRoasting(false);
+      setRoastVersion((v) => v + 1);
     } catch (error) {
+      setRoasting(false);
+      setRoastError(error.message);
       if (error?.name === "AbortError") {
         throw new Error("Roast generation timed out. Try again or use the local roast.");
       }
@@ -92,12 +102,12 @@ function AppBody() {
         ) : (
           <>
             <div className={accessOpen ? "pointer-events-none select-none blur-[3px]" : ""} aria-hidden={accessOpen}>
-              <ProfileResult data={profileData} />
+              <ProfileResult key={roastVersion} data={profileData} roasting={roasting} roastError={roastError} />
             </div>
             <RoastAccessModal
               open={accessOpen}
               onGenerate={generateRoast}
-              onLocal={() => setAccessOpen(false)}
+              onLocal={() => { setAccessOpen(false); setRoastVersion((v) => v + 1); }}
             />
           </>
         )}

@@ -113,7 +113,7 @@ function PageChrome({ accent, onShare, posterBusy, t }) {
   );
 }
 
-export default function ProfileResult({ data }) {
+export default function ProfileResult({ data, roasting, roastError }) {
   const { locale, t } = useLocale();
   const zh = locale === "zh";
   const vibe = data?.vibe_profile;
@@ -132,7 +132,7 @@ export default function ProfileResult({ data }) {
     () => {
       const generated = zh ? vibe?.hashtagsZh : vibe?.hashtags;
       if (Array.isArray(generated) && generated.length >= 3) {
-        return mergeHashtags(generated);
+        return mergeHashtags(generated, 10);
       }
       return buildHashtags(vibe, categories, { locale: zh ? "zh" : "en" });
     },
@@ -305,21 +305,37 @@ export default function ProfileResult({ data }) {
             <h1 className="mt-1 mb-1 text-[28px] font-extrabold tracking-tight" style={{ color: accent }}>
               {personalityTitle}
             </h1>
-            <p className="m-0 text-sm font-semibold text-[#6b6560]">{hook}</p>
+            {roasting ? (
+              <span className="mx-auto mt-1 block h-4 w-[60%] rounded-md roast-shimmer" />
+            ) : (
+              <p className="m-0 text-sm font-semibold text-[#6b6560]">{hook}</p>
+            )}
 
             <div className="mt-4 flex flex-wrap justify-center gap-1.5">
-              {hashtags.map((tag) => (
-                <span
-                  key={tag}
-                  className="motion-chip rounded-full px-2.5 py-1 text-[12px] font-bold"
-                  style={{
-                    background: `color-mix(in srgb, ${accent} 14%, var(--roast-card))`,
-                    color: `color-mix(in srgb, ${accent} 72%, var(--roast-text))`,
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+              {roasting ? (
+                <>
+                  {[90, 70, 105, 78, 62].map((w, i) => (
+                    <span
+                      key={i}
+                      className="inline-block h-7 rounded-full roast-shimmer"
+                      style={{ width: w, animationDelay: `${i * 0.1}s` }}
+                    />
+                  ))}
+                </>
+              ) : (
+                hashtags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="motion-chip rounded-full px-2.5 py-1 text-[12px] font-bold"
+                    style={{
+                      background: `color-mix(in srgb, ${accent} 14%, var(--roast-card))`,
+                      color: `color-mix(in srgb, ${accent} 72%, var(--roast-text))`,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))
+              )}
             </div>
           </aside>
 
@@ -410,9 +426,32 @@ export default function ProfileResult({ data }) {
 
             <div className="motion-reveal motion-surface rounded-[18px] border border-black/[0.04] bg-[#fffcf7] p-5 shadow-[0_10px_30px_rgba(40,28,12,0.06)]">
               <h2 className="m-0 mb-3 text-sm font-extrabold tracking-wide uppercase text-[#6b6560]">{t("profile.roast")}</h2>
-              <p className="m-0 text-[15px] leading-relaxed whitespace-pre-wrap">{roast}</p>
+              {roasting ? (
+                <div className="space-y-3 py-2">
+                  <div className="h-4 w-full rounded-md roast-shimmer" />
+                  <div className="h-4 w-[91%] rounded-md roast-shimmer" style={{ animationDelay: "0.12s" }} />
+                  <div className="h-4 w-[83%] rounded-md roast-shimmer" style={{ animationDelay: "0.24s" }} />
+                  <div className="h-4 w-[58%] rounded-md roast-shimmer" style={{ animationDelay: "0.36s" }} />
+                  <div className="flex items-center gap-2.5 pt-2">
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full"
+                      style={{ background: accent, boxShadow: `0 0 10px ${accent}55`, animation: "roastGlowPulse 1.8s ease-in-out infinite" }}
+                    />
+                    <span className="text-[13px] font-bold tracking-wide" style={{ color: accent }}>
+                      {t("profile.roasting")}
+                    </span>
+                  </div>
+                </div>
+              ) : roastError ? (
+                <div className="rounded-xl bg-red-500/[0.06] px-4 py-3">
+                  <p className="m-0 text-[13px] font-semibold text-red-600 dark:text-red-400">{t("profile.roastError")}</p>
+                  <p className="mt-1 mb-0 text-[12px] text-red-500/70">{roastError}</p>
+                </div>
+              ) : (
+                <p className="m-0 text-[15px] leading-relaxed whitespace-pre-wrap">{roast}</p>
+              )}
               <p className="mt-4 mb-0 rounded-xl bg-[#fff0e8] px-3 py-2 text-sm">
-                <b>{t("profile.tldr")}</b> · {tldr}
+                <b>{t("profile.tldr")}</b> · {roasting ? <span className="inline-block h-3.5 w-28 align-middle rounded roast-shimmer" /> : tldr}
               </p>
             </div>
 

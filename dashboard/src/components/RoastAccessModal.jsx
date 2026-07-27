@@ -129,7 +129,7 @@ export default function RoastAccessModal({ open, onGenerate, onLocal }) {
     setError("");
   }
 
-  async function submitApi(event) {
+  function submitApi(event) {
     event.preventDefault();
     if (!apiKey.trim()) {
       setError(t("roastAccess.keyRequired"));
@@ -137,18 +137,12 @@ export default function RoastAccessModal({ open, onGenerate, onLocal }) {
     }
     setBusy(true);
     setError("");
-    try {
-      await onGenerate({
-        provider: provider.id,
-        apiKey: apiKey.trim(),
-        model: model.trim(),
-        baseUrl: baseUrl.trim(),
-      });
-    } catch (submitError) {
-      setError(submitError.message);
-    } finally {
-      setBusy(false);
-    }
+    onGenerate({
+      provider: provider.id,
+      apiKey: apiKey.trim(),
+      model: model.trim(),
+      baseUrl: baseUrl.trim(),
+    });
   }
 
   function startGithub() {
@@ -173,19 +167,11 @@ export default function RoastAccessModal({ open, onGenerate, onLocal }) {
     setError("");
   }
 
-  async function generateHostedRoast() {
-    setBusy(true);
-    setError("");
-    try {
-      await onGenerate({
-        mode: "hosted",
-        provider: "cloudflare",
-      });
-    } catch (hostedError) {
-      setError(hostedError.message);
-    } finally {
-      setBusy(false);
-    }
+  function generateHostedRoast() {
+    onGenerate({
+      mode: "hosted",
+      provider: "cloudflare",
+    });
   }
 
   return (
