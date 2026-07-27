@@ -59,5 +59,6 @@
   },
   "dependencies": {
     "tokentracker-cli": "^0.84.9"
-  }
+  },
+  "license": "MIT"
 }
