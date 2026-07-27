@@ -3,7 +3,7 @@
 <div align="center">
   <img
     src="./assests/readme/vibe-roast-16-types-banner.webp"
-    width="1100"
+    width="800"
     alt="Vibe Roaster 全部十六种编程人格齐聚在标题周围"
   />
 
@@ -54,23 +54,23 @@ Vibe Roaster 读取本地的 AI 编程对话记录，生成：
 人格计算是确定性的且在本地完成。AI 写作是可选功能。
 
 <p align="center">
-  <a href="./media/promo/masters/landscape.mp4">
+  <a href="./media/promo/masters/screencast.mp4">
     <img
-      src="./assests/readme/vibe-roast-promo-landscape.gif"
-      width="1100"
+      src="./assests/readme/vibe-roast-screencast.gif"
+      width="800"
       alt="Vibe Roaster 将提示词片段转化为四轴人格判词、十六种角色之一，以及一份可分享的吐槽"
     />
   </a>
 </p>
 
 <p align="center">
-  <sub>观看 15 秒启动影片 · 点击查看 1080p 版本</sub>
+  <sub>观看 30 秒演示 · 点击查看 1080p 版本</sub>
 </p>
 
 <p align="center">
   <img
     src="./assests/screenshots/roast-result-hero.jpg"
-    width="1100"
+    width="800"
     alt="Vibe Roaster 结果页面展示 Builder 人格、主题感知的 Hashtag、Token 统计、行为雷达图和类型轴"
   />
 </p>
