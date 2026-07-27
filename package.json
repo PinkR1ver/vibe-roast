@@ -1,6 +1,6 @@
 {
   "name": "vibe-roast",
-  "version": "0.98.4",
+  "version": "0.98.5",
   "description": "Local-first AI coding personality profiler, usage dashboard, and evidence-grounded roast.",
   "type": "commonjs",
   "bin": {
