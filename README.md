@@ -18,7 +18,7 @@
       <img src="https://img.shields.io/npm/v/vibe-roast?color=25b985&label=npm" alt="npm version" />
     </a>
     <a href="https://www.npmjs.com/package/vibe-roast">
-      <img src="https://img.shields.io/npm/dm/vibe-roast?color=557fd8&label=npm%20downloads%2Fmonth" alt="npm Registry downloads in the last month" />
+      <img src="https://img.shields.io/npm/dw/vibe-roast?color=557fd8&label=npm%20downloads%2Fweek&cacheSeconds=3600" alt="npm Registry downloads in the last month" />
     </a>
     <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-171717" alt="Node.js 20 or newer" />
     <img src="https://img.shields.io/badge/types-16-9a70cf" alt="16 coding personality types" />

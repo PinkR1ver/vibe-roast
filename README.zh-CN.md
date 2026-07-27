@@ -18,7 +18,7 @@
       <img src="https://img.shields.io/npm/v/vibe-roast?color=25b985&label=npm" alt="npm 版本" />
     </a>
     <a href="https://www.npmjs.com/package/vibe-roast">
-      <img src="https://img.shields.io/npm/dm/vibe-roast?color=557fd8&label=npm%20月下载量" alt="npm Registry 最近一月下载量" />
+      <img src="https://img.shields.io/npm/dw/vibe-roast?color=557fd8&label=npm%20周下载量&cacheSeconds=3600" alt="npm Registry 最近一月下载量" />
     </a>
     <img src="https://img.shields.io/badge/Node.js-%E2%89%A520-171717" alt="需要 Node.js 20 或更高版本" />
     <img src="https://img.shields.io/badge/类型-16-9a70cf" alt="16 种编程人格类型" />
