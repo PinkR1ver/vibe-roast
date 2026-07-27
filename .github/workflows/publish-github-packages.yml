@@ -28,6 +28,6 @@ jobs:
       - name: Publish to GitHub Packages
         run: |
           npm pkg set name="@PinkR1ver/vibe-roast"
-          npm publish
+          npm publish --registry https://npm.pkg.github.com
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
