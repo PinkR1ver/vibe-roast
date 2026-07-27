@@ -56,17 +56,17 @@ Vibe Roaster reads local coding-agent histories and builds:
 The personality calculation is deterministic and local. AI writing is optional.
 
 <p align="center">
-  <a href="./media/promo/masters/landscape.mp4">
+  <a href="./media/promo/masters/screencast.mp4">
     <img
-      src="./assests/readme/vibe-roast-promo-landscape.gif"
-      width="1100"
-      alt="Vibe Roaster turns prompt fragments into a four-axis personality verdict, one of sixteen characters, and a shareable roast"
+      src="./assests/readme/vibe-roast-screencast.gif"
+      width="800"
+      alt="Vibe Roast screencast — terminal to web demo, personality reveal, 16-type cast, and CTA"
     />
   </a>
 </p>
 
 <p align="center">
-  <sub>Watch the 15-second launch film · click for the 1080p version</sub>
+  <sub>Watch the 30-second demo · click for the 1080p version</sub>
 </p>
 
 <p align="center">
