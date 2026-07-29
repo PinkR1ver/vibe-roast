@@ -455,15 +455,11 @@ Deployment and secret configuration live in [`worker/README.md`](worker/README.m
 
 ## Contributing
 
-Issues and pull requests are welcome:
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md)
+for development setup, test requirements, privacy rules, AI-assisted
+contribution disclosure, and the review process.
 
-1. Fork the repository.
-2. Create a focused branch.
-3. Add or update fixture-backed tests.
-4. Run `npm test` and `npm run build`.
-5. Open a pull request describing the user-visible change.
-
-Keep adapters best-effort (missing sources must not crash inspection). Never commit
-private session dumps, user histories, tokens, or credentials.
+Report vulnerabilities privately according to [SECURITY.md](SECURITY.md).
+Never commit private session dumps, user histories, tokens, or credentials.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

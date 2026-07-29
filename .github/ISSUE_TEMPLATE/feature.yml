@@ -1,0 +1,56 @@
+name: Feature request
+description: Propose a focused product or developer-experience improvement
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and pull requests
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the user problem rather than only the desired implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include scope, user flow, and compatibility expectations.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Primary area
+      options:
+        - Source adapter
+        - Prompt/profile analysis
+        - Activity and TokenTracker
+        - Dashboard and share poster
+        - Server, OAuth, or hosted AI
+        - Packaging and release
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: privacy
+    attributes:
+      label: Privacy and security impact
+      description: Explain new data access, network exposure, credentials, or trust boundaries. Write "None" when applicable.
+    validations:
+      required: true

@@ -437,15 +437,11 @@ test/                    Node fixture 和测试
 
 ## 贡献
 
-欢迎提交 Issue 和 Pull Request：
+欢迎提交 Issue 和 Pull Request。开发环境、测试要求、隐私规则、AI 辅助贡献
+披露和审查流程见 [中文贡献规范](CONTRIBUTING.zh-CN.md)。
 
-1. Fork 本仓库。
-2. 创建一个有明确目标的开发分支。
-3. 添加或更新有 fixture 支撑的测试。
-4. 运行 `npm test` 和 `npm run build`。
-5. 发起 Pull Request，描述用户可见的变化。
-
-适配器需保持容错性（缺失的数据源不能导致检测崩溃）。绝不提交私有会话转储、用户原始历史、Token 或凭证。
+安全漏洞请按 [安全策略](SECURITY.md) 私下报告。绝不提交私有会话转储、
+用户原始历史、Token 或凭证。
 
 ## 相关链接
 

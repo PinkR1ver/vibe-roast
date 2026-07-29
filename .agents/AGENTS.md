@@ -53,3 +53,11 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 - Scoring changes need bounds, zero-input, archetype, and asset-path coverage.
 - UI changes need `npm run build`; visually verify desktop/mobile composition and the 3:4 share-poster flow when layout or canvas code changes.
 - When feature status or architecture changes, update the relevant spec and `.agents/spec/README.md` in the same task.
+
+## Contribution and automation
+
+- `CONTRIBUTING.md` and `CONTRIBUTING.zh-CN.md` are the source of truth for contributor requirements; keep the pull request template and CI title policy aligned with them.
+- Pull requests run root tests on Node.js 20, 22, and 24, build the dashboard, validate the Worker bundle and npm package, run dependency review, and receive CodeQL analysis.
+- GitHub Actions must use least-privilege permissions and pin third-party actions to full commit SHAs. Dependabot keeps npm and action pins current.
+- `.github/copilot-instructions.md` and path-specific files under `.github/instructions/` guide AI review. AI feedback is advisory and does not replace maintainer approval.
+- Do not configure a required status check until that check has run successfully on the default branch. Keep required check names stable once branch rules depend on them.
