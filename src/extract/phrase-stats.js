@@ -128,7 +128,6 @@ const STOP_WORDS = new Set([
   "range",
   "gemini",
   "json",
-  "judew",
   "mentioned",
   "opencode",
   "png",
@@ -576,7 +575,8 @@ function promptTextForCloud(text) {
     .replace(/[A-Za-z]:\\[^\s"'`]+/g, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/--[A-Za-z0-9_-]+\s*:[^;]+;?/g, " ")
-    .replace(/\b(?:import|from\s+\S+\s+import|class\s+\w+|def\s+\w+|const\s+\w+|let\s+\w+|var\s+\w+|function\s+\w+)\b[\s\S]*$/gim, " ")
+    .replace(/\b(?:import\s+\S+\s+from\s+\S+|from\s+\S+\s+import\s+\S+|(?:const|let|var)\s+\w+\s*=|(?:class|def|function)\s+\w+)[^\n]*$/gim, " ")
+    .replace(/^\s*(?:import\b|from\s+\S+\s+import\b|class\s+\w+|def\s+\w+|const\s+\w+|let\s+\w+|var\s+\w+|function\s+\w+)\b.*$/gim, " ")
     .replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/gi, " ")
     .replace(/\b(?:torch|numpy|nn|plt|pd|np)\.[A-Za-z_][\w.]*\b/g, " ")
     .split(/\r?\n/)

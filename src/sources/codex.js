@@ -9,7 +9,7 @@ async function inspectCodex({ root, range } = {}) {
   const sessionsRoot = root || path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "sessions");
   const files = await walkFiles(
     sessionsRoot,
-    (_filePath, name) => name.endsWith(".jsonl") && (name.startsWith("rollout-") || true),
+    (_filePath, name) => name.startsWith("rollout-") && name.endsWith(".jsonl"),
   );
   const prompts = [];
   const tokenTotals = emptyTotals();
@@ -105,11 +105,21 @@ function stripCodexInjectedContext(value) {
     "in-app-browser-context",
     "recommended_plugins",
     "environment_context",
+    "app-context",
+    "permissions",
+    "collaboration_mode",
+    "apps_instructions",
+    "plugins_instructions",
+    "skills_instructions",
   ];
   for (const tag of injectedTags) {
     const block = new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, "gi");
     text = text.replace(block, " ");
   }
+  text = text.replace(
+    /^\s*#\s*AGENTS\.md instructions\s*<INSTRUCTIONS>[\s\S]*?<\/INSTRUCTIONS>\s*/gim,
+    " ",
+  );
   return text.trim();
 }
 
