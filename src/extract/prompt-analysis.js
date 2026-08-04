@@ -60,7 +60,8 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
       if (usefulPrompts.length < usefulLimit) usefulPrompts.push(entry);
     } else {
       categories.reference.count += 1;
-      if (categories.reference.examples.length < 3) categories.reference.examples.push(preview(entry));
+      if (categories.reference.examples.length < 3)
+        categories.reference.examples.push(preview(entry));
       referencePrompts.push(entry);
     }
   }
@@ -70,7 +71,9 @@ function analyzePrompts(prompts, { usefulLimit = 60 } = {}) {
     useful_prompt_count: usefulCount,
     reference_prompt_count: referencePrompts.length,
     useful_ratio:
-      prompts && prompts.length > 0 ? Number((usefulCount / prompts.length).toFixed(4)) : 0,
+      prompts && prompts.length > 0
+        ? Number((usefulCount / prompts.length).toFixed(4))
+        : 0,
     average_useful_prompt_chars:
       usefulCount > 0 ? Math.round(usefulCharacterCount / usefulCount) : 0,
     long_prompt_ratio:
@@ -98,12 +101,16 @@ function classifyPrompt(text) {
 
   const artifacts = artifactEvidence(text);
   const intentText = textOutsideArtifacts(text, artifacts);
-  const origin = artifacts.kinds.length > 0 ? inferArtifactOrigin(intentText) : null;
+  const origin =
+    artifacts.kinds.length > 0 ? inferArtifactOrigin(intentText) : null;
 
   // Large structured material has ambiguous provenance. Keep only request prose
   // with explicit provenance or an inherently reference-shaped attachment.
   if (artifacts.strong) {
-    if (hasSubstantialUserIntent(intentText) && canRetainArtifactIntent(artifacts, origin)) {
+    if (
+      hasSubstantialUserIntent(intentText) &&
+      canRetainArtifactIntent(artifacts, origin)
+    ) {
       const categories = inferCategories(intentText.toLowerCase());
       return {
         useful: true,
@@ -136,7 +143,8 @@ function classifyPrompt(text) {
 
   if (
     artifacts.moderate &&
-    (!hasSubstantialUserIntent(intentText) || !canRetainArtifactIntent(artifacts, origin))
+    (!hasSubstantialUserIntent(intentText) ||
+      !canRetainArtifactIntent(artifacts, origin))
   ) {
     return {
       useful: false,
@@ -150,7 +158,7 @@ function classifyPrompt(text) {
     };
   }
 
-  const categoryText = artifacts.kinds.length > 0 ? (intentText || text) : text;
+  const categoryText = artifacts.kinds.length > 0 ? intentText || text : text;
   const categories = inferCategories(categoryText.toLowerCase());
   return {
     useful: true,
@@ -181,7 +189,10 @@ function isSystemOrToolNoise(text) {
   if (/^\s*#\s*AGENTS\.md instructions\b/i.test(raw)) return true;
   if (/^\s*<INSTRUCTIONS>[\s\S]*<\/INSTRUCTIONS>\s*$/i.test(raw)) return true;
   if (/^\s*You are (?:ChatGPT|Codex),?\b/i.test(raw)) return true;
-  if (/Here is a list of plugins that are available but not installed/i.test(raw)) return true;
+  if (
+    /Here is a list of plugins that are available but not installed/i.test(raw)
+  )
+    return true;
   if (/\bThe following task has finished\b/i.test(raw)) return true;
   if (/^\s*\[?(system|tool)\]?\s*:/i.test(raw)) return true;
   return false;
@@ -192,7 +203,10 @@ function textOutsideArtifacts(text, artifacts = artifactEvidence(text)) {
   let stripped = String(text || "").replace(/```[\s\S]*?```/g, " ");
   if (artifacts.kinds.includes("diff")) {
     stripped = stripped
-      .replace(/^\s*(?:diff --git|index [a-f0-9.]+|@@ .* @@|[+-]{3} [ab]\/).*$\n?/gim, " ")
+      .replace(
+        /^\s*(?:diff --git|index [a-f0-9.]+|@@ .* @@|[+-]{3} [ab]\/).*$\n?/gim,
+        " ",
+      )
       .replace(/^\s*[+-](?![+-]).*$\n?/gm, " ");
   }
   if (artifacts.kinds.includes("terminal_output")) {
@@ -207,13 +221,22 @@ function textOutsideArtifacts(text, artifacts = artifactEvidence(text)) {
       /^\s*(?:at .+:\d+:\d+|Traceback \(most recent call last\):|File ["'].+["'], line \d+.*|[A-Za-z]+Error:).*$\n?/gim,
       " ",
     )
-    .replace(/^\s*(?:[$%]\s+\S+|npm (?:ERR!|WARN)|ELIFECYCLE|Process exited with code).*$\n?/gim, " ")
+    .replace(
+      /^\s*(?:[$%]\s+\S+|npm (?:ERR!|WARN)|ELIFECYCLE|Process exited with code).*$\n?/gim,
+      " ",
+    )
     .replace(
       /^\s*(?:import\s+(?:["'{*]|[\w$]+\s+from\b).*|from\s+\S+\s+import\b.*|(?:const|let|var)\s+\w+\s*=.*|(?:def|class|(?:async\s+)?function)\s+\w+\s*[:({].*|export\s+(?:default\b|(?:const|let|var|class|function)\b).*|package\s+[\w.]+\s*;|#include\s*[<"].*|(?:if|for|while|catch)\s*\(.*|(?:try|else)\s*\{.*|return\s+(?:(?:await|new)\s+)?(?:[A-Za-z_$][\w$]*(?:[.(]|\s*=>)|["'[{\d]|true\b|false\b|null\b).*|throw\s+new\s+\w+\s*\(.*|[}\])]+\s*;?)$/gim,
       " ",
     )
-    .replace(/^\s*(?:[A-Za-z_$][\w$]*\.)?[A-Za-z_$][\w$]*\([^)]*\)\s*;?\s*$/gm, " ")
-    .replace(/^\s*["']?[\w.-]+["']?\s*[:=]\s*(?:["'[{\d]|true\b|false\b|null\b).*$\n?/gim, " ")
+    .replace(
+      /^\s*(?:[A-Za-z_$][\w$]*\.)?[A-Za-z_$][\w$]*\([^)]*\)\s*;?\s*$/gm,
+      " ",
+    )
+    .replace(
+      /^\s*["']?[\w.-]+["']?\s*[:=]\s*(?:["'[{\d]|true\b|false\b|null\b).*$\n?/gim,
+      " ",
+    )
     .replace(/[{};=<>]{2,}/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -246,7 +269,10 @@ function stripTerminalBlocks(text) {
       sawBlank = true;
       continue;
     }
-    if (sawBlank && (hasIntentVerb(line.toLowerCase()) || hasQuestionIntent(line))) {
+    if (
+      sawBlank &&
+      (hasIntentVerb(line.toLowerCase()) || hasQuestionIntent(line))
+    ) {
       inTerminal = false;
       sawBlank = false;
       kept.push(line);
@@ -265,8 +291,12 @@ function hasQuestionIntent(text) {
   const raw = String(text || "").trim();
   return (
     /[?？]/u.test(raw) ||
-    /^\s*(?:why|how|what|where|when|which|who|can|could|would|should|does|do|did|is|are)\b/i.test(raw) ||
-    /(?:为什么|为何|怎么回事|怎么|怎样|如何|哪里|哪儿|什么问题|是否|能否|可不可以|有没有)/u.test(raw)
+    /^\s*(?:why|how|what|where|when|which|who|can|could|would|should|does|do|did|is|are)\b/i.test(
+      raw,
+    ) ||
+    /(?:为什么|为何|怎么回事|怎么|怎样|如何|哪里|哪儿|什么问题|是否|能否|可不可以|有没有)/u.test(
+      raw,
+    )
   );
 }
 
@@ -291,7 +321,11 @@ function inferArtifactOrigin(text) {
 
 function canRetainArtifactIntent(artifacts, origin) {
   if (origin !== "unverified") return true;
-  if (artifacts.kinds.some((kind) => ["prompt_template", "opaque_text"].includes(kind))) {
+  if (
+    artifacts.kinds.some((kind) =>
+      ["prompt_template", "opaque_text"].includes(kind),
+    )
+  ) {
     return false;
   }
   return artifacts.kinds.length > 0;
@@ -299,24 +333,46 @@ function canRetainArtifactIntent(artifacts, origin) {
 
 function artifactIntentReason(origin) {
   if (origin === "user_authored") return "user_authored_artifact_with_intent";
-  if (origin === "external_or_generated") return "user_intent_with_external_reference";
+  if (origin === "external_or_generated")
+    return "user_intent_with_external_reference";
   return "user_intent_with_attached_reference";
 }
 
 function inferCategories(text) {
   const rules = [
-    ["planning", /(?:方案|计划|架构|先不要写代码|\b(?:brainstorm|plan|architecture)\b)/i],
-    ["debugging", /(?:bug|报错|错误|失败|修复|\b(?:debug|error|exception|traceback|syntaxerror)\b)/i],
+    [
+      "planning",
+      /(?:方案|计划|架构|先不要写代码|\b(?:brainstorm|plan|architecture)\b)/i,
+    ],
+    [
+      "debugging",
+      /(?:bug|报错|错误|失败|修复|\b(?:debug|error|exception|traceback|syntaxerror)\b)/i,
+    ],
     ["testing", /(?:测试|回归|覆盖率|断言|\b(?:test|spec)\b)/i],
     ["refactor", /(?:重构|抽象|拆分|整理|\brefactor\b)/i],
     ["packaging", /(?:打包|发布|\b(?:npm|xpi|release|publish|build)\b)/i],
     ["explanation", /(?:解释|为什么|讲一下|说明|\b(?:explain|why)\b)/i],
-    ["research", /(?:查找|调研|搜索|资料|文档|\b(?:research|search|look up)\b)/i],
-    ["ui_design", /(?:页面|布局|组件|交互|视觉|按钮|\b(?:ui|ux|style|css|design)\b)/i],
-    ["workflow", /(?:流程|自动化|\b(?:workflow|hook|mcp|skill|agent|instructions|system prompt)\b)/i],
+    [
+      "research",
+      /(?:查找|调研|搜索|资料|文档|\b(?:research|search|look up)\b)/i,
+    ],
+    [
+      "ui_design",
+      /(?:页面|布局|组件|交互|视觉|按钮|\b(?:ui|ux|style|css|design)\b)/i,
+    ],
+    [
+      "workflow",
+      /(?:流程|自动化|\b(?:workflow|hook|mcp|skill|agent|instructions|system prompt)\b)/i,
+    ],
   ];
-  const matched = rules.filter(([, pattern]) => pattern.test(text)).map(([name]) => name);
-  if (/(?:实现|编写|创建|新增|修改|开发|\b(?:implement|create|add|write|code|update|build)\b)/i.test(text)) {
+  const matched = rules
+    .filter(([, pattern]) => pattern.test(text))
+    .map(([name]) => name);
+  if (
+    /(?:实现|编写|创建|新增|修改|开发|\b(?:implement|create|add|write|code|update|build)\b)/i.test(
+      text,
+    )
+  ) {
     matched.push("implementation");
   }
   return [...new Set(matched.length > 0 ? matched : ["implementation"])];
@@ -332,7 +388,11 @@ function codeLikeScore(text) {
   let score = 0;
   const raw = String(text || "");
   if (/```/.test(raw)) score += 2;
-  if (/\b(const|let|var|function|class|return|import|export|async|await|def|self\.|torch\.|nn\.)\b/.test(raw)) {
+  if (
+    /\b(const|let|var|function|class|return|import|export|async|await|def|self\.|torch\.|nn\.)\b/.test(
+      raw,
+    )
+  ) {
     score += 1;
   }
   if (/[{};]{2,}/.test(raw)) score += 1;
@@ -341,7 +401,9 @@ function codeLikeScore(text) {
   if (lines.length >= 8) score += 1;
   // Collapsed single-line dumps still look like code by density.
   if (lines.length < 8 && raw.length > 400) {
-    const codeTokens = (raw.match(/\b(def|class|import|return|const|self|torch|nn|plt)\b/gi) || []).length;
+    const codeTokens = (
+      raw.match(/\b(def|class|import|return|const|self|torch|nn|plt)\b/gi) || []
+    ).length;
     if (codeTokens >= 6) score += 2;
   }
   const codeLines = (
@@ -356,9 +418,15 @@ function codeLikeScore(text) {
 
 function logLikeScore(text) {
   let score = 0;
-  if (/(syntaxerror|typeerror|referenceerror|traceback|exception|stack trace)/i.test(text)) score += 2;
+  if (
+    /(syntaxerror|typeerror|referenceerror|traceback|exception|stack trace)/i.test(
+      text,
+    )
+  )
+    score += 2;
   if (/\bat .+:\d+:\d+/.test(text)) score += 1;
-  if (/(warning|error|failed|missing resource|deprecated)/i.test(text)) score += 1;
+  if (/(warning|error|failed|missing resource|deprecated)/i.test(text))
+    score += 1;
   if (text.split(/\r?\n/).length >= 6 && /:\d+:\d+/.test(text)) score += 1;
   return score;
 }
@@ -418,7 +486,9 @@ function configLikeScore(text) {
     }
   }
   const keyValueLines = (
-    text.match(/^\s*["']?[\w.-]+["']?\s*[:=]\s*(?:["'[{\d]|true\b|false\b|null\b).+$/gim) || []
+    text.match(
+      /^\s*["']?[\w.-]+["']?\s*[:=]\s*(?:["'[{\d]|true\b|false\b|null\b).+$/gim,
+    ) || []
   ).length;
   if (keyValueLines >= 4) score += 3;
   if (keyValueLines >= 10) score += 1;
@@ -430,8 +500,14 @@ function terminalLikeScore(text) {
   const promptLines = (text.match(/^\s*[$%]\s+\S.+$/gm) || []).length;
   if (promptLines >= 1) score += 2;
   if (promptLines >= 3) score += 1;
-  if (/(?:npm ERR!|ELIFECYCLE|Process exited with code|command not found|Tests:\s+\d+)/i.test(text)) score += 2;
-  if ((text.match(/^\s*(?:PASS|FAIL|WARN|ERROR|INFO)\b/gm) || []).length >= 3) score += 2;
+  if (
+    /(?:npm ERR!|ELIFECYCLE|Process exited with code|command not found|Tests:\s+\d+)/i.test(
+      text,
+    )
+  )
+    score += 2;
+  if ((text.match(/^\s*(?:PASS|FAIL|WARN|ERROR|INFO)\b/gm) || []).length >= 3)
+    score += 2;
   return score;
 }
 
@@ -440,29 +516,42 @@ function promptTemplateLikeScore(text) {
   if (/^\s*(?:system|developer) prompt\s*:/im.test(text)) score += 2;
   if (/^\s*You are (?:an?|the)\b/im.test(text)) score += 2;
   const sections = (
-    text.match(/^\s*#{1,3}\s*(?:context|instructions?|constraints?|rules?|output format|examples?|任务|指令|约束|输出格式)\s*$/gim) ||
-    []
+    text.match(
+      /^\s*#{1,3}\s*(?:context|instructions?|constraints?|rules?|output format|examples?|任务|指令|约束|输出格式)\s*$/gim,
+    ) || []
   ).length;
   if (sections >= 2) score += 2;
   if (sections >= 4) score += 2;
-  if (/\{\{[\w.-]+\}\}|<PLACEHOLDER>|\[(?:INSERT|PLACEHOLDER)[^\]]*\]/i.test(text)) score += 1;
+  if (
+    /\{\{[\w.-]+\}\}|<PLACEHOLDER>|\[(?:INSERT|PLACEHOLDER)[^\]]*\]/i.test(text)
+  )
+    score += 1;
   return score;
 }
 
 function opaqueTextLikeScore(text) {
   const raw = String(text || "");
   if (/[A-Za-z0-9+/]{500,}={0,2}/.test(raw)) return 4;
-  const longestLine = raw.split(/\r?\n/).reduce((max, line) => Math.max(max, line.length), 0);
-  return longestLine >= 1500 && (raw.match(/\s/g) || []).length / Math.max(1, raw.length) < 0.08
+  const longestLine = raw
+    .split(/\r?\n/)
+    .reduce((max, line) => Math.max(max, line.length), 0);
+  return longestLine >= 1500 &&
+    (raw.match(/\s/g) || []).length / Math.max(1, raw.length) < 0.08
     ? 4
     : 0;
 }
 
 function referenceReason(artifacts, origin) {
-  if (origin === "user_authored") return "user_authored_artifact_without_intent";
-  if (origin === "external_or_generated") return "external_reference_without_intent";
-  if (artifacts.kinds.includes("prompt_template")) return "looks_like_prompt_template";
-  if (artifacts.kinds.includes("log") || artifacts.kinds.includes("terminal_output")) {
+  if (origin === "user_authored")
+    return "user_authored_artifact_without_intent";
+  if (origin === "external_or_generated")
+    return "external_reference_without_intent";
+  if (artifacts.kinds.includes("prompt_template"))
+    return "looks_like_prompt_template";
+  if (
+    artifacts.kinds.includes("log") ||
+    artifacts.kinds.includes("terminal_output")
+  ) {
     return "looks_like_error_or_log";
   }
   if (artifacts.kinds.length === 1 && artifacts.kinds[0] === "code") {
@@ -483,14 +572,19 @@ function summarizeReferences(referencePrompts) {
   const signals = emptyReferenceSignals();
   for (const prompt of referencePrompts) {
     addReferenceSignals(signals, prompt.text);
-    for (const kind of prompt.artifact_kinds || []) inc(signals.artifact_kinds, kind);
+    for (const kind of prompt.artifact_kinds || [])
+      inc(signals.artifact_kinds, kind);
   }
 
   return {
     count: referencePrompts.length,
-    artifact_count: referencePrompts.filter((prompt) => prompt.artifact_kinds?.length > 0).length,
+    artifact_count: referencePrompts.filter(
+      (prompt) => prompt.artifact_kinds?.length > 0,
+    ).length,
     code_or_log_count: referencePrompts.filter((prompt) =>
-      prompt.artifact_kinds?.some((kind) => ["code", "log", "terminal_output"].includes(kind)),
+      prompt.artifact_kinds?.some((kind) =>
+        ["code", "log", "terminal_output"].includes(kind),
+      ),
     ).length,
     signals: finalizeReferenceSignals(signals),
     examples: referencePrompts.slice(0, 5).map(preview),
@@ -628,7 +722,9 @@ function finalizeReferenceSignals(signals) {
 
 function mapToObject(map) {
   return Object.fromEntries(
-    Array.from(map.entries()).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+    Array.from(map.entries()).sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    ),
   );
 }
 

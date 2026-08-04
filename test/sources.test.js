@@ -10,7 +10,11 @@ const {
   extractCodexTokens,
   stripCodexInjectedContext,
 } = require("../src/sources/codex");
-const { inspectClaude, extractClaudePrompt, extractClaudeTokens } = require("../src/sources/claude");
+const {
+  inspectClaude,
+  extractClaudePrompt,
+  extractClaudeTokens,
+} = require("../src/sources/claude");
 const { inspectCursor, resolveCursorDbPath } = require("../src/sources/cursor");
 const { dayBounds } = require("../src/lib/dates");
 

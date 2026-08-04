@@ -392,7 +392,9 @@ const CONCEPT_GROUPS = [
 ];
 
 const CONCEPT_BY_TERM = new Map(
-  CONCEPT_GROUPS.flatMap(([concept, terms]) => terms.map((term) => [term, `concept:${concept}`])),
+  CONCEPT_GROUPS.flatMap(([concept, terms]) =>
+    terms.map((term) => [term, `concept:${concept}`]),
+  ),
 );
 const CATEGORY_BY_CONCEPT = new Map([
   ["concept:testing", "category:testing"],
@@ -463,7 +465,8 @@ function wordCloudRecords(prompts = []) {
       };
       existing.vibe = existing.vibe || isVibeCodingTerm(term);
       existing.acronym = existing.acronym || acronym;
-      existing.variants[displayTerm] = (existing.variants[displayTerm] || 0) + 1;
+      existing.variants[displayTerm] =
+        (existing.variants[displayTerm] || 0) + 1;
       byConcept.set(key, existing);
     }
     for (const category of prompt.categories || []) {
@@ -485,7 +488,10 @@ function wordCloudRecords(prompts = []) {
   });
 }
 
-function wordFrequenciesFromRecords(records = [], { limit = 30, vibeOnly = false } = {}) {
+function wordFrequenciesFromRecords(
+  records = [],
+  { limit = 30, vibeOnly = false } = {},
+) {
   const concepts = new Map();
   for (const record of records) {
     for (const item of record.concepts || []) {
@@ -503,7 +509,10 @@ function wordFrequenciesFromRecords(records = [], { limit = 30, vibeOnly = false
       for (const [term, rawCount] of Object.entries(item.variants || {})) {
         const count = Math.max(0, Number(rawCount) || 0);
         if (count === 0) continue;
-        const variant = concept.variants.get(term) || { count: 0, prompt_count: 0 };
+        const variant = concept.variants.get(term) || {
+          count: 0,
+          prompt_count: 0,
+        };
         conceptCount += count;
         variant.count += count;
         variant.prompt_count += 1;
@@ -528,8 +537,10 @@ function wordFrequenciesFromRecords(records = [], { limit = 30, vibeOnly = false
       // only a small logarithmic boost, so pasted/verbose prompts cannot dominate.
       const repetition = Math.max(0, concept.count - concept.prompt_count);
       const weight = Number(
-        ((concept.prompt_count + Math.log2(1 + repetition) * 0.35)
-          * (concept.kind === "category" ? 1.12 : 1)).toFixed(3),
+        (
+          (concept.prompt_count + Math.log2(1 + repetition) * 0.35) *
+          (concept.kind === "category" ? 1.12 : 1)
+        ).toFixed(3),
       );
       return {
         key: concept.key,
@@ -540,14 +551,22 @@ function wordFrequenciesFromRecords(records = [], { limit = 30, vibeOnly = false
         weight,
       };
     })
-    .sort((a, b) => b.weight - a.weight || b.prompt_count - a.prompt_count || b.count - a.count || a.term.localeCompare(b.term))
+    .sort(
+      (a, b) =>
+        b.weight - a.weight ||
+        b.prompt_count - a.prompt_count ||
+        b.count - a.count ||
+        a.term.localeCompare(b.term),
+    )
     .slice(0, limit);
 }
 
 function isAcronymUse(term, text) {
   if (!/^[a-z][a-z0-9]{1,5}$/.test(term)) return false;
   const upper = term.toUpperCase();
-  return new RegExp(`(^|[^A-Za-z0-9])${upper}(?=$|[^A-Za-z0-9])`).test(String(text || ""));
+  return new RegExp(`(^|[^A-Za-z0-9])${upper}(?=$|[^A-Za-z0-9])`).test(
+    String(text || ""),
+  );
 }
 
 function isVibeCodingTerm(term) {
@@ -557,13 +576,15 @@ function isVibeCodingTerm(term) {
 }
 
 function preferredVariant(variants) {
-  return [...variants.entries()]
-    .sort((a, b) => (
-      b[1].prompt_count - a[1].prompt_count
-      || b[1].count - a[1].count
-      || a[0].length - b[0].length
-      || a[0].localeCompare(b[0])
-    ))[0]?.[0] || "";
+  return (
+    [...variants.entries()].sort(
+      (a, b) =>
+        b[1].prompt_count - a[1].prompt_count ||
+        b[1].count - a[1].count ||
+        a[0].length - b[0].length ||
+        a[0].localeCompare(b[0]),
+    )[0]?.[0] || ""
+  );
 }
 
 /** Prefer natural-language intent; drop fenced/code-heavy lines before tokenizing. */
@@ -575,8 +596,14 @@ function promptTextForCloud(text) {
     .replace(/[A-Za-z]:\\[^\s"'`]+/g, " ")
     .replace(/<[^>]*>/g, " ")
     .replace(/--[A-Za-z0-9_-]+\s*:[^;]+;?/g, " ")
-    .replace(/\b(?:import\s+\S+\s+from\s+\S+|from\s+\S+\s+import\s+\S+|(?:const|let|var)\s+\w+\s*=|(?:class|def|function)\s+\w+)[^\n]*$/gim, " ")
-    .replace(/^\s*(?:import\b|from\s+\S+\s+import\b|class\s+\w+|def\s+\w+|const\s+\w+|let\s+\w+|var\s+\w+|function\s+\w+)\b.*$/gim, " ")
+    .replace(
+      /\b(?:import\s+\S+\s+from\s+\S+|from\s+\S+\s+import\s+\S+|(?:const|let|var)\s+\w+\s*=|(?:class|def|function)\s+\w+)[^\n]*$/gim,
+      " ",
+    )
+    .replace(
+      /^\s*(?:import\b|from\s+\S+\s+import\b|class\s+\w+|def\s+\w+|const\s+\w+|let\s+\w+|var\s+\w+|function\s+\w+)\b.*$/gim,
+      " ",
+    )
     .replace(/\b[a-z][a-z0-9]*(?:_[a-z0-9]+)+\b/gi, " ")
     .replace(/\b(?:torch|numpy|nn|plt|pd|np)\.[A-Za-z_][\w.]*\b/g, " ")
     .split(/\r?\n/)
@@ -586,7 +613,8 @@ function promptTextForCloud(text) {
 
 function tokenize(text) {
   const normalized = String(text || "");
-  const matches = normalized.match(/[\p{Script=Han}]+|[a-z0-9][a-z0-9_-]{1,}/giu) || [];
+  const matches =
+    normalized.match(/[\p{Script=Han}]+|[a-z0-9][a-z0-9_-]{1,}/giu) || [];
   const terms = [];
   for (const match of matches) {
     if (/^[\p{Script=Han}]+$/u.test(match)) {
@@ -595,12 +623,13 @@ function tokenize(text) {
       terms.push(...splitAsciiTerm(match));
     }
   }
-  return terms.filter((term) => (
-    term.length > 1
-    && !STOP_WORDS.has(term)
-    && !HAN_STOP_WORDS.has(term)
-    && !/^\d+$/.test(term)
-  ));
+  return terms.filter(
+    (term) =>
+      term.length > 1 &&
+      !STOP_WORDS.has(term) &&
+      !HAN_STOP_WORDS.has(term) &&
+      !/^\d+$/.test(term),
+  );
 }
 
 function splitHanTerm(term) {
@@ -637,11 +666,12 @@ function splitHanTerm(term) {
         { length: segment.segment.length },
         (_, offset) => segment.index + offset,
       ).every((index) => knownCoverage.has(index));
-      if (!overlapsKnown) matches.push({
-        term: value,
-        start: segment.index,
-        end: segment.index + segment.segment.length,
-      });
+      if (!overlapsKnown)
+        matches.push({
+          term: value,
+          start: segment.index,
+          end: segment.index + segment.segment.length,
+        });
     }
   }
 
@@ -656,10 +686,23 @@ function looksLikeCodeLine(line) {
   if (!trimmed) return false;
   const withoutDiff = trimmed.replace(/^[+-]\s?/, "");
   const hasHan = /[\p{Script=Han}]/u.test(withoutDiff);
-  if (/^(const|let|var|return|import|export|function|class|if|else|for|while|await|async)\b/.test(withoutDiff)) return true;
-  if (/\b(className|useState|useEffect|style=|aria-|data-|set[A-Z][A-Za-z0-9_]*)\b/.test(withoutDiff)) return true;
+  if (
+    /^(const|let|var|return|import|export|function|class|if|else|for|while|await|async)\b/.test(
+      withoutDiff,
+    )
+  )
+    return true;
+  if (
+    /\b(className|useState|useEffect|style=|aria-|data-|set[A-Z][A-Za-z0-9_]*)\b/.test(
+      withoutDiff,
+    )
+  )
+    return true;
   if (!hasHan && /[{}<>;=]/.test(withoutDiff)) return true;
-  const styleTokens = withoutDiff.match(/\b(?:text|bg|border|rounded|flex|grid|items|justify|gap|px|py|mt|mb|w|h|dark):?-[A-Za-z0-9/[\].%-]+/g) || [];
+  const styleTokens =
+    withoutDiff.match(
+      /\b(?:text|bg|border|rounded|flex|grid|items|justify|gap|px|py|mt|mb|w|h|dark):?-[A-Za-z0-9/[\].%-]+/g,
+    ) || [];
   if (!hasHan && styleTokens.length >= 3) return true;
   return false;
 }
