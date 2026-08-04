@@ -31,6 +31,10 @@ npm ci --prefix dashboard
 npm run build --prefix dashboard
 ```
 
+The repository applies an L0–L4 review model. See
+[the quality-gate contract](.github/QUALITY_GATES.md) for the responsibility,
+blocking policy, and local audit command for each layer.
+
 Useful commands:
 
 ```bash

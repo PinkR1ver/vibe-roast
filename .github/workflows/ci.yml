@@ -15,8 +15,56 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  format:
+    name: L0 · Format changed files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check formatting
+        env:
+          QUALITY_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: npm run format:check
+
+  lint:
+    name: L1 · Lint changed files
+    needs: format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        env:
+          QUALITY_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha || github.event.before }}
+        run: npm run lint
+
   test:
-    name: Test (Node ${{ matrix.node-version }})
+    name: L3 · Test (Node ${{ matrix.node-version }})
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -42,7 +90,8 @@ jobs:
         run: npm test
 
   build:
-    name: Build and package
+    name: L3 · Build and package
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -76,8 +125,28 @@ jobs:
       - name: Validate npm package contents
         run: npm pack --dry-run --ignore-scripts
 
+  coverage:
+    name: L3 · Coverage baseline
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Enforce coverage baseline
+        run: npm run test:coverage
+
   pull-request-title:
-    name: Pull request title
+    name: Policy · Pull request title
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:

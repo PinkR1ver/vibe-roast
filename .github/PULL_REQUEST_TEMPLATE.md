@@ -18,7 +18,9 @@
 
 <!-- List exact commands, fixtures, screenshots, or manual checks. -->
 
-- [ ] `npm test`
+- [ ] L0/L1: `npm run format:check && npm run lint`
+- [ ] L2: `npm run audit:dependencies`
+- [ ] L3: `npm test` and `npm run test:coverage`
 - [ ] Dashboard build, when relevant
 - [ ] Missing-root/error behavior, when changing a source adapter
 - [ ] Desktop/mobile screenshots, when changing visible UI
@@ -47,3 +49,4 @@
 - [ ] Documentation and `.agents/` context are updated when contracts changed
 - [ ] The PR title uses an allowed conventional type
 - [ ] I have reviewed the final diff
+- [ ] I evaluated L4 AI/human findings instead of treating them as an automatic verdict

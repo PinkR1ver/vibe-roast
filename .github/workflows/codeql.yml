@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   analyze:
-    name: Analyze JavaScript and TypeScript
+    name: L2 · CodeQL (JavaScript and TypeScript)
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository

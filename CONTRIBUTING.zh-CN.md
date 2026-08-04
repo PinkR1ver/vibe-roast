@@ -28,6 +28,9 @@ npm ci --prefix dashboard
 npm run build --prefix dashboard
 ```
 
+仓库使用 L0–L4 分层 Review 模型。每层的职责、阻断策略和本地 Audit 命令见
+[质量门禁契约](.github/QUALITY_GATES.md)。
+
 修改跨模块行为前，请阅读 `.agents/AGENTS.md`、`.agents/docs/architecture.md`
 以及相关 `.agents/spec/` 文件。
 

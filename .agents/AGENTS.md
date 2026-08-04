@@ -57,7 +57,8 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 ## Contribution and automation
 
 - `CONTRIBUTING.md` and `CONTRIBUTING.zh-CN.md` are the source of truth for contributor requirements; keep the pull request template and CI title policy aligned with them.
-- Pull requests run root tests on Node.js 20, 22, and 24, build the dashboard, validate the Worker bundle and npm package, run dependency review, and receive CodeQL analysis.
+- `.github/QUALITY_GATES.md` defines the L0–L4 contract. L0 formatting and L1 lint apply incrementally to changed source/configuration files; L2 security/dependency checks and L3 tests/build/coverage are blocking; L4 AI and human semantic review is advisory.
+- Pull requests run root tests on Node.js 20, 22, and 24, enforce the executable-code coverage baseline, build the dashboard, validate the Worker bundle and npm package, audit high/critical dependency findings, run dependency review, and receive CodeQL analysis.
 - GitHub Actions must use least-privilege permissions and pin third-party actions to full commit SHAs. Dependabot keeps npm and action pins current.
 - `.github/copilot-instructions.md` and path-specific files under `.github/instructions/` guide AI review. AI feedback is advisory and does not replace maintainer approval.
 - Do not configure a required status check until that check has run successfully on the default branch. Keep required check names stable once branch rules depend on them.
