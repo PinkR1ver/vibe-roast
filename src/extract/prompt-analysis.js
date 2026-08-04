@@ -408,7 +408,7 @@ function codeLikeScore(text) {
   }
   const codeLines = (
     raw.match(
-      /^\s*(?:(?:import|from|const|let|var|def|class|function|export|return|if|for|while|try|catch)\b|[.#]?[A-Za-z_$][\w$:.\[\]#-]*\s*\{|[\w-]+\s*:\s*[^:]+;?\s*$|<\/?[A-Za-z][^>]*>)/gim,
+      /^\s*(?:(?:import|from|const|let|var|def|class|function|export|return|if|for|while|try|catch)\b|[.#]?[A-Za-z_$][\w$:.[]\]#-]*\s*\{|[\w-]+\s*:\s*[^:]+;?\s*$|<\/?[A-Za-z][^>]*>)/gim,
     ) || []
   ).length;
   if (codeLines >= 2) score += 2;
