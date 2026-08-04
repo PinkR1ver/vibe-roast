@@ -932,6 +932,27 @@ test("analyzePrompts removes successful stdout from single-command terminal atta
   );
 });
 
+test("analyzePrompts retains output-first terminal requests without a blank separator", () => {
+  const intent = "Please summarize the build result.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        "$ npm run build",
+        "vite v6.4.3 building for production...",
+        "dist/assets/index-R4nd0m.js 42.00 kB",
+        "✓ built in 812ms",
+        intent,
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, [
+    "terminal_output",
+  ]);
+});
+
 test("analyzePrompts removes unfenced code before category inference", () => {
   const intent = "Please explain this behavior.";
   const analysis = analyzePrompts([
@@ -981,6 +1002,29 @@ test("English testing categories include plural and inflected forms", () => {
       prompt.categories.includes("testing"),
     ),
   );
+});
+
+test("analyzePrompts recognizes write requests around code attachments", () => {
+  const intent = "Please write unit tests for this:";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "```js",
+        "export function sum(left, right) {",
+        "  return left + right;",
+        "}",
+        "```",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].categories, [
+    "testing",
+    "implementation",
+  ]);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
 });
 
 test("English sentence starters survive artifact stripping", () => {

@@ -270,8 +270,9 @@ function stripTerminalBlocks(text) {
       continue;
     }
     if (
-      sawBlank &&
-      (hasIntentVerb(line.toLowerCase()) || hasQuestionIntent(line))
+      hasDirectRequestIntent(line) ||
+      hasQuestionIntent(line) ||
+      (sawBlank && hasIntentVerb(line.toLowerCase()))
     ) {
       inTerminal = false;
       sawBlank = false;
@@ -297,6 +298,13 @@ function hasQuestionIntent(text) {
     /(?:为什么|为何|怎么回事|怎么|怎样|如何|哪里|哪儿|什么问题|是否|能否|可不可以|有没有)/u.test(
       raw,
     )
+  );
+}
+
+function hasDirectRequestIntent(text) {
+  const raw = String(text || "").trim();
+  return /^(?:(?:please|kindly)\s+)?(?:add|fix|build|create|implement|explain|analyze|summarize|update|refactor|write|review)\b(?!\s+(?:available|complete|completed|failed|finished|successful|succeeded)\b)|^(?:请|帮我|麻烦|实现|修改|修复|优化|设计|解释|分析|生成)/iu.test(
+    raw,
   );
 }
 
@@ -382,7 +390,7 @@ function inferCategories(text) {
 }
 
 function hasIntentVerb(text) {
-  return /(?:帮我|请|我要|我想|实现|做|改|修|优化|设计|解释|分析|生成|\b(?:add|fix|build|create|implement|explain|analyze|summarize|update|refactor)\b)/i.test(
+  return /(?:帮我|请|我要|我想|实现|做|改|修|优化|设计|解释|分析|生成|\b(?:add|fix|build|create|implement|explain|analyze|summarize|update|refactor|write|review)\b)/i.test(
     text,
   );
 }
