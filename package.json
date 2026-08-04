@@ -39,7 +39,11 @@
     "README.md"
   ],
   "scripts": {
+    "format:check": "node scripts/quality/changed-files.mjs format",
+    "lint": "node scripts/quality/changed-files.mjs lint",
     "test": "node --test test/*.test.js",
+    "test:coverage": "node scripts/quality/coverage.mjs",
+    "audit:dependencies": "node scripts/quality/audit-dependencies.mjs",
     "inspect": "node bin/vibe-roast.js inspect",
     "serve": "node bin/vibe-roast.js serve",
     "worker:login": "npm --prefix worker run login",
@@ -60,5 +64,13 @@
   "dependencies": {
     "tokentracker-cli": "^0.84.9"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "c8": "11.0.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react": "7.37.5",
+    "globals": "16.5.0",
+    "prettier": "3.9.6"
+  }
 }

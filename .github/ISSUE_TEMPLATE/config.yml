@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/PinkR1ver/vibe-roast/security/advisories/new
+    about: Report vulnerabilities privately. Do not open a public issue.
+  - name: Support guidance
+    url: https://github.com/PinkR1ver/vibe-roast/blob/main/SUPPORT.md
+    about: Choose the right support channel and prepare a sanitized reproduction.

@@ -1,0 +1,11 @@
+# Default ownership. Split these paths into teams as the maintainer group grows.
+* @PinkR1ver
+
+# Security- and release-sensitive surfaces.
+/.github/ @PinkR1ver
+/src/server.js @PinkR1ver
+/src/lib/ai-roast.js @PinkR1ver
+/src/lib/roast-evidence.js @PinkR1ver
+/worker/ @PinkR1ver
+/package.json @PinkR1ver
+/package-lock.json @PinkR1ver

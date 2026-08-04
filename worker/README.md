@@ -5,6 +5,27 @@ the public npm client. It keeps GitHub secrets off user machines, stores OAuth
 flows and one-time tickets in a SQLite-backed Durable Object, and invokes
 Cloudflare Workers AI through a server-only binding.
 
+Worker and Wrangler development requires Node.js 22 or newer. The root CLI
+continues to support Node.js 20.
+
+## Dependency security override
+
+`worker/package.json` pins the transitive `undici` dependency to `7.29.0` to
+remediate GHSA-4cwx-7wf7-3272 and the related Undici 7.28 advisories inherited
+through Wrangler/Miniflare. Keep the override until Wrangler's dependency tree
+resolves to Undici 7.29.0 or newer without it. Before removing or changing the
+override, run:
+
+```bash
+npm install --prefix worker
+npm ls undici --prefix worker --all
+npm audit --prefix worker --audit-level=high
+npm run deploy:dry --prefix worker
+```
+
+The L2 workflow verifies both the audit result and the expected resolved
+version so a future Wrangler update cannot silently invalidate this workaround.
+
 ## Configure
 
 Authenticate Wrangler:

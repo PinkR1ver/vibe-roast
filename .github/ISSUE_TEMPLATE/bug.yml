@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible problem without exposing private session data
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and pull requests
+          required: true
+        - label: I replaced private prompts, paths, tokens, and session data with synthetic examples
+          required: true
+        - label: This is not a security vulnerability
+          required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Vibe Roaster version
+      placeholder: "0.98.5"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node.js version, install method, and relevant source adapters
+      placeholder: "macOS 15, Node 24, npx, Codex + Claude"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current behavior
+      description: Include the exact command and a minimal synthetic reproduction.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Remove usernames, local paths, prompt text, credentials, and session identifiers.
+      render: shell
