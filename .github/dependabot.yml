@@ -4,53 +4,69 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "03:00"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
     groups:
       npm-minor-and-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
   - package-ecosystem: npm
     directory: /dashboard
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "03:15"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
     groups:
       dashboard-minor-and-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
   - package-ecosystem: npm
     directory: /worker
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "03:30"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
     groups:
       worker-minor-and-patch:
         update-types:
           - minor
           - patch
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "03:45"
       timezone: Asia/Shanghai
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
+    commit-message:
+      prefix: "chore(deps)"
     groups:
       github-actions:
         patterns:
