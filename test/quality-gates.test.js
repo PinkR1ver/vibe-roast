@@ -9,6 +9,9 @@ const { execFileSync } = require("node:child_process");
 const SCRIPT_URL = pathToFileURL(
   path.join(__dirname, "..", "scripts", "quality", "changed-files.mjs"),
 );
+const COVERAGE_SCRIPT_URL = pathToFileURL(
+  path.join(__dirname, "..", "scripts", "quality", "coverage.mjs"),
+);
 
 test("changed-file gate fails closed when no comparison base exists", async (context) => {
   const repo = temporaryRepository(context);
@@ -55,6 +58,68 @@ test("quality scopes treat CJS as lintable and generated lockfiles as formatter-
   assert.equal(isInScope("dashboard/postcss.config.cjs", "lint"), true);
   assert.equal(isInScope("package-lock.json", "format"), false);
   assert.equal(isInScope("worker/npm-shrinkwrap.json", "format"), false);
+});
+
+test("coverage areas use the same recursive directory semantics", async () => {
+  const { COVERAGE_AREAS } = await import(COVERAGE_SCRIPT_URL);
+
+  assert.deepEqual(COVERAGE_AREAS, [
+    ["src", ".js"],
+    ["bin", ".js"],
+    ["dashboard/src/lib", ".js"],
+    ["worker/src", ".mjs"],
+  ]);
+});
+
+test("coverage runner cleans its temporary directory when test discovery fails", async (context) => {
+  const cwd = fs.mkdtempSync(
+    path.join(os.tmpdir(), "vibe-roast-coverage-cwd-"),
+  );
+  const tempDirectory = path.join(cwd, "coverage-temp");
+  context.after(() => fs.rmSync(cwd, { force: true, recursive: true }));
+  const { runCoverage } = await import(COVERAGE_SCRIPT_URL);
+
+  assert.throws(
+    () =>
+      runCoverage({
+        cwd,
+        makeTemp: () => {
+          fs.mkdirSync(tempDirectory);
+          return tempDirectory;
+        },
+      }),
+    /ENOENT/,
+  );
+  assert.equal(fs.existsSync(tempDirectory), false);
+});
+
+test("coverage runner preserves a c8 failure without reading its report", async (context) => {
+  const cwd = fs.mkdtempSync(
+    path.join(os.tmpdir(), "vibe-roast-coverage-cwd-"),
+  );
+  const tempDirectory = path.join(cwd, "coverage-temp");
+  fs.mkdirSync(path.join(cwd, "test"));
+  fs.writeFileSync(path.join(cwd, "test", "example.test.js"), "");
+  context.after(() => fs.rmSync(cwd, { force: true, recursive: true }));
+  const { runCoverage } = await import(COVERAGE_SCRIPT_URL);
+  let reportRead = false;
+
+  const status = runCoverage({
+    cwd,
+    makeTemp: () => {
+      fs.mkdirSync(tempDirectory);
+      return tempDirectory;
+    },
+    spawn: () => ({ status: 7 }),
+    findMissing: () => {
+      reportRead = true;
+      throw new Error("coverage report should not be read");
+    },
+  });
+
+  assert.equal(status, 7);
+  assert.equal(reportRead, false);
+  assert.equal(fs.existsSync(tempDirectory), false);
 });
 
 function temporaryRepository(context) {
