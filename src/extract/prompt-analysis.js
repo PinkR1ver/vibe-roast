@@ -195,6 +195,9 @@ function textOutsideArtifacts(text, artifacts = artifactEvidence(text)) {
       .replace(/^\s*(?:diff --git|index [a-f0-9.]+|@@ .* @@|[+-]{3} [ab]\/).*$\n?/gim, " ")
       .replace(/^\s*[+-](?![+-]).*$\n?/gm, " ");
   }
+  if (artifacts.kinds.includes("terminal_output")) {
+    stripped = stripTerminalBlocks(stripped);
+  }
   return stripped
     .replace(
       /^\s*Traceback \(most recent call last\):[\s\S]*?^\s*[A-Za-z]+Error:.*$\n?/gim,
@@ -206,7 +209,7 @@ function textOutsideArtifacts(text, artifacts = artifactEvidence(text)) {
     )
     .replace(/^\s*(?:[$%]\s+\S+|npm (?:ERR!|WARN)|ELIFECYCLE|Process exited with code).*$\n?/gim, " ")
     .replace(
-      /^\s*(?:import\s+(?:["'{*]|[\w$]+\s+from\b).*|from\s+\S+\s+import\b.*|(?:const|let|var)\s+\w+\s*=.*|(?:def|class|function)\s+\w+\s*[:({].*|export\s+(?:default\b|(?:const|let|var|class|function)\b).*|package\s+[\w.]+\s*;|#include\s*[<"].*|(?:if|for|while|catch)\s*\(.*|(?:try|else)\s*\{.*)$/gim,
+      /^\s*(?:import\s+(?:["'{*]|[\w$]+\s+from\b).*|from\s+\S+\s+import\b.*|(?:const|let|var)\s+\w+\s*=.*|(?:def|class|(?:async\s+)?function)\s+\w+\s*[:({].*|export\s+(?:default\b|(?:const|let|var|class|function)\b).*|package\s+[\w.]+\s*;|#include\s*[<"].*|(?:if|for|while|catch)\s*\(.*|(?:try|else)\s*\{.*|return\s+(?:(?:await|new)\s+)?(?:[A-Za-z_$][\w$]*(?:[.(]|\s*=>)|["'[{\d]|true\b|false\b|null\b).*|throw\s+new\s+\w+\s*\(.*|[}\])]+\s*;?)$/gim,
       " ",
     )
     .replace(/^\s*(?:[A-Za-z_$][\w$]*\.)?[A-Za-z_$][\w$]*\([^)]*\)\s*;?\s*$/gm, " ")
@@ -219,8 +222,52 @@ function textOutsideArtifacts(text, artifacts = artifactEvidence(text)) {
 /** Intent outside fenced/code lines — avoids counting "IMPLEMENT" inside dumps. */
 function hasSubstantialUserIntent(text) {
   const stripped = String(text || "").trim();
+  if (hasQuestionIntent(stripped)) return true;
   if (stripped.length < 12) return false;
   return hasIntentVerb(stripped.toLowerCase());
+}
+
+function stripTerminalBlocks(text) {
+  const kept = [];
+  let inTerminal = false;
+  let sawBlank = false;
+
+  for (const line of String(text || "").split(/\r?\n/)) {
+    if (/^\s*[$%]\s+\S/.test(line)) {
+      inTerminal = true;
+      sawBlank = false;
+      continue;
+    }
+    if (!inTerminal) {
+      kept.push(line);
+      continue;
+    }
+    if (!line.trim()) {
+      sawBlank = true;
+      continue;
+    }
+    if (sawBlank && (hasIntentVerb(line.toLowerCase()) || hasQuestionIntent(line))) {
+      inTerminal = false;
+      sawBlank = false;
+      kept.push(line);
+      continue;
+    }
+    sawBlank = false;
+    if (/^\s*(?:ELIFECYCLE|Process exited with code)\b/i.test(line)) {
+      inTerminal = false;
+    }
+  }
+
+  return kept.join("\n");
+}
+
+function hasQuestionIntent(text) {
+  const raw = String(text || "").trim();
+  return (
+    /[?？]/u.test(raw) ||
+    /^\s*(?:why|how|what|where|when|which|who|can|could|would|should|does|do|did|is|are)\b/i.test(raw) ||
+    /(?:为什么|为何|怎么回事|怎么|怎样|如何|哪里|哪儿|什么问题|是否|能否|可不可以|有没有)/u.test(raw)
+  );
 }
 
 function inferArtifactOrigin(text) {

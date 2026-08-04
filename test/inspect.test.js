@@ -756,6 +756,65 @@ test("analyzePrompts retains debugging intent around an unlabelled traceback", (
   assert.equal(analysis.useful_for_stats[0].text, intent);
 });
 
+test("analyzePrompts retains interrogative intent around attached code", () => {
+  const code = [
+    "```js",
+    "export async function load() {",
+    "  const result = await fetch('/api');",
+    "  return result.json();",
+    "}",
+    "```",
+  ].join("\n");
+  const analysis = analyzePrompts([
+    { text: `Why does this fail?\n${code}` },
+    { text: `这个报错是怎么回事？\n${code}` },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 2);
+  assert.deepEqual(
+    analysis.useful_for_stats.map((prompt) => prompt.text),
+    ["Why does this fail?", "这个报错是怎么回事？"],
+  );
+});
+
+test("analyzePrompts removes ordinary stdout from terminal attachments", () => {
+  const intent = "Please fix the failing test.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "$ npm test",
+        "Loading Acme Payments Production Fixtures",
+        "Connected Banana Orchard Customer Alpha",
+        "npm ERR! Test failed",
+        "Process exited with code 1",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.ok(!wordFrequencies(analysis.useful_for_stats).some((row) => row.term === "acme"));
+});
+
+test("analyzePrompts removes unfenced code before category inference", () => {
+  const intent = "Please explain this behavior.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "async function load() {",
+        "  const result = await fetchData();",
+        "  if (!result.ok) throw new Error('bad');",
+        "  return build(result);",
+        "}",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.deepEqual(analysis.useful_prompts[0].categories, ["explanation"]);
+});
+
 test("English category and intent keywords require word boundaries", () => {
   const prose = analyzePrompts([
     { text: "Please explain a guide about padding and prefixes." },
