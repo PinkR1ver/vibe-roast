@@ -12,7 +12,7 @@
     "secret:session": "wrangler secret put AUTH_BROKER_SESSION_SECRET --config wrangler.jsonc"
   },
   "devDependencies": {
-    "wrangler": "4.114.0"
+    "wrangler": "4.118.0"
   },
   "overrides": {
     "undici": "7.29.0"
