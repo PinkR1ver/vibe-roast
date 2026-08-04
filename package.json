@@ -42,8 +42,8 @@
     "format:check": "node scripts/quality/changed-files.mjs format",
     "lint": "node scripts/quality/changed-files.mjs lint",
     "test": "node --test test/*.test.js",
-    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=\"src/**/*.js\" --test-coverage-include=\"bin/*.js\" --test-coverage-include=\"dashboard/src/lib/*.js\" --test-coverage-include=\"worker/src/*.mjs\" --test-coverage-lines=87 --test-coverage-branches=67 --test-coverage-functions=88 test/*.test.js",
-    "audit:dependencies": "npm audit --audit-level=high && npm audit --prefix dashboard --audit-level=high && npm audit --prefix worker --audit-level=high",
+    "test:coverage": "node scripts/quality/coverage.mjs",
+    "audit:dependencies": "node scripts/quality/audit-dependencies.mjs",
     "inspect": "node bin/vibe-roast.js inspect",
     "serve": "node bin/vibe-roast.js serve",
     "worker:login": "npm --prefix worker run login",
@@ -67,6 +67,7 @@
   "license": "MIT",
   "devDependencies": {
     "@eslint/js": "9.39.5",
+    "c8": "11.0.0",
     "eslint": "9.39.5",
     "eslint-plugin-react": "7.37.5",
     "globals": "16.5.0",

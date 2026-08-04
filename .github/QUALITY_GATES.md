@@ -23,10 +23,15 @@ This is an intentional progressive-adoption boundary: every touched source file
 must satisfy the new rules, while this automation PR does not create a broad
 formatting diff or conflicts with active product work. Generated assets,
 promotional media, and `.agents/` context are outside these source-code gates.
+Generated npm lockfiles are also excluded from formatting because npm owns their
+serialization. If the comparison base cannot be resolved, the changed-file gate
+fails closed instead of silently treating the diff as empty.
 
-L3 records the current executable-code coverage floor at 87% lines, 67%
-branches, and 88% functions. Raising coverage should ratchet these values upward;
-lowering them requires an explicit rationale in the pull request.
+L3 uses `c8 --all` and verifies that every file in the declared executable-code
+universe appears in the coverage report, including files no test imports. The
+current honest floor is 79.7% lines, 67.7% branches, and 89.2% functions.
+Raising coverage should ratchet these values upward; lowering them requires an
+explicit rationale in the pull request.
 
 ## Local audit
 

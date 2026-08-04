@@ -15,7 +15,8 @@
 
 要求：
 
-- Node.js 20 或更高版本；CI 当前验证 Node.js 20、22 和 24。
+- Node.js 20 或更高版本；CI 当前验证 Node.js 20、22 和 24。Worker 与
+  Wrangler 开发需要 Node.js 22 或更高版本。
 - npm
 - 涉及 Cursor fixture 或本地存储时需要 `sqlite3`
 

@@ -38,3 +38,6 @@ jobs:
 
       - name: Reject high or critical vulnerabilities
         run: npm run audit:dependencies
+
+      - name: Verify Worker Undici security override
+        run: npm ls undici@7.29.0 --prefix worker --all

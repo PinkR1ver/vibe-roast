@@ -15,7 +15,13 @@ module.exports = [
     ],
   },
   {
-    files: ["bin/**/*.js", "src/**/*.js", "test/**/*.js", "eslint.config.js"],
+    files: [
+      "bin/**/*.{js,cjs}",
+      "src/**/*.{js,cjs}",
+      "test/**/*.{js,cjs}",
+      "dashboard/*.cjs",
+      "eslint.config.js",
+    ],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "commonjs",
@@ -24,7 +30,7 @@ module.exports = [
     rules: recommendedRules,
   },
   {
-    files: ["scripts/quality/**/*.mjs", "dashboard/*.{js,mjs,cjs}"],
+    files: ["scripts/quality/**/*.mjs", "dashboard/*.{js,mjs}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

@@ -18,7 +18,8 @@ For Chinese guidance, see [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md).
 
 Requirements:
 
-- Node.js 20 or newer. CI currently verifies Node.js 20, 22, and 24.
+- Node.js 20 or newer. CI currently verifies Node.js 20, 22, and 24. Worker and
+  Wrangler development requires Node.js 22 or newer.
 - npm
 - `sqlite3` for Cursor fixture and local-store work
 
