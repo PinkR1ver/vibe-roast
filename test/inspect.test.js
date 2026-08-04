@@ -6,16 +6,30 @@ const os = require("node:os");
 const path = require("node:path");
 
 const { inspectSources } = require("../src/inspect");
-const { analyzePrompts } = require("../src/extract/prompt-analysis");
-const { tokenize, wordCloudRecords, wordFrequencies } = require("../src/extract/phrase-stats");
+const {
+  analyzePrompts,
+  classifyPrompt,
+} = require("../src/extract/prompt-analysis");
+const {
+  tokenize,
+  wordCloudRecords,
+  wordFrequencies,
+  promptTextForCloud,
+} = require("../src/extract/phrase-stats");
 const { inspectEnvironment } = require("../src/extract/environment");
 const { dayBounds } = require("../src/lib/dates");
 const { extractCodexPrompt } = require("../src/sources/codex");
 const { extractClaudePrompt } = require("../src/sources/claude");
-const { extractCursorEntriesFromRows, inspectCursor } = require("../src/sources/cursor");
+const {
+  extractCursorEntriesFromRows,
+  inspectCursor,
+} = require("../src/sources/cursor");
 const { inspectTokenTracker } = require("../src/sources/token-tracker");
 const { codexUsageDelta } = require("../src/sources/codex");
-const { collectClaudeContextMessage, splitClaudeOutput } = require("../src/sources/claude");
+const {
+  collectClaudeContextMessage,
+  splitClaudeOutput,
+} = require("../src/sources/claude");
 
 const fixtures = path.join(__dirname, "fixtures");
 
@@ -52,7 +66,11 @@ test("inspectSources includes Codex, Claude, and Cursor when fixtures are presen
 
   assert.equal(report.summary.source_count, 3);
   assert.equal(report.summary.active_source_count, 3);
-  assert.deepEqual(report.summary.active_sources.sort(), ["claude", "codex", "cursor"]);
+  assert.deepEqual(report.summary.active_sources.sort(), [
+    "claude",
+    "codex",
+    "cursor",
+  ]);
   assert.equal(report.summary.prompt_count, 5);
   assert.equal(report.sources.codex.prompt_count, 2);
   assert.equal(report.sources.claude.prompt_count, 1);
@@ -87,7 +105,10 @@ test("inspectSources builds vibe_profile from multi-source prompts", async () =>
   assert.match(vibe.type_code, /^[MA][OP][VS][FX]$/);
   assert.equal(vibe.type_axes.length, 4);
   assert.ok(vibe.personality?.id);
-  assert.match(vibe.figure, /^\/assests\/characters-vibe-types\/.+-figure\.png$/);
+  assert.match(
+    vibe.figure,
+    /^\/assests\/characters-vibe-types\/.+-figure\.png$/,
+  );
   assert.equal(vibe.badge, null);
   assert.equal(vibe.dimensions.length, 6);
   assert.ok(!vibe.signals.some((signal) => signal.label === "Useful prompts"));
@@ -140,31 +161,43 @@ test("Cursor row parser treats cursorDiskKV type 1 bubbles as user prompts", () 
 });
 
 test("Codex prompt extractor ignores assistant messages", () => {
-  assert.equal(extractCodexPrompt({
-    payload: {
-      type: "assistant_message",
-      message: "我会先检查项目结构。",
-    },
-  }), "");
-  assert.equal(extractCodexPrompt({
-    payload: {
-      type: "user_message",
-      message: "帮我检查项目结构",
-    },
-  }), "帮我检查项目结构");
+  assert.equal(
+    extractCodexPrompt({
+      payload: {
+        type: "assistant_message",
+        message: "我会先检查项目结构。",
+      },
+    }),
+    "",
+  );
+  assert.equal(
+    extractCodexPrompt({
+      payload: {
+        type: "user_message",
+        message: "帮我检查项目结构",
+      },
+    }),
+    "帮我检查项目结构",
+  );
 });
 
 test("Claude prompt extractor ignores tool result content", () => {
-  assert.equal(extractClaudePrompt({
-    type: "user",
-    message: {
-      role: "user",
-      content: [
-        { type: "tool_result", content: "Fast-forward 13 files changed create mode 100644" },
-        { type: "text", text: "总结一下这次改动" },
-      ],
-    },
-  }), "总结一下这次改动");
+  assert.equal(
+    extractClaudePrompt({
+      type: "user",
+      message: {
+        role: "user",
+        content: [
+          {
+            type: "tool_result",
+            content: "Fast-forward 13 files changed create mode 100644",
+          },
+          { type: "text", text: "总结一下这次改动" },
+        ],
+      },
+    }),
+    "总结一下这次改动",
+  );
 });
 
 test("Cursor date range omits prompt rows without timestamps", async (t) => {
@@ -207,7 +240,10 @@ test("TokenTracker queue adapter aggregates hourly token buckets by day", async 
   assert.equal(report.bucket_count, 3);
   assert.equal(report.active_day_count, 2);
   assert.equal(report.token_totals.total_tokens, 5800);
-  assert.deepEqual(report.daily_rows.map((row) => row.day), ["2026-06-07", "2026-06-08"]);
+  assert.deepEqual(
+    report.daily_rows.map((row) => row.day),
+    ["2026-06-07", "2026-06-08"],
+  );
   assert.equal(report.daily_rows[0].total_tokens, 5000);
   assert.equal(report.daily_rows[0].conversation_count, 4);
   assert.equal(report.daily_rows[0].models["codex/gpt-5"], 1500);
@@ -253,7 +289,10 @@ test("Claude context assigns output across text, thinking, and tool blocks", () 
   ]);
 
   assert.equal(split.reasoning, 20);
-  assert.equal(split.messages + split.tool_calls + split.reasoning + split.custom_agents, 100);
+  assert.equal(
+    split.messages + split.tool_calls + split.reasoning + split.custom_agents,
+    100,
+  );
   assert.ok(split.tool_calls > split.messages);
   assert.equal(split.tool_call_count, 1);
 });
@@ -267,21 +306,42 @@ test("Claude context merges streaming snapshots before assigning usage", () => {
       usage: { input_tokens: 100, output_tokens: 20 },
     },
   };
-  collectClaudeContextMessage(messages, {
-    ...base,
-    message: { ...base.message, content: [{ type: "thinking", thinking: "plan" }] },
-  }, base.timestamp);
-  collectClaudeContextMessage(messages, {
-    ...base,
-    message: {
-      ...base.message,
-      content: [{ type: "tool_use", id: "tool-1", name: "Read", input: { file: "a" } }],
+  collectClaudeContextMessage(
+    messages,
+    {
+      ...base,
+      message: {
+        ...base.message,
+        content: [{ type: "thinking", thinking: "plan" }],
+      },
     },
-  }, base.timestamp);
+    base.timestamp,
+  );
+  collectClaudeContextMessage(
+    messages,
+    {
+      ...base,
+      message: {
+        ...base.message,
+        content: [
+          {
+            type: "tool_use",
+            id: "tool-1",
+            name: "Read",
+            input: { file: "a" },
+          },
+        ],
+      },
+    },
+    base.timestamp,
+  );
 
   const [message] = messages.values();
   assert.equal(messages.size, 1);
-  assert.deepEqual(message.content.map((block) => block.type), ["thinking", "tool_use"]);
+  assert.deepEqual(
+    message.content.map((block) => block.type),
+    ["thinking", "tool_use"],
+  );
   assert.equal(message.usage.output_tokens, 20);
 });
 
@@ -301,11 +361,17 @@ test("inspectSources exposes TokenTracker activity without adding synthetic prom
   assert.equal(report.activity.daily_rows.length, 2);
   assert.equal(report.activity.total_tokens, 5800);
   assert.equal(report.summary.prompt_count, 2);
-  assert.deepEqual(report.summary.active_sources, ["cursor", "codex", "claude"]);
+  assert.deepEqual(report.summary.active_sources, [
+    "cursor",
+    "codex",
+    "claude",
+  ]);
   assert.equal(report.summary.active_source_count, 3);
   assert.equal(report.sources["token-tracker"], undefined);
   assert.equal(report.vibe_profile.signals[0].label, "Total tokens");
-  assert.ok(!report.vibe_profile.signals.some((s) => s.label === "Useful prompts"));
+  assert.ok(
+    !report.vibe_profile.signals.some((s) => s.label === "Useful prompts"),
+  );
   assert.ok(report.activity.peak_day?.day);
   assert.ok(report.activity.longest_streak >= 1);
 });
@@ -321,7 +387,10 @@ test("inspectSources filters TokenTracker activity by date range", async () => {
     },
   });
 
-  assert.deepEqual(report.activity.daily_rows.map((row) => row.day), ["2026-06-08"]);
+  assert.deepEqual(
+    report.activity.daily_rows.map((row) => row.day),
+    ["2026-06-08"],
+  );
   assert.equal(report.activity.total_tokens, 800);
   assert.equal(report.activity.daily_rows[0].models["claude/sonnet"], 750);
 });
@@ -357,7 +426,9 @@ test("inspectSources computes useful high-frequency terms", async () => {
 
   const terms = report.word_frequencies.map((row) => row.term);
   assert.ok(terms.includes("token"));
-  assert.ok(report.word_frequencies.some((row) => row.key === "category:testing"));
+  assert.ok(
+    report.word_frequencies.some((row) => row.key === "category:testing"),
+  );
 });
 
 test("word cloud input excludes assistant and tool content", async () => {
@@ -372,11 +443,16 @@ test("word cloud input excludes assistant and tool content", async () => {
   });
 
   const blob = report.prompts.map((p) => p.text).join("\n");
-  assert.ok(!/xerophyte/i.test(blob), "assistant/tool xerophyte must not enter prompts");
+  assert.ok(
+    !/xerophyte/i.test(blob),
+    "assistant/tool xerophyte must not enter prompts",
+  );
   const terms = report.word_frequencies.map((row) => row.term);
   assert.ok(!terms.includes("xerophyte"));
   assert.ok(!terms.includes("xerophyte-followup"));
-  assert.ok(report.prompts.every((p) => p.source === "codex" || p.source === "claude"));
+  assert.ok(
+    report.prompts.every((p) => p.source === "codex" || p.source === "claude"),
+  );
   assert.ok(report.prompts.some((p) => /登录页面/.test(p.text)));
   assert.ok(report.prompts.some((p) => /根因/.test(p.text)));
 });
@@ -492,7 +568,9 @@ test("tokenize extracts session from Claude Code style identifiers", () => {
 });
 
 test("tokenize filters common UI state words from word cloud terms", () => {
-  const terms = tokenize("selectedSource provider model key className dashboard 发票 统计");
+  const terms = tokenize(
+    "selectedSource provider model key className dashboard 发票 统计",
+  );
 
   assert.ok(!terms.includes("selected"));
   assert.ok(!terms.includes("source"));
@@ -537,15 +615,25 @@ test("wordFrequencies merges common bilingual concept variants", () => {
 
   assert.equal(motion?.count, 4);
   assert.equal(motion?.prompt_count, 2);
-  assert.equal(words.filter((row) => ["动效", "animation", "motion"].includes(row.term)).length, 1);
+  assert.equal(
+    words.filter((row) => ["动效", "animation", "motion"].includes(row.term))
+      .length,
+    1,
+  );
 });
 
 test("wordCloudRecords preserves observed acronyms for domain discovery", () => {
   const [record] = wordCloudRecords([
-    { source: "cursor", timestamp: "2026-01-14T00:00:00Z", text: "继续做 HIT 和前庭分析界面" },
+    {
+      source: "cursor",
+      timestamp: "2026-01-14T00:00:00Z",
+      text: "继续做 HIT 和前庭分析界面",
+    },
   ]);
   const hit = record.concepts.find((concept) => concept.key === "term:hit");
-  const vestibular = record.concepts.find((concept) => concept.key === "term:前庭");
+  const vestibular = record.concepts.find(
+    (concept) => concept.key === "term:前庭",
+  );
 
   assert.equal(hit?.acronym, true);
   assert.equal(hit?.variants.HIT, 1);
@@ -574,7 +662,7 @@ test("wordFrequencies keeps natural language before inline code", () => {
       text: "U-Net架构可以引入代码块说明 import torch from torch import nn class convBlock(nn.Module): self.layer = nn.Sequential()",
     },
     {
-      text: "胶囊还是太大<div class=\"z-10\"><span fill=\"currentColor\">Klaviyo</span></div>",
+      text: '胶囊还是太大<div class="z-10"><span fill="currentColor">Klaviyo</span></div>',
     },
   ]).map((row) => row.term);
 
@@ -601,8 +689,14 @@ test("wordFrequencies strips local path fragments", () => {
 test("analyzePrompts separates useful intent from pasted code and logs", () => {
   const analysis = analyzePrompts([
     { source: "codex", text: "帮我修复登录 bug，并写一个回归测试" },
-    { source: "cursor", text: "SyntaxError: JSON.parse unexpected character at line 1 column 10\n    at reader.js:22890:16" },
-    { source: "claude", text: "const value = items.map((item) => item.id).join(',');\nreturn value;" },
+    {
+      source: "cursor",
+      text: "SyntaxError: JSON.parse unexpected character at line 1 column 10\n    at reader.js:22890:16",
+    },
+    {
+      source: "claude",
+      text: "const value = items.map((item) => item.id).join(',');\nreturn value;",
+    },
     { source: "codex", text: "先不要写代码，帮我设计一下方案" },
   ]);
 
@@ -615,11 +709,518 @@ test("analyzePrompts separates useful intent from pasted code and logs", () => {
   assert.ok(analysis.useful_prompts.some((p) => p.text.includes("回归测试")));
 });
 
+test("analyzePrompts separates code authorship from surrounding request intent", () => {
+  const authored = [
+    "这是我自己写的 JavaScript，请帮我修复点击后重复提交的问题。",
+    "```js",
+    "export async function submit(form) {",
+    "  const payload = new FormData(form);",
+    "  const response = await fetch('/api/orders', { method: 'POST', body: payload });",
+    "  if (!response.ok) throw new Error('submit failed');",
+    "  return response.json();",
+    "}",
+    "```",
+  ].join("\n");
+  const unverified = authored.replace(
+    "这是我自己写的 JavaScript，请帮我修复点击后重复提交的问题。",
+    "请分析下面的 JavaScript。",
+  );
+
+  const analysis = analyzePrompts([
+    { source: "codex", text: authored },
+    { source: "codex", text: unverified },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 2);
+  assert.equal(analysis.reference_prompt_count, 0);
+  assert.deepEqual(analysis.useful_prompts[0].reasons, [
+    "user_authored_artifact_with_intent",
+  ]);
+  assert.equal(analysis.useful_prompts[0].artifact_origin, "user_authored");
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, ["code"]);
+  assert.equal(analysis.useful_prompts[0].category, "debugging");
+  assert.deepEqual(analysis.useful_prompts[1].reasons, [
+    "user_intent_with_attached_reference",
+  ]);
+  assert.equal(analysis.useful_prompts[1].artifact_origin, "unverified");
+  assert.equal(analysis.useful_for_stats[1].text, "请分析下面的 JavaScript。");
+});
+
+test("analyzePrompts rejects app-owned prompt envelopes even when they contain JavaScript and intent verbs", () => {
+  const analysis = analyzePrompts([
+    {
+      source: "codex",
+      text: [
+        "<recommended_plugins>",
+        "Here is a list of plugins that are available but not installed.",
+        "</recommended_plugins>",
+        "# AGENTS.md instructions",
+        "<INSTRUCTIONS>Please build the feature.</INSTRUCTIONS>",
+        "```js",
+        "const build = () => test();",
+        "```",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 0);
+  assert.equal(analysis.reference_prompt_count, 1);
+  assert.deepEqual(
+    analysis.reference_summary.examples[0].text.startsWith(
+      "<recommended_plugins>",
+    ),
+    true,
+  );
+});
+
+test("analyzePrompts infers categories from request text instead of JavaScript identifiers", () => {
+  const analysis = analyzePrompts([
+    {
+      source: "codex",
+      text: [
+        "这是我写的代码，请解释为什么这里会变慢。",
+        "```js",
+        "const buildTestPlan = async () => createPackage(await researchWorkflow());",
+        "export default buildTestPlan;",
+        "```",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.deepEqual(analysis.useful_prompts[0].categories, ["explanation"]);
+});
+
+test("analyzePrompts separates intent from generated code and terminal output", () => {
+  const generatedIntent = "这是模型生成的 Python，请帮我检查安全问题。";
+  const terminalIntent = "这是终端输出，请帮我修复构建失败。";
+  const analysis = analyzePrompts([
+    {
+      source: "codex",
+      text: [
+        generatedIntent,
+        "```python",
+        "import os",
+        "def run(value):",
+        "    return os.system(value)",
+        "```",
+      ].join("\n"),
+    },
+    {
+      source: "claude",
+      text: [
+        terminalIntent,
+        "$ npm test",
+        "npm ERR! Test failed",
+        "Process exited with code 1",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 2);
+  assert.deepEqual(
+    analysis.useful_prompts.map((prompt) => prompt.artifact_origin),
+    ["external_or_generated", "external_or_generated"],
+  );
+  assert.deepEqual(
+    analysis.useful_prompts.map((prompt) => prompt.reasons[0]),
+    [
+      "user_intent_with_external_reference",
+      "user_intent_with_external_reference",
+    ],
+  );
+  assert.deepEqual(
+    analysis.useful_for_stats.map((prompt) => prompt.text),
+    [generatedIntent, terminalIntent],
+  );
+  assert.equal(
+    analysis.average_useful_prompt_chars,
+    Math.round((generatedIntent.length + terminalIntent.length) / 2),
+  );
+  assert.equal(analysis.long_prompt_ratio, 0);
+});
+
+test("analyzePrompts retains debugging intent around an unlabelled traceback", () => {
+  const intent = "请帮我分析这个错误并修复登录问题。";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "Traceback (most recent call last):",
+        '  File "auth.py", line 42, in login',
+        "    return session.user.id",
+        "AttributeError: 'NoneType' object has no attribute 'user'",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].categories, ["debugging"]);
+  assert.equal(analysis.useful_prompts[0].artifact_origin, "unverified");
+  assert.deepEqual(analysis.useful_prompts[0].reasons, [
+    "user_intent_with_attached_reference",
+  ]);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+});
+
+test("analyzePrompts retains interrogative intent around attached code", () => {
+  const code = [
+    "```js",
+    "export async function load() {",
+    "  const result = await fetch('/api');",
+    "  return result.json();",
+    "}",
+    "```",
+  ].join("\n");
+  const analysis = analyzePrompts([
+    { text: `Why does this fail?\n${code}` },
+    { text: `这个报错是怎么回事？\n${code}` },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 2);
+  assert.deepEqual(
+    analysis.useful_for_stats.map((prompt) => prompt.text),
+    ["Why does this fail?", "这个报错是怎么回事？"],
+  );
+});
+
+test("analyzePrompts removes ordinary stdout from terminal attachments", () => {
+  const intent = "Please fix the failing test.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "$ npm test",
+        "Loading Acme Payments Production Fixtures",
+        "Connected Banana Orchard Customer Alpha",
+        "npm ERR! Test failed",
+        "Process exited with code 1",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.ok(
+    !wordFrequencies(analysis.useful_for_stats).some(
+      (row) => row.term === "acme",
+    ),
+  );
+});
+
+test("analyzePrompts removes successful stdout from single-command terminal attachments", () => {
+  const intent = "Please summarize the build result.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "$ npm run build",
+        "vite v6.4.3 building for production...",
+        "dist/assets/index-R4nd0m.js 42.00 kB",
+        "✓ built in 812ms",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, [
+    "terminal_output",
+  ]);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.ok(
+    !wordFrequencies(analysis.useful_for_stats).some((row) =>
+      ["vite", "dist", "assets", "r4nd0m"].includes(row.term),
+    ),
+  );
+});
+
+test("analyzePrompts retains output-first terminal requests without a blank separator", () => {
+  const intent = "Please summarize the build result.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        "$ npm run build",
+        "vite v6.4.3 building for production...",
+        "dist/assets/index-R4nd0m.js 42.00 kB",
+        "✓ built in 812ms",
+        intent,
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, [
+    "terminal_output",
+  ]);
+});
+
+test("analyzePrompts removes unfenced code before category inference", () => {
+  const intent = "Please explain this behavior.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "async function load() {",
+        "  const result = await fetchData();",
+        "  if (!result.ok) throw new Error('bad');",
+        "  return build(result);",
+        "}",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.deepEqual(analysis.useful_prompts[0].categories, ["explanation"]);
+});
+
+test("English category and intent keywords require word boundaries", () => {
+  const prose = analyzePrompts([
+    { text: "Please explain a guide about padding and prefixes." },
+  ]);
+  const codeReference = analyzePrompts([
+    {
+      text: ["padding prefixes guide material", "```", "foo(bar)", "```"].join(
+        "\n",
+      ),
+    },
+  ]);
+
+  assert.deepEqual(prose.useful_prompts[0].categories, ["explanation"]);
+  assert.equal(codeReference.useful_prompt_count, 0);
+  assert.equal(codeReference.reference_prompt_count, 1);
+});
+
+test("English testing categories include plural and inflected forms", () => {
+  const analysis = analyzePrompts([
+    { text: "Please write unit tests." },
+    { text: "Add specs for this module." },
+    { text: "The feature was tested with fixtures." },
+    { text: "Testing should cover the login flow." },
+  ]);
+
+  assert.ok(
+    analysis.useful_prompts.every((prompt) =>
+      prompt.categories.includes("testing"),
+    ),
+  );
+});
+
+test("analyzePrompts recognizes write requests around code attachments", () => {
+  const intent = "Please write unit tests for this:";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "```js",
+        "export function sum(left, right) {",
+        "  return left + right;",
+        "}",
+        "```",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].categories, [
+    "testing",
+    "implementation",
+  ]);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+});
+
+test("English sentence starters survive artifact stripping", () => {
+  const requests = [
+    "For the login page, fix the validation.",
+    "If possible, please add error handling.",
+    "While you're working on this, please update the tests.",
+    "Return the filtered results and please explain the change.",
+    "Try opening the file and please analyze the failure.",
+    "From the documentation, please fix this integration.",
+    "Class definitions confuse me; please explain this behavior.",
+    "Import duties are unrelated; please update this module.",
+  ];
+  const prompts = requests.map((request) => ({
+    text: [
+      request,
+      "```js",
+      "export function validate(value) {",
+      "  if (!value) throw new Error('required');",
+      "  return value.trim();",
+      "}",
+      "```",
+    ].join("\n"),
+  }));
+  const analysis = analyzePrompts(prompts);
+
+  assert.equal(analysis.useful_prompt_count, requests.length);
+  assert.deepEqual(
+    analysis.useful_for_stats.map((prompt) => prompt.text),
+    requests,
+  );
+  assert.ok(
+    analysis.useful_prompts.every(
+      (prompt) => prompt.artifact_origin === "unverified",
+    ),
+  );
+});
+
+test("moderate prompt templates cannot bypass provenance retention", () => {
+  const analysis = analyzePrompts([
+    {
+      text: ["帮我完善这个模板", "System prompt:", "{{user_input}}"].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 0);
+  assert.equal(analysis.reference_prompt_count, 1);
+  assert.deepEqual(analysis.reference_summary.signals.artifact_kinds, {
+    prompt_template: 1,
+  });
+});
+
+test("analyzePrompts rejects short multi-line code without request prose", () => {
+  const analysis = analyzePrompts([
+    { text: "const first = items[0];\nlet second = items[1];" },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 0);
+  assert.deepEqual(analysis.reference_summary.signals.artifact_kinds, {
+    code: 1,
+  });
+});
+
+test("reference reasons agree with declared artifact origin", () => {
+  const classification = classifyPrompt(
+    [
+      "这是我自己写的代码：",
+      "```js",
+      "const first = items[0];",
+      "let second = items[1];",
+      "```",
+    ].join("\n"),
+  );
+
+  assert.equal(classification.useful, false);
+  assert.equal(classification.artifact_origin, "user_authored");
+  assert.deepEqual(classification.reasons, [
+    "user_authored_artifact_without_intent",
+  ]);
+});
+
+test("analyzePrompts recognizes config, diff, prompt-template, and opaque references", () => {
+  const analysis = analyzePrompts([
+    {
+      text: "```yaml\nserver:\n  host: localhost\n  port: 7681\nfeatures:\n  roast: true\n```",
+    },
+    {
+      text: [
+        "diff --git a/a.js b/a.js",
+        "index 123..456 100644",
+        "--- a/a.js",
+        "+++ b/a.js",
+        "@@ -1,2 +1,2 @@",
+        "-const value = oldValue;",
+        "+const value = newValue;",
+        "-renderOld();",
+        "+renderNew();",
+      ].join("\n"),
+    },
+    {
+      text: [
+        "System prompt:",
+        "You are an expert.",
+        "## Context",
+        "A generated context",
+        "## Instructions",
+        "Build the result",
+        "## Constraints",
+        "Use the template",
+        "## Output Format",
+        "JSON",
+      ].join("\n"),
+    },
+    { text: "A".repeat(1600) },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 0);
+  assert.equal(analysis.reference_prompt_count, 4);
+  assert.equal(analysis.reference_summary.artifact_count, 4);
+  assert.equal(analysis.reference_summary.signals.artifact_kinds.config, 1);
+  assert.equal(analysis.reference_summary.signals.artifact_kinds.diff, 1);
+  assert.equal(
+    analysis.reference_summary.signals.artifact_kinds.prompt_template,
+    1,
+  );
+  assert.equal(
+    analysis.reference_summary.signals.artifact_kinds.opaque_text,
+    1,
+  );
+});
+
+test("analyzePrompts preserves ordinary Markdown requirement lists", () => {
+  const text = [
+    "请实现账户设置页面：",
+    "- 支持修改头像",
+    "- 添加邮箱验证",
+    "- 增加回归测试",
+    "- 优化移动端布局",
+  ].join("\n");
+  const analysis = analyzePrompts([{ text }]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, []);
+  assert.equal(analysis.useful_for_stats[0].text, text);
+});
+
+test("analyzePrompts preserves pure Markdown lists and blockquotes", () => {
+  const list = [
+    "- 请实现头像修改",
+    "- 添加邮箱验证",
+    "- 增加回归测试",
+    "- 优化移动端布局",
+  ].join("\n");
+  const quote = [
+    "> Please explain the migration plan",
+    "> Please add rollback steps",
+    "> Keep the existing API stable",
+  ].join("\n");
+  const analysis = analyzePrompts([{ text: list }, { text: quote }]);
+
+  assert.equal(analysis.useful_prompt_count, 2);
+  assert.ok(
+    analysis.useful_prompts.every(
+      (prompt) => prompt.artifact_kinds.length === 0,
+    ),
+  );
+  assert.deepEqual(
+    analysis.useful_for_stats.map((prompt) => prompt.text),
+    [list, quote],
+  );
+});
+
+test("promptTextForCloud preserves natural-language import mentions", () => {
+  assert.equal(
+    promptTextForCloud("I want to import the library and also add types"),
+    "I want to import the library and also add types",
+  );
+  assert.equal(
+    promptTextForCloud(
+      "Keep this request\nimport { thing } from './module.js'\nand this explanation",
+    ),
+    "Keep this request\n \nand this explanation",
+  );
+  assert.equal(
+    promptTextForCloud(
+      "Keep this request\nimport React from 'react'\nWhat do you think about the performance?",
+    ),
+    "Keep this request\n \nWhat do you think about the performance?",
+  );
+});
+
 test("analyzePrompts extracts code and log signals from reference prompts", () => {
   const analysis = analyzePrompts([
     {
       source: "cursor",
-      text: "src/App.tsx\n```tsx\nexport function App() { return <main className=\"page\">Hi</main>; }\n```",
+      text: 'src/App.tsx\n```tsx\nexport function App() { return <main className="page">Hi</main>; }\n```',
     },
     {
       source: "codex",
@@ -651,7 +1252,10 @@ test("analyzePrompts counts all useful prompts even when useful prompt examples 
 
 test("inspectEnvironment counts skills, MCP servers, plugins, and custom instructions", async () => {
   const home = path.join(fixtures, "home");
-  const env = await inspectEnvironment({ home, codexHome: path.join(home, ".codex") });
+  const env = await inspectEnvironment({
+    home,
+    codexHome: path.join(home, ".codex"),
+  });
 
   assert.equal(env.codex.skills.count, 3);
   assert.equal(env.codex.skills.user_count, 2);

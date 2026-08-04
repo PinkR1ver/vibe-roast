@@ -6,10 +6,15 @@ const { isInRange } = require("../lib/dates");
 const { normalizeWhitespace, textFromContent } = require("../extract/text");
 
 async function inspectCodex({ root, range } = {}) {
-  const sessionsRoot = root || path.join(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"), "sessions");
+  const sessionsRoot =
+    root ||
+    path.join(
+      process.env.CODEX_HOME || path.join(os.homedir(), ".codex"),
+      "sessions",
+    );
   const files = await walkFiles(
     sessionsRoot,
-    (_filePath, name) => name.endsWith(".jsonl") && (name.startsWith("rollout-") || true),
+    (_filePath, name) => name.startsWith("rollout-") && name.endsWith(".jsonl"),
   );
   const prompts = [];
   const tokenTotals = emptyTotals();
@@ -44,7 +49,8 @@ async function inspectCodex({ root, range } = {}) {
       if (usage) {
         const delta = codexUsageDelta(usage, previousTotals);
         if (usage.total) previousTotals = usage.total;
-        if (inRequestedRange) addCodexContext(contextByDay, timestamp, delta, pendingTools);
+        if (inRequestedRange)
+          addCodexContext(contextByDay, timestamp, delta, pendingTools);
         pendingTools = [];
       }
     });
@@ -56,14 +62,17 @@ async function inspectCodex({ root, range } = {}) {
     files_scanned: files.length,
     prompt_count: prompts.length,
     token_totals: tokenTotals,
-    context_breakdown_daily: [...contextByDay.values()].sort((a, b) => a.day.localeCompare(b.day)),
+    context_breakdown_daily: [...contextByDay.values()].sort((a, b) =>
+      a.day.localeCompare(b.day),
+    ),
     prompts,
   };
 }
 
 function extractCodexPrompt(obj) {
   const payload = obj?.payload || {};
-  const nested = payload.msg && typeof payload.msg === "object" ? payload.msg : null;
+  const nested =
+    payload.msg && typeof payload.msg === "object" ? payload.msg : null;
   const type = String(payload.type || nested?.type || "").toLowerCase();
   // Codex rollouts mix user / agent / tool / token events — only keep user prompts.
   if (type !== "user_message") return "";
@@ -79,7 +88,9 @@ function extractCodexPrompt(obj) {
     nested?.content,
   ];
   for (const candidate of candidates) {
-    const text = normalizeWhitespace(stripCodexInjectedContext(textFromContent(candidate)));
+    const text = normalizeWhitespace(
+      stripCodexInjectedContext(textFromContent(candidate)),
+    );
     if (text) return text;
   }
   return "";
@@ -105,20 +116,32 @@ function stripCodexInjectedContext(value) {
     "in-app-browser-context",
     "recommended_plugins",
     "environment_context",
+    "app-context",
+    "permissions",
+    "collaboration_mode",
+    "apps_instructions",
+    "plugins_instructions",
+    "skills_instructions",
   ];
   for (const tag of injectedTags) {
     const block = new RegExp(`<${tag}\\b[^>]*>[\\s\\S]*?<\\/${tag}>`, "gi");
     text = text.replace(block, " ");
   }
+  text = text.replace(
+    /^\s*#\s*AGENTS\.md instructions\s*<INSTRUCTIONS>[\s\S]*?<\/INSTRUCTIONS>\s*/gim,
+    " ",
+  );
   return text.trim();
 }
 
 function extractCodexTokens(obj) {
   const payload = obj?.payload || {};
   const info =
-    payload.type === "token_count" ? payload.info
-    : payload.msg?.type === "token_count" ? payload.msg.info
-    : null;
+    payload.type === "token_count"
+      ? payload.info
+      : payload.msg?.type === "token_count"
+        ? payload.msg.info
+        : null;
   if (!info) return null;
   return normalizeTotals(info.total_token_usage || info);
 }
@@ -126,24 +149,32 @@ function extractCodexTokens(obj) {
 function extractCodexUsageEvent(obj) {
   const payload = obj?.payload || {};
   const info =
-    payload.type === "token_count" ? payload.info
-    : payload.msg?.type === "token_count" ? payload.msg.info
-    : null;
+    payload.type === "token_count"
+      ? payload.info
+      : payload.msg?.type === "token_count"
+        ? payload.msg.info
+        : null;
   if (!info) return null;
   return {
-    last: info.last_token_usage && typeof info.last_token_usage === "object"
-      ? info.last_token_usage
-      : null,
-    total: info.total_token_usage && typeof info.total_token_usage === "object"
-      ? info.total_token_usage
-      : null,
+    last:
+      info.last_token_usage && typeof info.last_token_usage === "object"
+        ? info.last_token_usage
+        : null,
+    total:
+      info.total_token_usage && typeof info.total_token_usage === "object"
+        ? info.total_token_usage
+        : null,
   };
 }
 
 function extractCodexTool(obj) {
-  if (obj?.type !== "response_item" || obj?.payload?.type !== "function_call") return "";
+  if (obj?.type !== "response_item" || obj?.payload?.type !== "function_call")
+    return "";
   const payload = obj.payload;
-  if (typeof payload.namespace === "string" && payload.namespace.startsWith("mcp__")) {
+  if (
+    typeof payload.namespace === "string" &&
+    payload.namespace.startsWith("mcp__")
+  ) {
     return `${payload.namespace}${payload.name || ""}`;
   }
   return typeof payload.name === "string" ? payload.name : "";
@@ -156,7 +187,10 @@ function codexUsageDelta(usage, previousTotals) {
     const previous = normalizeCodexUsage(previousTotals);
     if (total.total_tokens >= previous.total_tokens) {
       return Object.fromEntries(
-        Object.keys(total).map((key) => [key, Math.max(0, total[key] - previous[key])]),
+        Object.keys(total).map((key) => [
+          key,
+          Math.max(0, total[key] - previous[key]),
+        ]),
       );
     }
   }
@@ -166,7 +200,10 @@ function codexUsageDelta(usage, previousTotals) {
 function normalizeCodexUsage(raw) {
   const totals = normalizeTotals(raw);
   // Codex reports input inclusive of cache reads.
-  totals.input_tokens = Math.max(0, totals.input_tokens - totals.cached_input_tokens);
+  totals.input_tokens = Math.max(
+    0,
+    totals.input_tokens - totals.cached_input_tokens,
+  );
   totals.total_tokens =
     totals.input_tokens +
     totals.cached_input_tokens +
@@ -182,15 +219,19 @@ function addCodexContext(byDay, timestamp, delta, tools) {
   const row = byDay.get(day) || emptyContextRow(day, "turn_delta");
   const uniqueTools = [...new Set((tools || []).filter(Boolean))];
   const toolShare = uniqueTools.length > 0 ? 1 : 0;
-  const reasoning = Math.min(delta.total_tokens, number(delta.reasoning_output_tokens));
+  const reasoning = Math.min(
+    delta.total_tokens,
+    number(delta.reasoning_output_tokens),
+  );
   const attributable = Math.max(0, delta.total_tokens - reasoning);
   row.categories.reasoning += reasoning;
   row.categories.tool_calls += attributable * toolShare;
   row.categories.messages += attributable * (1 - toolShare);
   row.total_tokens += delta.total_tokens;
-  row.input_tokens += number(delta.input_tokens)
-    + number(delta.cached_input_tokens)
-    + number(delta.cache_creation_input_tokens);
+  row.input_tokens +=
+    number(delta.input_tokens) +
+    number(delta.cached_input_tokens) +
+    number(delta.cache_creation_input_tokens);
   row.cached_input_tokens += number(delta.cached_input_tokens);
   row.tool_call_count += uniqueTools.length;
   row.event_count += 1;

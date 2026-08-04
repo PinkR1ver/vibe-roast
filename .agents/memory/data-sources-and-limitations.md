@@ -1,6 +1,6 @@
 # Data sources and limitations
 
-Last updated: 2026-07-26
+Last updated: 2026-08-05
 
 ## Normalized source contract
 
@@ -53,7 +53,10 @@ Prompt adapters return a report shaped like:
 ## Prompt hygiene
 
 - Codex assistant/tool events, Claude tool-result blocks, Cursor assistant/system bubbles, and generic system/tool notifications are excluded before aggregation.
+- Codex extraction removes known desktop-owned envelopes, including recommended-plugin, environment, app-context, permission, skills, and `AGENTS.md` instruction blocks, while preserving the authored request that follows them.
 - `profile_signals.prompt_analysis` classifies useful intent separately from pasted code/log reference material.
+- Structured attachments have ambiguous provenance. Code, config, diffs, logs, terminal output, prompt templates, and opaque text are separated from the surrounding request. Separable actionable prose around code, config, diffs, logs, or terminal output is retained while unknown material origin stays `unverified`; explicit self-authorship or external/generated provenance is recorded separately. Only stripped request text affects profile statistics. Pure code without request prose, source-unknown templates, and opaque text remain reference evidence.
+- Actionable prose includes imperative and interrogative requests in English or Chinese. Terminal blocks and unfenced code are stripped as attachment regions so their stdout and code keywords cannot influence categories or word statistics.
 - Word frequencies use the complete useful-for-stats collection, prefer timestamped prompts when available, and remove fenced code, local paths, HTML/CSS/code-heavy lines, identifier noise, and stop words.
 
 ## Privacy boundary

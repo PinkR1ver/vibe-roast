@@ -1,5 +1,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs/promises");
+const os = require("node:os");
 const path = require("node:path");
 
 const {
@@ -8,7 +10,11 @@ const {
   extractCodexTokens,
   stripCodexInjectedContext,
 } = require("../src/sources/codex");
-const { inspectClaude, extractClaudePrompt, extractClaudeTokens } = require("../src/sources/claude");
+const {
+  inspectClaude,
+  extractClaudePrompt,
+  extractClaudeTokens,
+} = require("../src/sources/claude");
 const { inspectCursor, resolveCursorDbPath } = require("../src/sources/cursor");
 const { dayBounds } = require("../src/lib/dates");
 
@@ -66,6 +72,14 @@ Current URL: https://example.com/private
 检查主题词算法`),
     "检查主题词算法",
   );
+  assert.equal(
+    stripCodexInjectedContext(`<recommended_plugins>plugin noise</recommended_plugins>
+# AGENTS.md instructions
+<INSTRUCTIONS>Build with this generated JavaScript template.</INSTRUCTIONS>
+<environment_context>machine state</environment_context>
+这是我自己写的 JavaScript，请帮我修复重复提交。`),
+    "这是我自己写的 JavaScript，请帮我修复重复提交。",
+  );
 });
 
 test("extractCodexTokens normalizes total_token_usage", () => {
@@ -96,6 +110,27 @@ test("inspectCodex reads fixture session JSONL", async () => {
   assert.equal(report.prompt_count, 2);
   assert.equal(report.token_totals.total_tokens, 1800);
   assert.ok(report.prompts.every((p) => p.source === "codex"));
+});
+
+test("inspectCodex ignores non-rollout JSONL files", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "vibe-roast-codex-"));
+  const row = JSON.stringify({
+    timestamp: "2026-06-07T10:00:00.000Z",
+    payload: { type: "user_message", message: "实现登录页" },
+  });
+  await fs.writeFile(path.join(root, "rollout-valid.jsonl"), `${row}\n`);
+  await fs.writeFile(path.join(root, "unrelated.jsonl"), `${row}\n`);
+
+  try {
+    const report = await inspectCodex({
+      root,
+      range: dayBounds("2026-06-07", "2026-06-07"),
+    });
+    assert.equal(report.files_scanned, 1);
+    assert.equal(report.prompt_count, 1);
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
 });
 
 test("extractClaudePrompt only keeps user messages", () => {
