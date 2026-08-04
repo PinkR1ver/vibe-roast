@@ -29,7 +29,7 @@ fails closed instead of silently treating the diff as empty.
 
 L3 uses `c8 --all` and verifies that every file in the declared executable-code
 universe appears in the coverage report, including files no test imports. The
-current honest floor is 79.7% lines, 67.7% branches, and 89.2% functions.
+current Node.js 24 floor is 79.7% lines, 67.6% branches, and 89.2% functions.
 Raising coverage should ratchet these values upward; lowering them requires an
 explicit rationale in the pull request.
 

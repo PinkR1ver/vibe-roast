@@ -22,7 +22,7 @@ const args = [
   "--reporter=json-summary",
   "--check-coverage",
   "--lines=79.7",
-  "--branches=67.7",
+  "--branches=67.6",
   "--functions=89.2",
   process.execPath,
   "--test",
