@@ -906,6 +906,32 @@ test("analyzePrompts removes ordinary stdout from terminal attachments", () => {
   );
 });
 
+test("analyzePrompts removes successful stdout from single-command terminal attachments", () => {
+  const intent = "Please summarize the build result.";
+  const analysis = analyzePrompts([
+    {
+      text: [
+        intent,
+        "$ npm run build",
+        "vite v6.4.3 building for production...",
+        "dist/assets/index-R4nd0m.js 42.00 kB",
+        "✓ built in 812ms",
+      ].join("\n"),
+    },
+  ]);
+
+  assert.equal(analysis.useful_prompt_count, 1);
+  assert.deepEqual(analysis.useful_prompts[0].artifact_kinds, [
+    "terminal_output",
+  ]);
+  assert.equal(analysis.useful_for_stats[0].text, intent);
+  assert.ok(
+    !wordFrequencies(analysis.useful_for_stats).some((row) =>
+      ["vite", "dist", "assets", "r4nd0m"].includes(row.term),
+    ),
+  );
+});
+
 test("analyzePrompts removes unfenced code before category inference", () => {
   const intent = "Please explain this behavior.";
   const analysis = analyzePrompts([
@@ -940,6 +966,21 @@ test("English category and intent keywords require word boundaries", () => {
   assert.deepEqual(prose.useful_prompts[0].categories, ["explanation"]);
   assert.equal(codeReference.useful_prompt_count, 0);
   assert.equal(codeReference.reference_prompt_count, 1);
+});
+
+test("English testing categories include plural and inflected forms", () => {
+  const analysis = analyzePrompts([
+    { text: "Please write unit tests." },
+    { text: "Add specs for this module." },
+    { text: "The feature was tested with fixtures." },
+    { text: "Testing should cover the login flow." },
+  ]);
+
+  assert.ok(
+    analysis.useful_prompts.every((prompt) =>
+      prompt.categories.includes("testing"),
+    ),
+  );
 });
 
 test("English sentence starters survive artifact stripping", () => {

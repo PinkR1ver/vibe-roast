@@ -348,7 +348,10 @@ function inferCategories(text) {
       "debugging",
       /(?:bug|报错|错误|失败|修复|\b(?:debug|error|exception|traceback|syntaxerror)\b)/i,
     ],
-    ["testing", /(?:测试|回归|覆盖率|断言|\b(?:test|spec)\b)/i],
+    [
+      "testing",
+      /(?:测试|回归|覆盖率|断言|\b(?:tests?|testing|tested|specs?)\b)/i,
+    ],
     ["refactor", /(?:重构|抽象|拆分|整理|\brefactor\b)/i],
     ["packaging", /(?:打包|发布|\b(?:npm|xpi|release|publish|build)\b)/i],
     ["explanation", /(?:解释|为什么|讲一下|说明|\b(?:explain|why)\b)/i],
@@ -379,7 +382,7 @@ function inferCategories(text) {
 }
 
 function hasIntentVerb(text) {
-  return /(?:帮我|请|我要|我想|实现|做|改|修|优化|设计|解释|分析|生成|\b(?:add|fix|build|create|implement|explain|analyze|update|refactor)\b)/i.test(
+  return /(?:帮我|请|我要|我想|实现|做|改|修|优化|设计|解释|分析|生成|\b(?:add|fix|build|create|implement|explain|analyze|summarize|update|refactor)\b)/i.test(
     text,
   );
 }
@@ -498,7 +501,7 @@ function configLikeScore(text) {
 function terminalLikeScore(text) {
   let score = 0;
   const promptLines = (text.match(/^\s*[$%]\s+\S.+$/gm) || []).length;
-  if (promptLines >= 1) score += 2;
+  if (promptLines >= 1) score += 3;
   if (promptLines >= 3) score += 1;
   if (
     /(?:npm ERR!|ELIFECYCLE|Process exited with code|command not found|Tests:\s+\d+)/i.test(
