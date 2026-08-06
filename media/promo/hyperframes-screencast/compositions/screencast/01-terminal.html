@@ -1,0 +1,59 @@
+<template>
+  <div id="root" data-composition-id="01-terminal" data-duration="6" data-width="1920" data-height="1080">
+    <div class="clip g" data-start="0" data-duration="6" data-track-index="0"></div>
+    <div class="clip s" data-start="0" data-duration="6" data-track-index="1">
+      <div class="r r-tl"></div><div class="r r-tr"></div><div class="r r-bl"></div><div class="r r-br"></div>
+      <div class="pr">
+        <span class="pl">~ $ </span>
+        <span class="pt-wrap">
+          <span class="pc">n</span><span class="pc">p</span><span class="pc">x</span><span class="pc"> </span><span class="pc">v</span><span class="pc">i</span><span class="pc">b</span><span class="pc">e</span><span class="pc">-</span><span class="pc">r</span><span class="pc">o</span><span class="pc">a</span><span class="pc">s</span><span class="pc">t</span>
+          <span class="cr" id="cr"></span>
+        </span>
+      </div>
+      <div class="out" id="out"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    #root{position:relative;width:1920px;height:1080px;overflow:hidden;container-type:size;color:#f5f0e5}
+    .g{position:absolute;inset:0;background:#181615}
+    .s{position:absolute;inset:0;overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:16px;line-height:1.65}
+    .r{position:absolute;width:54px;height:54px;color:#f5f0e5}
+    .r::before,.r::after{content:"";position:absolute;background:currentColor}
+    .r::before{width:100%;height:1px;top:0}.r::after{width:1px;height:100%;left:0}
+    .r-tl{top:48px;left:48px}.r-tr{top:48px;right:48px;transform:scaleX(-1)}
+    .r-bl{bottom:48px;left:48px;transform:scaleY(-1)}.r-br{bottom:48px;right:48px;transform:scale(-1,-1)}
+    .pr{position:absolute;top:320px;left:50%;transform:translateX(-50%);white-space:nowrap}
+    .pl{color:#4ec94e}
+    .pt-wrap{position:relative;display:inline}
+    .pc{display:none;color:#d4d4d4}
+    .cr{display:inline-block;width:9px;height:18px;background:#d4d4d4;vertical-align:middle;position:relative;top:-1px;opacity:0}
+    .out{position:absolute;top:410px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:0}
+    .ol{white-space:pre;opacity:0;margin:0}
+    .oo{color:#e8a55a}.ob{color:#f5e6c8;font-weight:600}.od{color:#999}.oc{color:#5db8a6}.og{color:#4ec94e}
+  </style>
+  <script>
+    window.__timelines=window.__timelines||{};var tl=gsap.timeline({paused:true});window.__timelines["01-terminal"]=tl;
+    gsap.set(".r",{opacity:0});
+    // Reg marks
+    tl.to(".r",{opacity:.55,duration:.5,stagger:.1,ease:"power2.out"},.1);
+    // Show cursor
+    tl.set("#cr",{opacity:1},.5);
+    // Reveal each character AND move cursor — use display:none→inline so cursor follows
+    var chars=document.querySelectorAll(".pc");
+    for(var i=0;i<chars.length;i++){
+      // Show this character
+      tl.set(chars[i],{display:"inline"},.55+i*.14);
+    }
+    // Cursor blinks after all chars revealed
+    tl.to("#cr",{opacity:0,duration:.08,repeat:3,yoyo:true},.55+14*.14);
+    tl.set("#cr",{opacity:0},.55+14*.14+.7);
+
+    // Output lines
+    var lines=[{t:"",c:""},{t:"╭─ VIBE ROAST · local evidence lab",c:"oo ob od"},{t:"│  Compiling vibes. Types may be dramatically exaggerated.",c:"oo od"},{t:"╰────────────────────────────────────────────",c:"oo"},{t:"",c:""},{t:"  ◜ Dusting the fingerprints off local agent history",c:"oc od"},{t:"  ◝ Arranging the evidence by dramatic potential",c:"oc od"},{t:"  ◟ Preheating the roast without uploading your prompts",c:"oc od"},{t:"  ◆ Preheating the roast without uploading your prompts",c:"og od"},{t:"",c:""},{t:"  ◆ Ready — open http://localhost:7681",c:"og oc"}];
+    var out=document.getElementById("out"),divs=[];
+    for(var i=0;i<lines.length;i++){var d=document.createElement("div");d.className="ol";if(lines[i].c){var css=lines[i].c.split(" "),t=lines[i].t;d.innerHTML='<span class="'+css[0]+'">'+t.substring(0,2)+'</span><span class="'+css[1]+'">'+t.substring(2)+'</span>'}else{d.textContent=lines[i].t||""}out.appendChild(d);divs.push(d)}
+    var timings=[2.0,2.0,2.6,3.2,3.6,3.6,4.1,4.6,5.0,5.3,5.3];
+    for(var i=0;i<divs.length;i++){if(lines[i].t===""&&i!==0&&i!==4&&i!==9)continue;(function(idx){tl.to(divs[idx],{opacity:1,y:0,duration:.4,ease:"power2.out"},timings[idx]);gsap.set(divs[idx],{y:6})})(i)}
+  </script>
+</template>

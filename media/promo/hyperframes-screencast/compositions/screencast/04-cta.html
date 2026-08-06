@@ -1,0 +1,44 @@
+<template>
+  <div id="root" data-composition-id="04-cta" data-duration="5" data-width="1920" data-height="1080">
+    <div class="clip f04-ground" data-start="0" data-duration="5" data-track-index="0"></div>
+    <div class="clip f04-field" data-start="0" data-duration="5" data-track-index="1">
+      <div class="f04-reg f04-reg-tl"></div><div class="f04-reg f04-reg-tr"></div>
+      <div class="f04-reg f04-reg-bl"></div><div class="f04-reg f04-reg-br"></div>
+      <div class="f04-lockup" id="f04-lockup">
+        <div class="f04-code" id="f04-code"><span class="f04-dollar">$</span> npx vibe-roast</div>
+        <div class="f04-tagline" id="f04-tagline">Your prompts have a personality.</div>
+        <div class="f04-btns" id="f04-btns"><span class="f04-btn">GitHub</span><span class="f04-btn">npm</span></div>
+        <div class="f04-wm" id="f04-wm"><span class="f04-spike">✱</span> Vibe Roast</div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    #root{position:relative;width:1920px;height:1080px;overflow:hidden;container-type:size}
+    .f04-ground{position:absolute;inset:0;background:#181615}
+    .f04-field{position:absolute;inset:0;overflow:hidden;color:#f5f0e5;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif}
+    .f04-reg{position:absolute;width:54px;height:54px;color:#f5f0e5;opacity:.4}
+    .f04-reg::before,.f04-reg::after{content:"";position:absolute;background:currentColor}
+    .f04-reg::before{width:100%;height:1px;top:0}.f04-reg::after{width:1px;height:100%;left:0}
+    .f04-reg-tl{top:48px;left:48px}.f04-reg-tr{top:48px;right:48px;transform:scaleX(-1)}
+    .f04-reg-bl{bottom:48px;left:48px;transform:scaleY(-1)}.f04-reg-br{bottom:48px;right:48px;transform:scale(-1,-1)}
+    .f04-lockup{text-align:center;opacity:0}
+    .f04-code{display:inline-block;padding:24px 48px;background:#1f1c1b;color:#d4d4d4;font-family:'JetBrains Mono',monospace;font-size:30px;border-radius:10px;border:1px solid rgba(245,240,229,.12);margin-bottom:32px}
+    .f04-dollar{color:#4ec94e}
+    .f04-tagline{font-size:38px;font-weight:400;font-style:italic;margin-bottom:36px}
+    .f04-btns{display:flex;gap:16px;justify-content:center}
+    .f04-btn{padding:16px 36px;background:#d45135;color:#f5f0e5;font-size:17px;font-weight:500;border-radius:10px}
+    .f04-wm{font-family:'Inter',sans-serif;font-style:italic;font-size:28px;color:rgba(245,240,229,.4);margin-top:40px}
+    .f04-spike{color:#d45135;font-style:normal}
+  </style>
+  <script>
+    var cid="04-cta";window.__timelines=window.__timelines||{};var tl=gsap.timeline({paused:true});window.__timelines[cid]=tl;
+    gsap.set(".f04-reg",{opacity:0});
+    tl.to(".f04-reg",{opacity:.4,duration:.5,stagger:.08,ease:"power2.out"},.1);
+    tl.to("#f04-lockup",{opacity:1,duration:.5,ease:"power2.out"},.5);
+    tl.from("#f04-code",{y:20,opacity:0,duration:.5,ease:"power3.out"},.6);
+    tl.from("#f04-tagline",{y:16,opacity:0,duration:.4,ease:"power2.out"},.9);
+    tl.from("#f04-btns .f04-btn",{scale:.85,opacity:0,duration:.35,stagger:.1,ease:"power2.out"},1.2);
+    tl.from("#f04-wm",{y:10,opacity:0,duration:.4,ease:"power2.out"},1.5);
+  </script>
+</template>

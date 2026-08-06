@@ -1,0 +1,7 @@
+{
+  "name": "vibe-roast-screencast",
+  "private": true,
+  "scripts": {
+    "render": "npx hyperframes render --quality high --output ../masters/screencast.mp4"
+  }
+}

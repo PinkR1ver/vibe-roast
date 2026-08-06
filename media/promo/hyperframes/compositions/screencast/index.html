@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Vibe Roast — Terminal-to-Web Screencast</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&family=Great+Vibes&display=swap');
+
+      :root {
+        --ink: #0B1113;
+        --cream: #F5F0E5;
+        --mint: #18B98B;
+        --coral: #EF6B4A;
+        --navy: #181615;
+        --navy-soft: #1F1C1B;
+        --term-bg: #1a1a1a;
+        --term-text: #d4d4d4;
+        --term-green: #4ec94e;
+        --term-orange: #e8a55a;
+        --term-cyan: #5db8a6;
+        --term-dim: #6b6b6b;
+      }
+
+      body { margin: 0; background: var(--ink); font-family: 'Inter', system-ui, sans-serif; }
+
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+      }
+
+      /* ── Terminal window ── */
+      .term-window {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        background: var(--term-bg);
+        border-radius: 8px;
+        box-shadow: 0 0 60px rgba(0,0,0,0.6);
+        overflow: hidden;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      .term-titlebar {
+        height: 32px;
+        background: #2d2d2d;
+        display: flex;
+        align-items: center;
+        padding: 0 14px;
+        gap: 8px;
+        user-select: none;
+      }
+      .term-dot { width: 12px; height: 12px; border-radius: 50%; }
+      .term-dot.red { background: #ff5f57; }
+      .term-dot.yellow { background: #febc2e; }
+      .term-dot.green { background: #28c840; }
+      .term-title {
+        flex: 1; text-align: center;
+        font-size: 12px; color: #999;
+        font-family: -apple-system, sans-serif;
+        margin-right: 40px;
+      }
+      .term-body {
+        padding: 24px 28px;
+        min-height: 480px;
+        color: var(--term-text);
+      }
+      .term-line { white-space: pre; }
+      .term-prompt { color: var(--term-green); }
+      .term-cmd { color: var(--term-text); }
+      .term-cursor {
+        display: inline-block; width: 8px; height: 16px;
+        background: var(--term-text); vertical-align: text-bottom;
+      }
+      .term-orange { color: var(--term-orange); }
+      .term-cream { color: #f5e6c8; }
+      .term-dim { color: var(--term-dim); }
+      .term-green-c { color: var(--term-green); }
+      .term-cyan-c { color: var(--term-cyan); }
+
+      /* ── Transition mask ── */
+      .push-transition {
+        position: absolute;
+        inset: 0;
+        background: var(--ink);
+      }
+
+      /* ── Browser frame ── */
+      .browser-frame {
+        position: absolute;
+        top: 60px; left: 60px;
+        right: 60px; bottom: 40px;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 80px rgba(0,0,0,0.5);
+      }
+      .browser-titlebar {
+        height: 40px;
+        background: #e8e6e3;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        gap: 8px;
+      }
+      .browser-dot { width: 10px; height: 10px; border-radius: 50%; }
+      .browser-url {
+        flex: 1;
+        height: 26px;
+        background: #fff;
+        border-radius: 6px;
+        margin: 0 12px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 13px;
+        color: #555;
+        font-family: -apple-system, sans-serif;
+      }
+      .browser-content {
+        height: calc(100% - 40px);
+        overflow: hidden;
+        position: relative;
+      }
+      .browser-content img {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+      }
+
+      /* ── Cream canvas ── */
+      .cream-canvas {
+        position: absolute;
+        inset: 0;
+        background: var(--cream);
+      }
+
+      /* ── Character grid ── */
+      .char-grid {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        display: grid;
+        grid-template-columns: repeat(4, 180px);
+        grid-template-rows: repeat(4, 200px);
+        gap: 20px 24px;
+      }
+      .char-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+      }
+      .char-img {
+        width: 140px;
+        height: 140px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid rgba(11,17,19,0.12);
+        background: var(--navy-soft);
+      }
+      .char-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink);
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      /* ── CTA lockup ── */
+      .cta-lockup {
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+      }
+      .cta-code {
+        display: inline-block;
+        padding: 20px 40px;
+        background: var(--navy);
+        color: var(--term-text);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 26px;
+        border-radius: 8px;
+        border: 1px solid rgba(245,240,229,0.14);
+        margin-bottom: 24px;
+      }
+      .cta-tagline {
+        font-family: 'Inter', sans-serif;
+        font-size: 32px;
+        font-weight: 400;
+        font-style: italic;
+        color: var(--ink);
+        margin-bottom: 28px;
+      }
+      .cta-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+      }
+      .cta-btn {
+        padding: 12px 28px;
+        background: var(--coral);
+        color: var(--cream);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        font-weight: 500;
+        border-radius: 8px;
+        text-decoration: none;
+        border: none;
+      }
+      .cta-wordmark {
+        font-family: 'Great Vibes', cursive;
+        font-size: 28px;
+        color: rgba(11,17,19,0.4);
+        margin-top: 32px;
+      }
+      .coral-spike {
+        color: var(--coral);
+        font-size: 18px;
+        margin-right: 4px;
+      }
+
+      /* ── Axis overlay ── */
+      .axis-stamp {
+        position: absolute;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--coral);
+      }
+
+      /* ── Hero icon ── */
+      .hero-icon {
+        width: 120px; height: 120px;
+        object-fit: contain;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"
+      data-composition-id="screencast"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="42"
+    >
+
+      <!-- ═══ Shot 1–2: Terminal opens + command types ═══ -->
+      <section id="shot-terminal" class="clip" data-start="0" data-duration="14" data-track-index="1">
+        <div class="term-window" id="termwin">
+          <div class="term-titlebar">
+            <span class="term-dot red"></span>
+            <span class="term-dot yellow"></span>
+            <span class="term-dot green"></span>
+            <span class="term-title">judew — -zsh — 120×40</span>
+          </div>
+          <div class="term-body" id="termbody">
+            <div class="term-line"><span class="term-dim">Last login: Sun Jul 27 02:30:42 on ttys001</span></div>
+            <div class="term-line" style="margin-top:12px">
+              <span class="term-prompt">~ $ </span><span class="term-cmd" id="typed-cmd"></span><span class="term-cursor" id="typing-cursor"></span>
+            </div>
+            <div id="term-output" style="margin-top:16px; opacity:0"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Shot 4b: Push transition (terminal → browser) ═══ -->
+      <section id="shot-push" class="clip" data-start="12.5" data-duration="3" data-track-index="2">
+        <div class="push-transition" style="display:flex">
+          <div id="push-left" style="flex:1; background:var(--term-bg); display:flex; align-items:center; justify-content:center; overflow:hidden">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--term-dim); text-align:center; line-height:1.8">
+              ◆ Ready<br>localhost:7681
+            </div>
+          </div>
+          <div id="push-right" style="flex:0; background:#fff; overflow:hidden"></div>
+        </div>
+      </section>
+
+      <!-- ═══ Shot 5–6: Browser with roast result ═══ -->
+      <section id="shot-browser" class="clip" data-start="14" data-duration="14.5" data-track-index="1">
+        <div class="browser-frame" id="browserwin">
+          <div class="browser-titlebar">
+            <span class="browser-dot" style="background:#ff5f57"></span>
+            <span class="browser-dot" style="background:#febc2e"></span>
+            <span class="browser-dot" style="background:#28c840"></span>
+            <div class="browser-url">localhost:7681</div>
+          </div>
+          <div class="browser-content" id="browser-scroll">
+            <img src="../../../assests/screenshots/roast-result-hero.jpg" alt="Vibe Roast Result" style="position:relative" />
+            <!-- Axis stamps overlay -->
+            <div class="axis-stamp" id="axis-m" style="top:160px; left:280px">✱ M</div>
+            <div class="axis-stamp" id="axis-p" style="top:160px; left:380px">✱ P</div>
+            <div class="axis-stamp" id="axis-s" style="top:160px; left:480px">✱ S</div>
+            <div class="axis-stamp" id="axis-f" style="top:160px; left:580px">✱ F</div>
+            <!-- Type name overlay -->
+            <div id="type-badge" style="position:absolute; top:280px; left:50%; transform:translateX(-50%); font-family:'Inter',sans-serif; font-size:36px; font-weight:400; color:var(--ink); opacity:0">Builder</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Shot 7: Camera pull-back ═══ -->
+      <section id="shot-pullback" class="clip" data-start="28.5" data-duration="2" data-track-index="1">
+        <div class="cream-canvas"></div>
+      </section>
+
+      <!-- ═══ Shot 8: 16-type character grid ═══ -->
+      <section id="shot-cast" class="clip" data-start="30.5" data-duration="6.5" data-track-index="1">
+        <div class="cream-canvas" style="display:flex; align-items:center; justify-content:center">
+          <div class="char-grid" id="chargrid">
+            <!-- Row 1 -->
+            <div class="char-cell" id="cell-0"><img class="char-img" src="../../assets/strategy-shipper-figure.png" alt="Strategy Shipper"><span class="char-label">Strategy<br>Shipper</span></div>
+            <div class="char-cell" id="cell-1"><img class="char-img" src="../../assets/agent-believer-figure.png" alt="Agent Believer"><span class="char-label">Agent<br>Believer</span></div>
+            <div class="char-cell" id="cell-2"><img class="char-img" src="../../assets/systems-architect-figure.png" alt="Systems Architect"><span class="char-label">Systems<br>Architect</span></div>
+            <div class="char-cell" id="cell-3"><img class="char-img" src="../../assets/context-cartographer-figure.png" alt="Context Cartographer"><span class="char-label">Context<br>Cartographer</span></div>
+            <!-- Row 2 -->
+            <div class="char-cell" id="cell-4"><img class="char-img" src="../../assets/diagram-sprinter-figure.png" alt="Diagram Sprinter"><span class="char-label">Diagram<br>Sprinter</span></div>
+            <div class="char-cell" id="cell-5"><img class="char-img" src="../../assets/infinite-planner-figure.png" alt="Infinite Planner"><span class="char-label">Infinite<br>Planner</span></div>
+            <div class="char-cell" id="cell-6"><img class="char-img" src="../../assets/architect-figure.png" alt="Architect"><span class="char-label">Architect</span></div>
+            <div class="char-cell" id="cell-7"><img class="char-img" src="../../assets/prompt-priest-figure.png" alt="Prompt Priest"><span class="char-label">Prompt<br>Priest</span></div>
+            <!-- Row 3 -->
+            <div class="char-cell" id="cell-8"><img class="char-img" src="../../assets/yolo-shipper-figure.png" alt="YOLO Shipper"><span class="char-label">YOLO<br>Shipper</span></div>
+            <div class="char-cell" id="cell-9"><img class="char-img" src="../../assets/agent-commander-figure.png" alt="Agent Commander"><span class="char-label">Agent<br>Commander</span></div>
+            <div class="char-cell" id="cell-10"><img class="char-img" src="../../assets/agent-engineer-figure.png" alt="Agent Engineer"><span class="char-label">Agent<br>Engineer</span></div>
+            <div class="char-cell" id="cell-11"><img class="char-img" src="../../assets/systems-wrangler-figure.png" alt="Systems Wrangler"><span class="char-label">Systems<br>Wrangler</span></div>
+            <!-- Row 4 -->
+            <div class="char-cell" id="cell-12"><img class="char-img" src="../../assets/builder-figure.png" alt="Builder"><span class="char-label">Builder</span></div>
+            <div class="char-cell" id="cell-13"><img class="char-img" src="../../assets/tab-hoarder-figure.png" alt="Tab Hoarder"><span class="char-label">Tab<br>Hoarder</span></div>
+            <div class="char-cell" id="cell-14"><img class="char-img" src="../../assets/debugger-figure.png" alt="Debugger"><span class="char-label">Debugger</span></div>
+            <div class="char-cell" id="cell-15"><img class="char-img" src="../../assets/context-maxxer-figure.png" alt="Context Maxxer"><span class="char-label">Context<br>Maxxer</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ Shot 9: CTA lockup ═══ -->
+      <section id="shot-cta" class="clip" data-start="37" data-duration="5" data-track-index="1">
+        <div class="cream-canvas" style="display:flex; align-items:center; justify-content:center">
+          <div class="cta-lockup" id="ctalockup">
+            <div class="cta-code">npx vibe-roast</div>
+            <div class="cta-tagline">Your prompts have a personality.</div>
+            <div class="cta-buttons">
+              <span class="cta-btn">GitHub</span>
+              <span class="cta-btn">npm</span>
+            </div>
+            <div class="cta-wordmark"><span class="coral-spike">✱</span>Vibe Roast</div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // ── Shot 1: Terminal fades in (0–1.5s) ──
+      tl.from("#termwin", { scale: 0.92, opacity: 0, duration: 0.8, ease: "power3.out" }, 0.2);
+
+      // ── Shot 2: Typing "npx vibe-roast" character by character (3.5–6.5s) ──
+      const cmd = "npx vibe-roast";
+      const typedEl = document.getElementById("typed-cmd");
+      const cursorEl = document.getElementById("typing-cursor");
+      // Type each character
+      for (let i = 0; i < cmd.length; i++) {
+        tl.call(() => { typedEl.textContent = cmd.slice(0, i + 1); }, null, 3.5 + i * 0.18);
+      }
+      // Blink cursor a few times after typing
+      tl.to("#typing-cursor", { opacity: 0, duration: 0.08, repeat: 3, yoyo: true }, 3.5 + cmd.length * 0.18);
+      tl.set("#typing-cursor", { opacity: 0 }, 3.5 + cmd.length * 0.18 + 0.7);
+
+      // ── Shot 3: Terminal output appears (6.5–11.5s) ──
+      const output = document.getElementById("term-output");
+      tl.call(() => {
+        output.style.opacity = "1";
+        output.innerHTML =
+          '<div class="term-line" style="margin-top:8px"></div>' +
+          '<div class="term-line"><span class="term-orange">╭─</span> <span class="term-cream" style="font-weight:500">VIBE ROAST</span> <span class="term-dim">· local evidence lab</span></div>' +
+          '<div class="term-line"><span class="term-orange">│</span>  <span class="term-dim">Compiling vibes. Types may be dramatically exaggerated.</span></div>' +
+          '<div class="term-line"><span class="term-orange">╰────────────────────────────────────────────</span></div>' +
+          '<div class="term-line" style="margin-top:8px"></div>' +
+          '<div class="term-line"><span class="term-cyan-c">  ◜</span> <span class="term-dim">Dusting the fingerprints off local agent history</span></div>' +
+          '<div class="term-line" style="margin-top:4px"><span class="term-cyan-c">  ◝</span> <span class="term-dim">Arranging the evidence by dramatic potential</span></div>' +
+          '<div class="term-line" style="margin-top:4px"><span class="term-cyan-c">  ◟</span> <span class="term-dim">Preheating the roast without uploading your prompts</span></div>' +
+          '<div class="term-line" style="margin-top:4px"><span class="term-green-c">  ◆</span> <span class="term-dim">Preheating the roast without uploading your prompts</span></div>' +
+          '<div class="term-line" style="margin-top:8px"></div>' +
+          '<div class="term-line"><span class="term-green-c">  ◆</span> <span>Ready — open <span class="term-cyan-c">http://localhost:7681</span></span></div>';
+      }, null, 6.5);
+      // Fade in output lines
+      tl.from("#term-output .term-line", {
+        y: 8, opacity: 0, duration: 0.35,
+        stagger: 0.3, ease: "power2.out"
+      }, 6.5);
+
+      // ── Shot 4: Push transition (terminal shrinks, browser expands) (12.5–15.5s) ──
+      tl.set("#shot-terminal", { opacity: 0 }, 12.5);
+      tl.from("#push-left", { flex: "0 0 1920px", duration: 0.7, ease: "power3.inOut" }, 12.5);
+      tl.to("#push-right", { flex: "1 1 0px", duration: 0.7, ease: "power3.inOut" }, 12.5);
+
+      // ── Shot 5: Browser loads, axis stamps + type badge appear (14–18.5s) ──
+      tl.from("#browserwin", { scale: 0.95, opacity: 0, duration: 0.6, ease: "power3.out" }, 14.2);
+      // Axis stamps stamp in one by one
+      const axes = ["#axis-m", "#axis-p", "#axis-s", "#axis-f"];
+      axes.forEach((id, i) => {
+        tl.from(id, { scale: 1.6, opacity: 0, duration: 0.25, ease: "back.out(1.7)" }, 16 + i * 0.45);
+      });
+      // Type badge appears
+      tl.to("#type-badge", { opacity: 1, duration: 0.5, ease: "power2.out" }, 18);
+
+      // ── Shot 6: Scroll the browser content (18.5–28.5s) ──
+      tl.to("#browser-scroll", { scrollTop: 400, duration: 8, ease: "none" }, 18.5);
+      tl.to("#browser-scroll", { scrollTop: 400, duration: 0.5 }, 26.5); // pause at bottom
+
+      // ── Shot 7: Camera pull-back — cream canvas reveals (28.5–30.5s) ──
+      tl.set("#shot-browser", { opacity: 0 }, 28.5);
+      tl.set("#shot-push", { opacity: 0 }, 28.5);
+
+      // ── Shot 8: Character grid — rows arrive one by one (30.5–37s) ──
+      const allCells = [];
+      for (let r = 0; r < 4; r++) {
+        for (let c = 0; c < 4; c++) {
+          allCells.push({ el: "#cell-" + (r * 4 + c), row: r });
+        }
+      }
+      allCells.forEach(({ el, row }) => {
+        tl.from(el, {
+          scale: 0.85, opacity: 0, y: 30,
+          duration: 0.5, ease: "power3.out"
+        }, 31 + row * 0.4);
+      });
+
+      // Highlight builder (cell-12), dim others
+      tl.to(allCells.filter(c => c.el !== "#cell-12").map(c => c.el), {
+        opacity: 0.35, duration: 0.5, ease: "power2.out"
+      }, 34);
+      tl.to("#cell-12 .char-img", {
+        boxShadow: "0 0 0 3px #EF6B4A", duration: 0.3
+      }, 34);
+      // Return all to full opacity
+      tl.to(allCells.filter(c => c.el !== "#cell-12").map(c => c.el), {
+        opacity: 1, duration: 0.6, ease: "power2.out"
+      }, 35.5);
+      tl.to("#cell-12 .char-img", {
+        boxShadow: "0 0 0 0px #EF6B4A", duration: 0.3
+      }, 35.5);
+
+      // ── Shot 9: CTA lockup fades in (37–42s) ──
+      tl.set("#shot-cast", { opacity: 0 }, 37);
+      tl.from("#ctalockup", { y: 30, opacity: 0, duration: 0.7, ease: "power3.out" }, 37.3);
+
+      // Fade to ink at the end
+      tl.to("#root", { backgroundColor: "#0B1113", duration: 0.8, ease: "power2.in" }, 41.2);
+      tl.to("#ctalockup", { opacity: 0, duration: 0.4 }, 41.2);
+
+      window.__timelines["screencast"] = tl;
+    </script>
+  </body>
+</html>

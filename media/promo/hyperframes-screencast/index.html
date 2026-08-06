@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      *{margin:0;padding:0;box-sizing:border-box}
+      html,body{width:1920px;height:1080px;overflow:hidden;background:#000}
+      #root{position:relative;width:1920px;height:1080px;overflow:hidden;background:#000}
+      .scene{position:absolute;inset:0;width:100%;height:100%}
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="screencast" data-start="0" data-duration="30" data-width="1920" data-height="1080">
+
+      <div id="f0" class="scene"
+        data-composition-id="00-intake" data-composition-src="compositions/screencast/00-intake.html"
+        data-start="0" data-duration="4" data-track-index="0"></div>
+
+      <div id="f1" class="scene"
+        data-composition-id="01-terminal" data-composition-src="compositions/screencast/01-terminal.html"
+        data-start="3.5" data-duration="6" data-track-index="1"></div>
+
+      <div id="f2" class="scene"
+        data-composition-id="02-page" data-composition-src="compositions/screencast/02-page.html"
+        data-start="9" data-duration="10" data-track-index="0"></div>
+
+      <div id="f3" class="scene"
+        data-composition-id="03-cast" data-composition-src="compositions/screencast/03-cast.html"
+        data-start="18.5" data-duration="7" data-track-index="1"></div>
+
+      <div id="f4" class="scene"
+        data-composition-id="04-cta" data-composition-src="compositions/screencast/04-cta.html"
+        data-start="25" data-duration="4.7" data-track-index="0"></div>
+
+      <audio id="bgm" src="assets/screencast-audio.wav" data-start="0" data-duration="30" data-track-index="99" data-volume="0.7"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+      window.__timelines["screencast"] = tl;
+
+      // 0→1: blur crossfade
+      tl.to("#f0", { filter:"blur(6px)", scale:1.02, opacity:0, duration:0.35, ease:"power2.inOut" }, 3.5);
+      tl.fromTo("#f1", { filter:"blur(6px)", scale:0.98, opacity:0 }, { filter:"blur(0px)", scale:1, opacity:1, duration:0.35, ease:"power2.inOut" }, 3.5);
+
+      // 1→2: blur crossfade
+      tl.to("#f1", { filter:"blur(6px)", scale:1.02, opacity:0, duration:0.35, ease:"power2.inOut" }, 9);
+      tl.fromTo("#f2", { filter:"blur(6px)", scale:0.98, opacity:0 }, { filter:"blur(0px)", scale:1, opacity:1, duration:0.35, ease:"power2.inOut" }, 9);
+
+      // 2→3: blur crossfade
+      tl.to("#f2", { filter:"blur(6px)", scale:1.02, opacity:0, duration:0.35, ease:"power2.inOut" }, 18.5);
+      tl.fromTo("#f3", { filter:"blur(6px)", scale:0.98, opacity:0 }, { filter:"blur(0px)", scale:1, opacity:1, duration:0.35, ease:"power2.inOut" }, 18.5);
+
+      // 3→4: blur crossfade
+      tl.to("#f3", { filter:"blur(6px)", scale:1.02, opacity:0, duration:0.3, ease:"power2.inOut" }, 25);
+      tl.fromTo("#f4", { filter:"blur(6px)", scale:0.98, opacity:0 }, { filter:"blur(0px)", scale:1, opacity:1, duration:0.3, ease:"power2.inOut" }, 25);
+
+      tl.to({}, { duration:30 }, 0);
+    </script>
+  </body>
+</html>

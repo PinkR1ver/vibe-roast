@@ -80,3 +80,17 @@ introducing a second illustration style or relying on licensed music.
 - HyperFrames `check --samples 7` passes with zero lint/runtime/layout/motion
   errors. The remaining notices are intentional overflow during camera and
   cast entrances plus non-blocking authoring warnings.
+
+## V3 — Terminal-to-Web Screencast
+
+- A new 42-second, 1920×1080 HyperFrames composition at
+  `media/promo/hyperframes-screencast/index.html`.
+- Nine-shot storyboard: real terminal → `npx vibe-roast` command → branded
+  status output → push transition to browser → Roast Result page → axis
+  verdict stamps → smooth scroll through evidence → camera pull-back →
+  16-type cast grid with Builder highlight → CTA lockup → fade to ink.
+- Original procedural sound bed with keyboard ASMR, low pulse bed, four
+  percussive verdict stamps, cast arrival whoosh, and coral sting.
+- Final master: `media/promo/masters/screencast.mp4` — 42 seconds,
+  1920×1080, 30fps, H.264/yuv420p with AAC 48kHz stereo audio.
+- Production script at `media/promo/SCREENCAST-SCRIPT.md`.
