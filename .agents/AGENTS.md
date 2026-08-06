@@ -47,6 +47,16 @@ Vibe Roaster is a local-first Node.js application, published as `vibe-roast`, th
 - `npm install` remains side-effect free. The first interactive `vibe-roast` run visibly initializes bundled TokenTracker collectors and compatible hooks; later runs sync them before inspection.
 - The root `files` whitelist and `prepack` build define the npm artifact. Keep CLI, backend, built UI, `assests/`, and README available to the published package.
 
+## Feature development workflow
+
+- Every new feature must be developed on a dedicated branch off `main`, never directly on `main`.
+- Use `git worktree` to create an isolated working directory for each feature branch. This keeps `main` free for hotfixes, reviews, or parallel feature work in other sessions.
+- Naming conventions:
+  - Branch: `feature/<short-kebab-case-description>` (e.g. `feature/add-dark-mode`).
+  - Worktree: place under `.claude/worktrees/` via `EnterWorktree` or manual `git worktree add`.
+- When the feature is complete and merged, remove the worktree to keep the workspace clean.
+- This applies to any non-trivial change — bug fixes, refactors, and experiments included. Trivial one-line fixes or urgent hotfixes may go directly on `main` with discretion.
+
 ## Verification expectations
 
 - Adapter and aggregation changes need fixture-backed Node tests, including empty/missing-root behavior.
