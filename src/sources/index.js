@@ -51,9 +51,14 @@ const KNOWN_SOURCES = Object.keys(SOURCE_INSPECTORS);
 
 function normalizeSources(sources) {
   if (typeof sources === "string") {
-    return sources.split(",").map((s) => s.trim()).filter(Boolean);
+    return sources
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
-  return Array.isArray(sources) && sources.length > 0 ? sources : DEFAULT_SOURCES.slice();
+  return Array.isArray(sources) && sources.length > 0
+    ? sources
+    : DEFAULT_SOURCES.slice();
 }
 
 module.exports = {

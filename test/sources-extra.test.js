@@ -8,13 +8,25 @@ const { dayBounds } = require("../src/lib/dates");
 const { DEFAULT_SOURCES, normalizeSources } = require("../src/sources");
 const { inspectCline } = require("../src/sources/cline");
 const { inspectRoo } = require("../src/sources/roo");
-const { inspectContinue, extractContinueUserText } = require("../src/sources/continue");
-const { inspectGemini, extractGeminiUserText } = require("../src/sources/gemini");
+const {
+  inspectContinue,
+  extractContinueUserText,
+} = require("../src/sources/continue");
+const {
+  inspectGemini,
+  extractGeminiUserText,
+} = require("../src/sources/gemini");
 const { inspectAider, parseAiderHistory } = require("../src/sources/aider");
 const { inspectWindsurf } = require("../src/sources/windsurf");
 const { inspectCopilot } = require("../src/sources/copilot");
-const { inspectAmazonQ, extractAmazonQUserText } = require("../src/sources/amazonq");
-const { inspectAntigravity, extractAntigravityUserText } = require("../src/sources/antigravity");
+const {
+  inspectAmazonQ,
+  extractAmazonQUserText,
+} = require("../src/sources/amazonq");
+const {
+  inspectAntigravity,
+  extractAntigravityUserText,
+} = require("../src/sources/antigravity");
 const { inspectOpenCode } = require("../src/sources/opencode");
 const { inspectSources } = require("../src/inspect");
 
@@ -24,7 +36,11 @@ const range = dayBounds("2026-06-07", "2026-06-07");
 test("normalizeSources defaults to mainstream agent list", () => {
   assert.ok(DEFAULT_SOURCES.includes("cline"));
   assert.ok(DEFAULT_SOURCES.includes("gemini"));
-  assert.deepEqual(normalizeSources(undefined).slice(0, 3), ["codex", "claude", "cursor"]);
+  assert.deepEqual(normalizeSources(undefined).slice(0, 3), [
+    "codex",
+    "claude",
+    "cursor",
+  ]);
 });
 
 test("inspectCline reads ui_messages fixture", async () => {
@@ -49,7 +65,9 @@ test("inspectRoo reads ui_messages fixture", async () => {
 
 test("inspectContinue reads session JSON", async () => {
   assert.equal(
-    extractContinueUserText({ message: { role: "user", content: "hello continue" } }),
+    extractContinueUserText({
+      message: { role: "user", content: "hello continue" },
+    }),
     "hello continue",
   );
   const report = await inspectContinue({
@@ -62,7 +80,10 @@ test("inspectContinue reads session JSON", async () => {
 });
 
 test("inspectGemini reads chat JSON", async () => {
-  assert.equal(extractGeminiUserText({ type: "user", content: "hi gemini" }), "hi gemini");
+  assert.equal(
+    extractGeminiUserText({ type: "user", content: "hi gemini" }),
+    "hi gemini",
+  );
   assert.equal(extractGeminiUserText({ type: "gemini", content: "nope" }), "");
   const report = await inspectGemini({
     root: path.join(fixtures, "gemini", "tmp"),
@@ -74,7 +95,9 @@ test("inspectGemini reads chat JSON", async () => {
 });
 
 test("inspectAider parses chat history markdown", async () => {
-  const entries = parseAiderHistory(`# aider: user (2026-06-07 10:15:00)\nShip it\n`);
+  const entries = parseAiderHistory(
+    `# aider: user (2026-06-07 10:15:00)\nShip it\n`,
+  );
   assert.equal(entries.length, 1);
   assert.match(entries[0].text, /Ship it/);
   const report = await inspectAider({
@@ -108,7 +131,10 @@ test("inspectCopilot reads chat session JSON", async () => {
 });
 
 test("inspectAmazonQ reads LokiJS chat-history JSON", async () => {
-  assert.equal(extractAmazonQUserText({ type: "prompt", body: "hi q" }), "hi q");
+  assert.equal(
+    extractAmazonQUserText({ type: "prompt", body: "hi q" }),
+    "hi q",
+  );
   assert.equal(extractAmazonQUserText({ type: "answer", body: "nope" }), "");
   const report = await inspectAmazonQ({
     root: path.join(fixtures, "amazonq", "history"),
@@ -209,8 +235,12 @@ test("inspectOpenCode reads fixture opencode.db prompts and tokens", async () =>
   assert.ok(report.prompts.some((p) => p.text.includes("animation")));
 
   // session_file should include session slug for attribution
-  assert.ok(report.prompts.some((p) => p.session_file.includes("test-session-1")));
-  assert.ok(report.prompts.some((p) => p.session_file.includes("test-session-2")));
+  assert.ok(
+    report.prompts.some((p) => p.session_file.includes("test-session-1")),
+  );
+  assert.ok(
+    report.prompts.some((p) => p.session_file.includes("test-session-2")),
+  );
 
   // All prompts should have source and timestamps
   for (const prompt of report.prompts) {
@@ -252,7 +282,11 @@ test("inspectOpenCode filters prompts by date range", async () => {
   });
 
   assert.ok(wideReport.prompt_count > 0, "wide range should find prompts");
-  assert.equal(narrowReport.prompt_count, 0, "narrow range should find no prompts");
+  assert.equal(
+    narrowReport.prompt_count,
+    0,
+    "narrow range should find no prompts",
+  );
   assert.equal(narrowReport.token_totals.total_tokens, 0);
 });
 

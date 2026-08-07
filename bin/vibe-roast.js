@@ -94,7 +94,8 @@ function parseArgs(args) {
     const arg = args[i];
     if (!arg.startsWith("--")) continue;
     const key = arg.slice(2);
-    const value = args[i + 1] && !args[i + 1].startsWith("--") ? args[++i] : "true";
+    const value =
+      args[i + 1] && !args[i + 1].startsWith("--") ? args[++i] : "true";
     if (key === "from") opts.from = value;
     else if (key === "to") opts.to = value;
     else if (key === "sources") opts.sources = value;
