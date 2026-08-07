@@ -258,7 +258,7 @@ test("inspectOpenCode reads fixture opencode.db prompts and tokens", async () =>
 
 test("inspectOpenCode returns empty report for missing database", async () => {
   const report = await inspectOpenCode({
-    root: path.join(fixtures, "opencode", "nonexistent.db"),
+    root: path.join(os.tmpdir(), "vibe-roast-opencode-missing.db"),
   });
 
   assert.equal(report.source, "opencode");
