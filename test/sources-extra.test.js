@@ -8,13 +8,26 @@ const { dayBounds } = require("../src/lib/dates");
 const { DEFAULT_SOURCES, normalizeSources } = require("../src/sources");
 const { inspectCline } = require("../src/sources/cline");
 const { inspectRoo } = require("../src/sources/roo");
-const { inspectContinue, extractContinueUserText } = require("../src/sources/continue");
-const { inspectGemini, extractGeminiUserText } = require("../src/sources/gemini");
+const {
+  inspectContinue,
+  extractContinueUserText,
+} = require("../src/sources/continue");
+const {
+  inspectGemini,
+  extractGeminiUserText,
+} = require("../src/sources/gemini");
 const { inspectAider, parseAiderHistory } = require("../src/sources/aider");
 const { inspectWindsurf } = require("../src/sources/windsurf");
 const { inspectCopilot } = require("../src/sources/copilot");
-const { inspectAmazonQ, extractAmazonQUserText } = require("../src/sources/amazonq");
-const { inspectAntigravity, extractAntigravityUserText } = require("../src/sources/antigravity");
+const {
+  inspectAmazonQ,
+  extractAmazonQUserText,
+} = require("../src/sources/amazonq");
+const {
+  inspectAntigravity,
+  extractAntigravityUserText,
+} = require("../src/sources/antigravity");
+const { inspectOpenCode } = require("../src/sources/opencode");
 const { inspectSources } = require("../src/inspect");
 
 const fixtures = path.join(__dirname, "fixtures");
@@ -23,7 +36,11 @@ const range = dayBounds("2026-06-07", "2026-06-07");
 test("normalizeSources defaults to mainstream agent list", () => {
   assert.ok(DEFAULT_SOURCES.includes("cline"));
   assert.ok(DEFAULT_SOURCES.includes("gemini"));
-  assert.deepEqual(normalizeSources(undefined).slice(0, 3), ["codex", "claude", "cursor"]);
+  assert.deepEqual(normalizeSources(undefined).slice(0, 3), [
+    "codex",
+    "claude",
+    "cursor",
+  ]);
 });
 
 test("inspectCline reads ui_messages fixture", async () => {
@@ -48,7 +65,9 @@ test("inspectRoo reads ui_messages fixture", async () => {
 
 test("inspectContinue reads session JSON", async () => {
   assert.equal(
-    extractContinueUserText({ message: { role: "user", content: "hello continue" } }),
+    extractContinueUserText({
+      message: { role: "user", content: "hello continue" },
+    }),
     "hello continue",
   );
   const report = await inspectContinue({
@@ -61,7 +80,10 @@ test("inspectContinue reads session JSON", async () => {
 });
 
 test("inspectGemini reads chat JSON", async () => {
-  assert.equal(extractGeminiUserText({ type: "user", content: "hi gemini" }), "hi gemini");
+  assert.equal(
+    extractGeminiUserText({ type: "user", content: "hi gemini" }),
+    "hi gemini",
+  );
   assert.equal(extractGeminiUserText({ type: "gemini", content: "nope" }), "");
   const report = await inspectGemini({
     root: path.join(fixtures, "gemini", "tmp"),
@@ -73,7 +95,9 @@ test("inspectGemini reads chat JSON", async () => {
 });
 
 test("inspectAider parses chat history markdown", async () => {
-  const entries = parseAiderHistory(`# aider: user (2026-06-07 10:15:00)\nShip it\n`);
+  const entries = parseAiderHistory(
+    `# aider: user (2026-06-07 10:15:00)\nShip it\n`,
+  );
   assert.equal(entries.length, 1);
   assert.match(entries[0].text, /Ship it/);
   const report = await inspectAider({
@@ -107,7 +131,10 @@ test("inspectCopilot reads chat session JSON", async () => {
 });
 
 test("inspectAmazonQ reads LokiJS chat-history JSON", async () => {
-  assert.equal(extractAmazonQUserText({ type: "prompt", body: "hi q" }), "hi q");
+  assert.equal(
+    extractAmazonQUserText({ type: "prompt", body: "hi q" }),
+    "hi q",
+  );
   assert.equal(extractAmazonQUserText({ type: "answer", body: "nope" }), "");
   const report = await inspectAmazonQ({
     root: path.join(fixtures, "amazonq", "history"),
@@ -190,4 +217,94 @@ test("inspectSources merges mainstream agent fixtures", async () => {
   assert.ok(report.sources.amazonq.prompt_count >= 1);
   assert.ok(report.sources.antigravity.prompt_count >= 1);
   assert.ok(report.word_frequencies.length >= 1);
+});
+
+test("inspectOpenCode reads fixture opencode.db prompts and tokens", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  assert.equal(report.source, "opencode");
+  // Only session 1 (active) has 2 user messages; session 2 (archived) is excluded.
+  assert.equal(report.prompt_count, 2);
+  assert.equal(report.files_scanned, 1);
+
+  // Verify prompt texts are extracted
+  assert.ok(report.prompts.some((p) => p.text.includes("词云组件")));
+  assert.ok(report.prompts.some((p) => p.text.includes("animation")));
+
+  // session_file uses opaque "opencode:slug" pattern (no filesystem path)
+  assert.ok(
+    report.prompts.every((p) => p.session_file.startsWith("opencode:")),
+  );
+  assert.ok(
+    report.prompts.some((p) => p.session_file.includes("test-session-1")),
+  );
+
+  // All prompts should have source and timestamps
+  for (const prompt of report.prompts) {
+    assert.equal(prompt.source, "opencode");
+    assert.ok(prompt.timestamp);
+  }
+
+  // Token totals: only non-archived sessions in range
+  // ses_test001: input=15000 cache_read=8000 output=3000 reasoning=500 total=26500
+  assert.ok(report.token_totals.total_tokens > 0);
+  assert.ok(report.token_totals.input_tokens > 0);
+  assert.ok(report.token_totals.output_tokens > 0);
+  assert.ok(report.token_totals.reasoning_output_tokens > 0);
+});
+
+test("inspectOpenCode returns empty report for missing database", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(os.tmpdir(), "vibe-roast-opencode-missing.db"),
+  });
+
+  assert.equal(report.source, "opencode");
+  assert.equal(report.prompt_count, 0);
+  assert.equal(report.files_scanned, 0);
+  assert.equal(report.token_totals.total_tokens, 0);
+  // Missing DB is silent (no noise for non-OpenCode users).
+  assert.equal(report.notes.length, 0);
+});
+
+test("inspectOpenCode filters prompts by date range", async () => {
+  const wideReport = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  // Narrow range that excludes all fixture data
+  const narrowReport = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2025-01-01", "2025-01-02"),
+  });
+
+  assert.ok(wideReport.prompt_count >= 1, "wide range should find prompts");
+  assert.equal(
+    narrowReport.prompt_count,
+    0,
+    "narrow range should find no prompts",
+  );
+  assert.equal(narrowReport.token_totals.total_tokens, 0);
+});
+
+test("inspectOpenCode excludes archived sessions from token totals", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  // ses_test002 is archived (time_archived IS NOT NULL) — its tokens should NOT be counted
+  // Only ses_test001's tokens should be in the totals
+  assert.ok(report.token_totals.total_tokens > 0);
+  // ses_test001 expected: 15000 + 8000 + 0 + 3000 + 500 = 26500
+  assert.equal(report.token_totals.total_tokens, 26500);
+});
+
+test("inspectSources includes opencode as a known source", () => {
+  const { KNOWN_SOURCES, DEFAULT_SOURCES } = require("../src/sources");
+  assert.ok(KNOWN_SOURCES.includes("opencode"));
+  assert.ok(DEFAULT_SOURCES.includes("opencode"));
 });

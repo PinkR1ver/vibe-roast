@@ -61,6 +61,7 @@ async function main(argv) {
       copilot: opts.copilotRoot,
       amazonq: opts.amazonqRoot,
       antigravity: opts.antigravityRoot,
+      opencode: opts.opencodeRoot,
       tokenTrackerQueue: opts.tokenTrackerQueue,
     },
   });
@@ -83,6 +84,7 @@ function hasFixtureRoots(opts) {
     "copilotRoot",
     "amazonqRoot",
     "antigravityRoot",
+    "opencodeRoot",
   ].some((key) => opts[key]);
 }
 
@@ -92,7 +94,8 @@ function parseArgs(args) {
     const arg = args[i];
     if (!arg.startsWith("--")) continue;
     const key = arg.slice(2);
-    const value = args[i + 1] && !args[i + 1].startsWith("--") ? args[++i] : "true";
+    const value =
+      args[i + 1] && !args[i + 1].startsWith("--") ? args[++i] : "true";
     if (key === "from") opts.from = value;
     else if (key === "to") opts.to = value;
     else if (key === "sources") opts.sources = value;
@@ -109,6 +112,7 @@ function parseArgs(args) {
     else if (key === "copilot-root") opts.copilotRoot = value;
     else if (key === "amazonq-root") opts.amazonqRoot = value;
     else if (key === "antigravity-root") opts.antigravityRoot = value;
+    else if (key === "opencode-root") opts.opencodeRoot = value;
     else if (key === "token-tracker-queue") opts.tokenTrackerQueue = value;
   }
   return opts;

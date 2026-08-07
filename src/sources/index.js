@@ -11,6 +11,7 @@ const { inspectWindsurf } = require("./windsurf");
 const { inspectCopilot } = require("./copilot");
 const { inspectAmazonQ } = require("./amazonq");
 const { inspectAntigravity } = require("./antigravity");
+const { inspectOpenCode } = require("./opencode");
 
 const SOURCE_INSPECTORS = {
   codex: inspectCodex,
@@ -26,6 +27,7 @@ const SOURCE_INSPECTORS = {
   copilot: inspectCopilot,
   amazonq: inspectAmazonQ,
   antigravity: inspectAntigravity,
+  opencode: inspectOpenCode,
 };
 
 /** Primary + best-effort mainstream local agents. Missing dirs return empty counts. */
@@ -42,15 +44,21 @@ const DEFAULT_SOURCES = [
   "copilot",
   "amazonq",
   "antigravity",
+  "opencode",
 ];
 
 const KNOWN_SOURCES = Object.keys(SOURCE_INSPECTORS);
 
 function normalizeSources(sources) {
   if (typeof sources === "string") {
-    return sources.split(",").map((s) => s.trim()).filter(Boolean);
+    return sources
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
   }
-  return Array.isArray(sources) && sources.length > 0 ? sources : DEFAULT_SOURCES.slice();
+  return Array.isArray(sources) && sources.length > 0
+    ? sources
+    : DEFAULT_SOURCES.slice();
 }
 
 module.exports = {
