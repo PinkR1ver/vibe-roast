@@ -226,20 +226,20 @@ test("inspectOpenCode reads fixture opencode.db prompts and tokens", async () =>
   });
 
   assert.equal(report.source, "opencode");
-  assert.equal(report.prompt_count, 3);
+  // Only session 1 (active) has 2 user messages; session 2 (archived) is excluded.
+  assert.equal(report.prompt_count, 2);
   assert.equal(report.files_scanned, 1);
 
   // Verify prompt texts are extracted
   assert.ok(report.prompts.some((p) => p.text.includes("词云组件")));
-  assert.ok(report.prompts.some((p) => p.text.includes("useDebounce")));
   assert.ok(report.prompts.some((p) => p.text.includes("animation")));
 
-  // session_file should include session slug for attribution
+  // session_file uses opaque "opencode:slug" pattern (no filesystem path)
   assert.ok(
-    report.prompts.some((p) => p.session_file.includes("test-session-1")),
+    report.prompts.every((p) => p.session_file.startsWith("opencode:")),
   );
   assert.ok(
-    report.prompts.some((p) => p.session_file.includes("test-session-2")),
+    report.prompts.some((p) => p.session_file.includes("test-session-1")),
   );
 
   // All prompts should have source and timestamps
@@ -265,8 +265,8 @@ test("inspectOpenCode returns empty report for missing database", async () => {
   assert.equal(report.prompt_count, 0);
   assert.equal(report.files_scanned, 0);
   assert.equal(report.token_totals.total_tokens, 0);
-  assert.ok(report.notes.length > 0);
-  assert.match(report.notes[0], /No readable/);
+  // Missing DB is silent (no noise for non-OpenCode users).
+  assert.equal(report.notes.length, 0);
 });
 
 test("inspectOpenCode filters prompts by date range", async () => {
@@ -281,7 +281,7 @@ test("inspectOpenCode filters prompts by date range", async () => {
     range: dayBounds("2025-01-01", "2025-01-02"),
   });
 
-  assert.ok(wideReport.prompt_count > 0, "wide range should find prompts");
+  assert.ok(wideReport.prompt_count >= 1, "wide range should find prompts");
   assert.equal(
     narrowReport.prompt_count,
     0,
