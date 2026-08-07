@@ -11,6 +11,7 @@ const { inspectWindsurf } = require("./windsurf");
 const { inspectCopilot } = require("./copilot");
 const { inspectAmazonQ } = require("./amazonq");
 const { inspectAntigravity } = require("./antigravity");
+const { inspectOpenCode } = require("./opencode");
 
 const SOURCE_INSPECTORS = {
   codex: inspectCodex,
@@ -26,6 +27,7 @@ const SOURCE_INSPECTORS = {
   copilot: inspectCopilot,
   amazonq: inspectAmazonQ,
   antigravity: inspectAntigravity,
+  opencode: inspectOpenCode,
 };
 
 /** Primary + best-effort mainstream local agents. Missing dirs return empty counts. */
@@ -42,6 +44,7 @@ const DEFAULT_SOURCES = [
   "copilot",
   "amazonq",
   "antigravity",
+  "opencode",
 ];
 
 const KNOWN_SOURCES = Object.keys(SOURCE_INSPECTORS);

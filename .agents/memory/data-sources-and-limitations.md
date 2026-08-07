@@ -19,7 +19,7 @@ Prompt adapters return a report shaped like:
 }
 ```
 
-`src/sources/index.js` is the registry and default-source list. The default inspect covers Codex, Claude, Cursor, Cline, Roo, Continue, Gemini, Aider, Windsurf, Copilot, Amazon Q, and Antigravity. `vibe-tracker` is registered but not part of the default list.
+`src/sources/index.js` is the registry and default-source list. The default inspect covers Codex, Claude, Cursor, Cline, Roo, Continue, Gemini, Aider, Windsurf, Copilot, Amazon Q, Antigravity, and OpenCode. `vibe-tracker` is registered but not part of the default list.
 
 ## Reliability by source
 
@@ -36,6 +36,7 @@ Prompt adapters return a report shaped like:
 | Copilot Chat | VS Code-family storage JSON | Best-effort across changing session containers. |
 | Amazon Q | LokiJS chat-history JSON | Only prompt/user rows are profile input. |
 | Antigravity | plaintext JSON exports | Binary `.pb` conversations are skipped. |
+| OpenCode | SQLite `opencode.db` | Requires local `sqlite3`; prompt text extracted from `message` + `part` tables joined on user role and text type. Archived sessions excluded from token totals. |
 | TokenTracker | append-only `queue.jsonl` | Activity-only; latest `(source, model, hour_start)` wins before daily aggregation. |
 | Vibe tracker | `~/.vibe-roast/sessions.jsonl` | Optional explicit-hook sink; its synthetic session summaries must not be mistaken for authored prompts. |
 

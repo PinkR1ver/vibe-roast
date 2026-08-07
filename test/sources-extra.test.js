@@ -15,6 +15,7 @@ const { inspectWindsurf } = require("../src/sources/windsurf");
 const { inspectCopilot } = require("../src/sources/copilot");
 const { inspectAmazonQ, extractAmazonQUserText } = require("../src/sources/amazonq");
 const { inspectAntigravity, extractAntigravityUserText } = require("../src/sources/antigravity");
+const { inspectOpenCode } = require("../src/sources/opencode");
 const { inspectSources } = require("../src/inspect");
 
 const fixtures = path.join(__dirname, "fixtures");
@@ -190,4 +191,86 @@ test("inspectSources merges mainstream agent fixtures", async () => {
   assert.ok(report.sources.amazonq.prompt_count >= 1);
   assert.ok(report.sources.antigravity.prompt_count >= 1);
   assert.ok(report.word_frequencies.length >= 1);
+});
+
+test("inspectOpenCode reads fixture opencode.db prompts and tokens", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  assert.equal(report.source, "opencode");
+  assert.equal(report.prompt_count, 3);
+  assert.equal(report.files_scanned, 1);
+
+  // Verify prompt texts are extracted
+  assert.ok(report.prompts.some((p) => p.text.includes("词云组件")));
+  assert.ok(report.prompts.some((p) => p.text.includes("useDebounce")));
+  assert.ok(report.prompts.some((p) => p.text.includes("animation")));
+
+  // session_file should include session slug for attribution
+  assert.ok(report.prompts.some((p) => p.session_file.includes("test-session-1")));
+  assert.ok(report.prompts.some((p) => p.session_file.includes("test-session-2")));
+
+  // All prompts should have source and timestamps
+  for (const prompt of report.prompts) {
+    assert.equal(prompt.source, "opencode");
+    assert.ok(prompt.timestamp);
+  }
+
+  // Token totals: only non-archived sessions in range
+  // ses_test001: input=15000 cache_read=8000 output=3000 reasoning=500 total=26500
+  assert.ok(report.token_totals.total_tokens > 0);
+  assert.ok(report.token_totals.input_tokens > 0);
+  assert.ok(report.token_totals.output_tokens > 0);
+  assert.ok(report.token_totals.reasoning_output_tokens > 0);
+});
+
+test("inspectOpenCode returns empty report for missing database", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "nonexistent.db"),
+  });
+
+  assert.equal(report.source, "opencode");
+  assert.equal(report.prompt_count, 0);
+  assert.equal(report.files_scanned, 0);
+  assert.equal(report.token_totals.total_tokens, 0);
+  assert.ok(report.notes.length > 0);
+  assert.match(report.notes[0], /No readable/);
+});
+
+test("inspectOpenCode filters prompts by date range", async () => {
+  const wideReport = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  // Narrow range that excludes all fixture data
+  const narrowReport = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2025-01-01", "2025-01-02"),
+  });
+
+  assert.ok(wideReport.prompt_count > 0, "wide range should find prompts");
+  assert.equal(narrowReport.prompt_count, 0, "narrow range should find no prompts");
+  assert.equal(narrowReport.token_totals.total_tokens, 0);
+});
+
+test("inspectOpenCode excludes archived sessions from token totals", async () => {
+  const report = await inspectOpenCode({
+    root: path.join(fixtures, "opencode", "opencode.db"),
+    range: dayBounds("2026-06-09", "2026-06-11"),
+  });
+
+  // ses_test002 is archived (time_archived IS NOT NULL) — its tokens should NOT be counted
+  // Only ses_test001's tokens should be in the totals
+  assert.ok(report.token_totals.total_tokens > 0);
+  // ses_test001 expected: 15000 + 8000 + 0 + 3000 + 500 = 26500
+  assert.equal(report.token_totals.total_tokens, 26500);
+});
+
+test("inspectSources includes opencode as a known source", () => {
+  const { KNOWN_SOURCES, DEFAULT_SOURCES } = require("../src/sources");
+  assert.ok(KNOWN_SOURCES.includes("opencode"));
+  assert.ok(DEFAULT_SOURCES.includes("opencode"));
 });

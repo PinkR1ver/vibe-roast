@@ -14,6 +14,7 @@ Last synchronized: 2026-07-27
 | One-click GitHub OAuth identity session | completed | `github-oauth-session.md` |
 | Hosted Cloudflare Workers AI free roast | completed | `hosted-free-ai-roast.md` |
 | Reproducible launch promo video | completed | `promo-motion-video.md` |
+| OpenCode source adapter and word cloud | completed | `opencode-source-adapter.md` |
 | npm release entrypoint | completed | `../memory/npm-release-entrypoint.md` |
 
 ## Historical foundation

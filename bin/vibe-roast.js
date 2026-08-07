@@ -61,6 +61,7 @@ async function main(argv) {
       copilot: opts.copilotRoot,
       amazonq: opts.amazonqRoot,
       antigravity: opts.antigravityRoot,
+      opencode: opts.opencodeRoot,
       tokenTrackerQueue: opts.tokenTrackerQueue,
     },
   });
@@ -83,6 +84,7 @@ function hasFixtureRoots(opts) {
     "copilotRoot",
     "amazonqRoot",
     "antigravityRoot",
+    "opencodeRoot",
   ].some((key) => opts[key]);
 }
 
@@ -109,6 +111,7 @@ function parseArgs(args) {
     else if (key === "copilot-root") opts.copilotRoot = value;
     else if (key === "amazonq-root") opts.amazonqRoot = value;
     else if (key === "antigravity-root") opts.antigravityRoot = value;
+    else if (key === "opencode-root") opts.opencodeRoot = value;
     else if (key === "token-tracker-queue") opts.tokenTrackerQueue = value;
   }
   return opts;
