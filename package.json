@@ -62,7 +62,7 @@
     "access": "public"
   },
   "dependencies": {
-    "tokentracker-cli": "^0.87.8"
+    "tokentracker-cli": "^0.99.0"
   },
   "license": "MIT",
   "devDependencies": {
@@ -71,6 +71,6 @@
     "eslint": "9.39.5",
     "eslint-plugin-react": "7.37.5",
     "globals": "16.5.0",
-    "prettier": "3.9.6"
+    "prettier": "3.9.9"
   }
 }
